@@ -1,0 +1,17 @@
+node_modules/
+dist/
+build/
+.cache/
+.env
+.env.*
+!.env.example
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# szerkesztők
+.vscode/
+.idea/
+*.swp
