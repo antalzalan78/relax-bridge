@@ -5,28 +5,32 @@
    --------------------------------------------------------------- */
 
 /*
- * A paletta a logobol jon: zold #56b44a, lila #8755b6, narancs #fdaa38.
- * A logo sajat zoldje vilagos hatteren csak 2,47:1 kontrasztu, ezert szoveghez
- * es gombhoz egy sotetebb valtozatot hasznalunk; a logo zoldje dekoracio marad.
- * Az ertekeket a scripts/check-contrast.mjs ellenorzi.
+ * Meleg, vilagos paletta: homok, terrakotta es mez.
+ *
+ * A kiindulopont a logo narancsa — ez az egyetlen meleg szine, es ehhez
+ * illeszkedik a tobbi. A logo sajat szinei tul vilagosak szoveghez (a narancs
+ * vilagos hatteren 1,81:1), ezert a felulet sotetebb, telitett valtozatokat
+ * hasznal, es a logo a sajat szineivel marad meg markajelkent.
+ *
+ * Minden itt szereplo szoveg- es gombszin legalabb 4,5:1 kontrasztu.
+ * Ellenorzes: node scripts/check-contrast.mjs
  */
 :root {
-  --brand: #35782c; /* 5,11:1 — szoveghez is jo */
-  --brand-dark: #2d6626;
-  --brand-logo: #56b44a; /* a logo zoldje, csak dekoracio */
-  --brand-soft: #e9f4e5;
+  --brand: #9c4f28; /* terrakotta, 5,58:1 */
+  --brand-dark: #8a4522; /* 6,73:1 — lebegtetesre */
+  --brand-soft: #f7e9df;
 
-  --accent: #8755b6; /* a logo lilaja, 4,95:1 */
-  --accent-soft: #f0e9f7;
+  --accent: #9c6210; /* mez, 4,77:1 */
+  --accent-soft: #f8eddb;
 
-  --warm: #fdaa38; /* a logo narancsa, csak dekoracio */
+  --warm: #e0973f; /* meleg borostyan, csak dekoracio */
 
-  --bg: #faf8f5;
-  --bg-raised: #ffffff;
-  --border: #e4dfd7;
+  --bg: #fdf8f2;
+  --bg-raised: #fffdfa;
+  --border: #eaddd0;
 
-  --text: #23282b;
-  --text-muted: #5d6669;
+  --text: #332822; /* meleg sotetbarna, 13,55:1 */
+  --text-muted: #6f6154; /* 5,66:1 */
 
   --radius: 14px;
   --radius-sm: 8px;
@@ -39,24 +43,23 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --brand: #7fd06f; /* 9,56:1 sotet hatteren */
-    --brand-dark: #a4e094;
-    --brand-logo: #56b44a;
-    --brand-soft: #1b2a19;
+    --brand: #e59468; /* halvany terrakotta, 7,42:1 sotet hatteren */
+    --brand-dark: #eda877;
+    --brand-soft: #2c211a;
 
-    --accent: #b98ee0; /* 6,86:1 */
-    --accent-soft: #241c2e;
+    --accent: #e0973f; /* 7,33:1 */
+    --accent-soft: #2a2018;
 
     --warm: #fdaa38;
 
-    --bg: #14171a;
-    --bg-raised: #1b1f22;
-    --border: #2c3236;
+    --bg: #1c1714;
+    --bg-raised: #241d19;
+    --border: #3a302a;
 
-    --text: #e8e6e2;
-    --text-muted: #a1a9ad;
+    --text: #f0e7dd;
+    --text-muted: #b3a496;
 
-    --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -12px rgb(0 0 0 / 0.6);
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.35), 0 8px 24px -12px rgb(0 0 0 / 0.7);
   }
 }
 
@@ -206,12 +209,13 @@ img {
   color: #fff;
 }
 
+/* Sotet temaban a gomb hattere vilagos, ezert sotet felirat kell ra. */
 @media (prefers-color-scheme: dark) {
   .btn--primary {
-    color: #10201a;
+    color: #1c1714;
   }
   .btn--primary:hover {
-    color: #10201a;
+    color: #1c1714;
   }
 }
 

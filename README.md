@@ -56,10 +56,26 @@ Ez kikulcsolja a fehéret (sötét témában különben fehér téglalapként l�
 és legyártja a `logo.png`, `logo-mark.png`, favikon- és megosztásképeket.
 Csak akkor kell újra futtatni, ha a forráslogó változik.
 
-A színpaletta a logóból jön: zöld `#56b44a`, lila `#8755b6`, narancs `#fdaa38`.
-A logó saját zöldje világos háttéren csak 2,47:1 kontrasztú, ezért szöveghez és
-gombhoz egy sötétebb változat megy (`#35782c`, 5,11:1), a logó zöldje pedig
-dekoráció marad. Az arányokat ellenőrizni:
+## Színek
+
+Meleg, világos paletta — homok, terrakotta és méz —, hogy a hangulat a
+masszázshoz és a relaxációhoz illeszkedjen.
+
+| Szerep | Világos téma | Kontraszt | Sötét téma |
+| --- | --- | --- | --- |
+| háttér | `#fdf8f2` | — | `#1c1714` |
+| szöveg | `#332822` | 13,55:1 | `#f0e7dd` |
+| halvány szöveg | `#6f6154` | 5,66:1 | `#b3a496` |
+| linkek, gombok | `#9c4f28` | 5,58:1 | `#e59468` |
+| kiemelés | `#9c6210` | 4,77:1 | `#e0973f` |
+| dekoráció | `#e0973f` | csak díszítés | `#fdaa38` |
+
+A kiindulópont a logó narancsa — ez az egyetlen meleg szín benne. A logó saját
+színei szövegnek túl világosak (a narancs világos háttéren 1,81:1), ezért a
+felület sötétebb, telítettebb változatokat használ, a logó pedig megmarad a
+saját színeivel márkajelként.
+
+Minden szöveg- és gombszín legalább 4,5:1 kontrasztú (WCAG AA). Ellenőrzés:
 
 ```bash
 node scripts/check-contrast.mjs

@@ -18,19 +18,29 @@ const ratio = (a, b) => {
   return (hi + 0.05) / (lo + 0.05);
 };
 
-const backgrounds = { vilagos: '#faf8f5', sotet: '#14171a' };
+const backgrounds = { vilagos: '#fdf8f2', sotet: '#1c1714' };
 
 const candidates = {
-  'logo zold': '#56b44a',
-  'zold -1': '#3f8f38',
-  'zold -2': '#35782c',
-  'zold -3': '#2d6626',
-  'logo lila': '#8755b6',
-  'lila -1': '#7a49a8',
+  // meleg szovegszinek
+  'meleg sotetbarna (szoveg)': '#332822',
+  'meleg szurkesbarna (halvany szoveg)': '#6f6154',
+  // terrakotta / agyag — fo interaktiv szin
+  'terrakotta': '#c2673a',
+  'terrakotta -1': '#b05c31',
+  'terrakotta -2': '#9c4f28',
+  'terrakotta -3': '#8a4522',
+  // meleg borostyan / mez
+  'borostyan': '#e0973f',
+  'borostyan -2': '#b9761f',
+  'borostyan -3': '#9c6210',
+  // a logo sajat szinei
   'logo narancs': '#fdaa38',
-  'narancs -2': '#b56f00',
-  'vilagos zold (sotet temara)': '#7fd06f',
-  'vilagos lila (sotet temara)': '#b98ee0',
+  'logo zold': '#56b44a',
+  'logo lila': '#8755b6',
+  // sotet temara szant vilagos, meleg arnyalatok
+  'homok (sotet temara)': '#f2c9a0',
+  'barack (sotet temara)': '#eda877',
+  'halvany terrakotta (sotet temara)': '#e59468',
 };
 
 for (const [bgName, bg] of Object.entries(backgrounds)) {

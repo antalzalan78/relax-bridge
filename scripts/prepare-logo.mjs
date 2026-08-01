@@ -147,7 +147,8 @@ await sharp({
     width: 1200,
     height: 630,
     channels: 4,
-    background: { r: 250, g: 248, b: 245, alpha: 1 },
+    // Ugyanaz a meleg krem, mint az oldal hattere (--bg: #fdf8f2).
+    background: { r: 253, g: 248, b: 242, alpha: 1 },
   },
 })
   .composite([
