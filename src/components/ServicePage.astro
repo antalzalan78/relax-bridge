@@ -1,0 +1,90 @@
+---
+import { render } from 'astro:content';
+import { site, pathFor, type Locale } from '../data/site';
+import { anchors } from '../data/routes';
+import { t } from '../i18n';
+import {
+  getServices,
+  servicePath,
+  serviceAlternates,
+  type Service,
+} from '../lib/services';
+import { localBusinessSchema, serviceSchema } from '../lib/schema';
+import Base from '../layouts/Base.astro';
+import PriceTable from './PriceTable.astro';
+import ServiceCard from './ServiceCard.astro';
+
+interface Props {
+  locale: Locale;
+  service: Service;
+}
+
+const { locale, service } = Astro.props;
+const d = t(locale);
+const { title, summary, category, slug, key } = service.data;
+
+const path = servicePath(locale, category, slug);
+const alternates = await serviceAlternates(key, category);
+const { Content } = await render(service);
+
+const siblings = (await getServices(locale)).filter(
+  (s) => !(s.data.key === key && s.data.category === category),
+);
+
+const pageTitle = `${title} — ${site.name} | ${site.city}`;
+
+const jsonLd = [
+  localBusinessSchema(locale, d.meta.description),
+  serviceSchema(service, new URL(path, site.url).href),
+];
+---
+
+<Base
+  locale={locale}
+  title={pageTitle}
+  description={summary}
+  path={path}
+  alternates={alternates}
+  jsonLd={jsonLd}
+>
+  <article class="wrap wrap--narrow section">
+    <p>
+      <a href={`${pathFor(locale)}#${anchors.services}`}>
+        &larr; {d.service.backToAll}
+      </a>
+    </p>
+
+    <span class="badge">
+      {category === 'studio' ? d.service.studioBadge : d.service.homeBadge}
+    </span>
+    <h1>{title}</h1>
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    <h2 style="margin-top:2.5rem">{d.service.pricesHeading}</h2>
+    <PriceTable
+      locale={locale}
+      caption={title}
+      services={[service]}
+      linked={false}
+    />
+
+    <div class="btn-row">
+      <a class="btn btn--primary" href={site.whatsapp} rel="noopener">
+        {d.service.bookCta}
+      </a>
+      <a class="btn btn--ghost" href={site.giftCardUrl} rel="noopener">
+        {d.nav.giftCard}
+      </a>
+    </div>
+  </article>
+
+  <section class="wrap section">
+    <h2>{d.service.otherServices}</h2>
+    <div class="grid grid--3">
+      {siblings.map((s) => <ServiceCard locale={locale} service={s} />)}
+    </div>
+  </section>
+</Base>

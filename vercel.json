@@ -1,0 +1,41 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/relaxmassage",
+      "destination": "/massage/relaxmassage",
+      "permanent": true
+    },
+    {
+      "source": "/nek-schouder-rugmassage-1",
+      "destination": "/massage/nek-schouder-rugmassage",
+      "permanent": true
+    },
+    {
+      "source": "/gezichtsmassage",
+      "destination": "/massage/gezichtsmassage",
+      "permanent": true
+    },
+    {
+      "source": "/voetmassage",
+      "destination": "/massage/voetmassage",
+      "permanent": true
+    },
+    {
+      "source": "/relaxmassage-2",
+      "destination": "/home-service/relaxmassage",
+      "permanent": true
+    },
+    {
+      "source": "/nek-schouder-rugmassage",
+      "destination": "/home-service/nek-schouder-rugmassage",
+      "permanent": true
+    },
+    {
+      "source": "/pages/cookie-policy",
+      "destination": "/",
+      "permanent": true
+    }
+  ]
+}

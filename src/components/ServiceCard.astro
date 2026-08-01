@@ -1,0 +1,29 @@
+---
+import type { Locale } from '../data/site';
+import { t } from '../i18n';
+import { servicePath, type Service } from '../lib/services';
+
+interface Props {
+  locale: Locale;
+  service: Service;
+}
+
+const { locale, service } = Astro.props;
+const d = t(locale);
+const { title, summary, category, slug, prices } = service.data;
+const cheapest = Math.min(...prices.map((p) => p.eur));
+---
+
+<a
+  class="card card--link"
+  href={servicePath(locale, category, slug)}
+>
+  <span class="badge">
+    {category === 'studio' ? d.service.studioBadge : d.service.homeBadge}
+  </span>
+  <h3>{title}</h3>
+  <p>{summary}</p>
+  <span class="card__foot">
+    {d.prices.from} &euro; {cheapest}
+  </span>
+</a>

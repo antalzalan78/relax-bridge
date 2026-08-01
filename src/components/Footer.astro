@@ -1,0 +1,85 @@
+---
+import { site, pathFor, type Locale } from '../data/site';
+import { t } from '../i18n';
+import { getServices, servicePath } from '../lib/services';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const d = t(locale);
+const studio = await getServices(locale, 'studio');
+const home = await getServices(locale, 'home');
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="grid grid--3">
+      <div>
+        <h3>{d.nav.studio}</h3>
+        <ul>
+          {
+            studio.map((s) => (
+              <li>
+                <a href={servicePath(locale, 'studio', s.data.slug)}>
+                  {s.data.title}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div>
+        <h3>{d.nav.homeService}</h3>
+        <ul>
+          {
+            home.map((s) => (
+              <li>
+                <a href={servicePath(locale, 'home', s.data.slug)}>
+                  {s.data.title}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div>
+        <h3>{d.contact.heading}</h3>
+        <ul>
+          <li>
+            <a href={site.whatsapp} rel="noopener">
+              WhatsApp {site.phoneDisplay}
+            </a>
+          </li>
+          {site.email && (
+            <li>
+              <a href={`mailto:${site.email}`}>{site.email}</a>
+            </li>
+          )}
+          <li>{d.contact.areaBody}</li>
+        </ul>
+
+        <h3 style="margin-top:1.5rem">{d.contact.follow}</h3>
+        <ul>
+          <li><a href={site.social.instagram} rel="noopener">Instagram</a></li>
+          <li><a href={site.social.facebook} rel="noopener">Facebook</a></li>
+          <li><a href={site.playlists.spotify} rel="noopener">Spotify</a></li>
+          <li>
+            <a href={site.playlists.youtubeMusic} rel="noopener">
+              YouTube Music
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="site-footer__bottom">
+      <span>&copy; {year} {site.name}. {d.footer.rights}</span>
+      <a href={pathFor(locale)}>www.relaxbridge.nl</a>
+    </div>
+  </div>
+</footer>

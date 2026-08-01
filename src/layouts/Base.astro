@@ -1,0 +1,43 @@
+---
+import { localeTags, type Locale } from '../data/site';
+import Seo from '../components/Seo.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+
+interface Props {
+  locale: Locale;
+  title: string;
+  description: string;
+  path: string;
+  alternates: Partial<Record<Locale, string>>;
+  jsonLd?: Record<string, unknown>[];
+}
+
+const { locale, title, description, path, alternates, jsonLd } = Astro.props;
+---
+
+<!doctype html>
+<html lang={localeTags[locale]}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <Seo
+      locale={locale}
+      title={title}
+      description={description}
+      path={path}
+      alternates={alternates}
+      jsonLd={jsonLd}
+    />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Direct naar de inhoud</a>
+    <Header locale={locale} alternates={alternates} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer locale={locale} />
+  </body>
+</html>

@@ -1,0 +1,29 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection } from 'astro:content';
+import type { Locale } from '../../../data/site';
+import { categoryPath } from '../../../data/routes';
+import ServicePage from '../../../components/ServicePage.astro';
+
+/** Az angol es a magyar kezelesek: /en/massage/... es /hu/masszazs/... */
+export const getStaticPaths = (async () => {
+  const services = await getCollection('services');
+  return services
+    .filter((s) => s.data.lang !== 'nl')
+    .map((service) => {
+      const lang = service.data.lang as Exclude<Locale, 'nl'>;
+      return {
+        params: {
+          lang,
+          category: categoryPath[lang][service.data.category],
+          slug: service.data.slug,
+        },
+        props: { service, lang },
+      };
+    });
+}) satisfies GetStaticPaths;
+
+const { service, lang } = Astro.props;
+---
+
+<ServicePage locale={lang} service={service} />

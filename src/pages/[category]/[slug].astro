@@ -1,0 +1,24 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection } from 'astro:content';
+import { categoryPath } from '../../data/routes';
+import ServicePage from '../../components/ServicePage.astro';
+
+/** A holland kezelesek eloteg nelkul: /massage/... es /home-service/... */
+export const getStaticPaths = (async () => {
+  const services = await getCollection('services');
+  return services
+    .filter((s) => s.data.lang === 'nl')
+    .map((service) => ({
+      params: {
+        category: categoryPath.nl[service.data.category],
+        slug: service.data.slug,
+      },
+      props: { service },
+    }));
+}) satisfies GetStaticPaths;
+
+const { service } = Astro.props;
+---
+
+<ServicePage locale="nl" service={service} />

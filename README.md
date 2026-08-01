@@ -1,47 +1,97 @@
 # Relax Bridge
 
-A [relaxbridge.nl](https://www.relaxbridge.nl/) weboldal forrása.
+A [relaxbridge.nl](https://www.relaxbridge.nl/) weboldala. Astro alapú statikus
+oldal, három nyelven, Vercelre telepítve.
 
-Jelenlegi állapot: **archívum + előkészítés**. Az élő oldal még a Strikingly nevű
-szerkesztőn fut; ez a repo egyelőre a régi oldal mentését és a tartalmat tárolja,
-hogy a teljes átépítés ne nulláról induljon.
+A régi, Strikingly-alapú oldal mentése a `snapshot/` és `content/` mappában
+maradt meg — abból készült ez az átépítés.
 
-## Mi van a repóban
+## Indítás
 
-| Mappa | Tartalom |
+```bash
+npm install
+npm run dev
+```
+
+A fejlesztői szerver a <http://localhost:4321> címen fut.
+
+| Parancs | Mit csinál |
 | --- | --- |
-| `snapshot/nl`, `snapshot/en`, `snapshot/hu` | A régi oldal összes aloldalának nyers HTML mentése, mindhárom nyelven (2026-08-01) |
-| `snapshot/assets/` | A CDN-ről visszaszedett eredeti, teljes felbontású képek |
-| `content/nl`, `content/en`, `content/hu` | Az oldalanként kinyert **tiszta szöveg** — ez megy majd át az új oldalra |
-| `AUDIT.md` | A régi oldal átvizsgálása: mi hiányzik, mi hibás, mit kell javítani |
+| `npm run dev` | fejlesztői szerver, mentésre azonnal frissül |
+| `npm run build` | legyártja a kész oldalt a `dist/` mappába |
+| `npm run preview` | a legyártott oldalt szolgálja ki, telepítés előtti ellenőrzésre |
 
-A `snapshot/` fájlok gépi mentések, nem szerkesztendők. A tartalmi munkát a
-`content/` alatt érdemes végezni.
+## Felépítés
 
-## Az oldal jelenlegi felépítése
+```
+src/
+├── data/site.ts          MINDEN elérhetőség egy helyen — telefon, e-mail, közösségi média
+├── data/routes.ts        az URL-ek nyelvenkénti szegmensei
+├── i18n/{nl,en,hu}.ts    a felület szövegei nyelvenként
+├── content/services/     a kezelések: 6 kezelés × 3 nyelv, markdown fájlban
+├── components/           a megjelenítés
+├── layouts/Base.astro    a közös oldalváz (fejléc, lábléc, meta adatok)
+└── pages/                az útvonalak
+```
 
-Három nyelvi verzió külön aldomainen:
+**Ha szöveget kell módosítani**, két hely van:
 
-- `www.relaxbridge.nl` — holland
-- `en.relaxbridge.nl` — angol
-- `hu.relaxbridge.nl` — magyar
+- egy kezelés leírása vagy ára → `src/content/services/<nyelv>/<fájl>.md`
+- bármi más felirat → `src/i18n/<nyelv>.ts`
 
-Szolgáltatások (mindhárom nyelven élő):
+**Ha elérhetőség változik**, csak a `src/data/site.ts` fájlt kell átírni. Ez
+szándékos: a régi oldalon a telefonszám szét volt szórva, és két hibás változat
+is bent maradt belőle.
 
-- **Studio visit** — Relaxmassage, Nek-Schouder-Rugmassage, Gezichtsmassage, Voetmassage
-- **Home service** — Relaxmassage, Nek-Schouder-Rugmassage
+## URL-ek
 
-Külső szolgáltatások, amiket az oldal használ:
+A holland az alapértelmezett nyelv, előtag nélkül. 21 oldal készül.
 
-- Ajándékutalvány: SumUp
-- Kapcsolat: WhatsApp (+31 6 53964923) és beépített űrlap
-- Zenei lejátszási listák: Spotify, YouTube Music
+| | holland | angol | magyar |
+| --- | --- | --- | --- |
+| főoldal | `/` | `/en` | `/hu` |
+| stúdió | `/massage/…` | `/en/massage/…` | `/hu/masszazs/…` |
+| házhoz | `/home-service/…` | `/en/home-service/…` | `/hu/hazhoz/…` |
 
-## Következő lépés
+A régi oldal aloldalai (`/relaxmassage`, `/voetmassage`, …) a `vercel.json`
+fájlban 301-es átirányítást kaptak az új helyükre, hogy a meglévő linkek és a
+Google-találatok ne törjenek el.
 
-Teljes átépítés saját kódbázisra. A technológiai döntés még nyitott.
+## SEO
 
-## A mentés újrafuttatása
+Ami a régi oldalról hiányzott, és most benne van:
 
-A `snapshot/` és a `content/` a régi oldal automatikus mentése. Amíg az élő oldal
-a Strikinglyn fut, frissíthető — a lépések az `AUDIT.md` végén vannak.
+- oldalanként saját cím és leírás, bennük a `massage` és a `Tilburg` szóval
+- `hreflang` a három nyelvi változat között, `x-default`-tal
+- `LocalBusiness` strukturált adat (`HealthAndBeautyBusiness` + `MassageTherapy`)
+  és `FAQPage` a „Jó tudni" blokkból, kezelésenként `Service` az árakkal
+- oldalanként pontosan egy `<h1>`
+- `alt` szöveg minden képen
+- `sitemap-index.xml` és `robots.txt`
+
+## Telepítés Vercelre
+
+1. Vercelen „New Project", a `relax-bridge` GitHub-repo importálása.
+2. A keretrendszert magától felismeri (Astro). Külön beállítás nem kell.
+3. Domain: a `www.relaxbridge.nl` és a `relaxbridge.nl` rákötése.
+4. **A régi nyelvi aldomainek** (`en.relaxbridge.nl`, `hu.relaxbridge.nl`) is
+   vegyük fel domainként, átirányítással a `www.relaxbridge.nl/en`, illetve
+   `/hu` címre. Enélkül a régi linkek és a Google-találatok eltörnek.
+
+Minden `main`-re push automatikusan új verziót telepít.
+
+## Ami még hiányzik
+
+A `src/data/site.ts` fájlban `TODO` jelöléssel:
+
+- **e-mail cím** — a régi oldalon üresen állt, a sablonban pedig egy nem létező
+  `info@relaxbridge.com` maradt. Amíg nincs valódi cím, sehol nem jelenik meg.
+- **a stúdió pontos címe** és a **nyitvatartás** — ezek nélkül a strukturált
+  adat hiányos, és a Google Cégprofil sem tud rendesen bekötni.
+- **foglalórendszer** — jelenleg a WhatsApp az egyetlen út. A `bookingUrl`
+  kitöltésével köthető be.
+
+Ezen felül: **„rólam" rész és vélemények.** Masszázsnál ez dönt a bizalomról, és
+a régi oldalon egyik sem volt. A fotók megvannak hozzá, a szöveg hiányzik.
+
+A régi oldal további hibái az [AUDIT.md](AUDIT.md) fájlban.

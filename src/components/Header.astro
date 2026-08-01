@@ -1,0 +1,48 @@
+---
+import { site, locales, pathFor, localeNames, type Locale } from '../data/site';
+import { anchors } from '../data/routes';
+import { t } from '../i18n';
+
+interface Props {
+  locale: Locale;
+  alternates: Partial<Record<Locale, string>>;
+}
+
+const { locale, alternates } = Astro.props;
+const d = t(locale);
+const home = pathFor(locale);
+---
+
+<header class="site-header">
+  <div class="wrap site-header__inner">
+    <a class="brand" href={home}>{site.name}</a>
+
+    <nav class="nav" aria-label={d.nav.menu}>
+      <a href={`${home}#${anchors.services}`}>{d.nav.studio}</a>
+      <a href={`${home}#${anchors.prices}`}>{d.nav.prices}</a>
+      <a href={`${home}#${anchors.contact}`}>{d.nav.contact}</a>
+      <a href={site.giftCardUrl} rel="noopener">{d.nav.giftCard}</a>
+    </nav>
+
+    <div class="lang">
+      <span class="visually-hidden">{d.nav.language}</span>
+      {
+        locales.map((l) =>
+          l === locale ? (
+            <span aria-current="true" title={localeNames[l]}>
+              {l}
+            </span>
+          ) : alternates[l] ? (
+            <a href={alternates[l]} hreflang={l} title={localeNames[l]}>
+              {l}
+            </a>
+          ) : (
+            <a href={pathFor(l)} hreflang={l} title={localeNames[l]}>
+              {l}
+            </a>
+          ),
+        )
+      }
+    </div>
+  </div>
+</header>

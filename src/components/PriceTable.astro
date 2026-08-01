@@ -1,0 +1,58 @@
+---
+import type { Locale } from '../data/site';
+import { t } from '../i18n';
+import { servicePath, type Service } from '../lib/services';
+
+interface Props {
+  locale: Locale;
+  caption: string;
+  services: Service[];
+  /** A kezelesek nevei linkeljenek-e a sajat oldalukra. */
+  linked?: boolean;
+}
+
+const { locale, caption, services, linked = true } = Astro.props;
+const d = t(locale);
+---
+
+<div class="table-scroll">
+  <table class="prices">
+    <caption>{caption}</caption>
+    <thead>
+      <tr>
+        <th scope="col">{d.prices.duration}</th>
+        <th scope="col">{d.prices.price}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        services.map((s) => (
+          <>
+            <tr>
+              <th scope="rowgroup" colspan="2" style="padding-top:1.1rem">
+                {linked ? (
+                  <a
+                    href={servicePath(locale, s.data.category, s.data.slug)}
+                    style="color:inherit"
+                  >
+                    {s.data.title}
+                  </a>
+                ) : (
+                  s.data.title
+                )}
+              </th>
+            </tr>
+            {s.data.prices.map((p) => (
+              <tr>
+                <td>
+                  {p.minutes} {d.prices.minutes}
+                </td>
+                <td>&euro; {p.eur}</td>
+              </tr>
+            ))}
+          </>
+        ))
+      }
+    </tbody>
+  </table>
+</div>

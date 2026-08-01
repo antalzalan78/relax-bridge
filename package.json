@@ -1,0 +1,28 @@
+{
+  "name": "relax-bridge",
+  "version": "1.0.0",
+  "description": "relaxbridge.nl",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/antalzalan78/relax-bridge.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/antalzalan78/relax-bridge/issues"
+  },
+  "homepage": "https://github.com/antalzalan78/relax-bridge#readme",
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.3",
+    "astro": "^7.1.6",
+    "sharp": "^0.35.3"
+  },
+  "private": true
+}

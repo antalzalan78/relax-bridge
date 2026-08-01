@@ -1,0 +1,68 @@
+---
+import { site, localeTags, defaultLocale, type Locale } from '../data/site';
+
+interface Props {
+  locale: Locale;
+  title: string;
+  description: string;
+  /** Az aktualis oldal utvonala, pl. '/massage/relaxmassage' */
+  path: string;
+  /** Ugyanaz az oldal a tobbi nyelven: { nl: '/...', en: '/en/...' } */
+  alternates: Partial<Record<Locale, string>>;
+  /** Tetszoleges strukturalt adat (LocalBusiness, Service, ...) */
+  jsonLd?: Record<string, unknown>[];
+  image?: string;
+}
+
+const { locale, title, description, path, alternates, jsonLd = [], image } =
+  Astro.props;
+
+const canonical = new URL(path, site.url).href;
+const ogImage = new URL(image ?? '/images/relax-bridge-logo.png', site.url).href;
+---
+
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+
+{/*
+  hreflang: ez hianyzott a regi oldalrol. Enelkul a Google duplikacionak latja
+  a harom nyelvi valtozatot, es nem tudja, kinek melyiket adja.
+*/}
+{
+  Object.entries(alternates).map(([lang, href]) => (
+    <link
+      rel="alternate"
+      hreflang={localeTags[lang as Locale]}
+      href={new URL(href, site.url).href}
+    />
+  ))
+}
+{
+  alternates[defaultLocale] && (
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href={new URL(alternates[defaultLocale]!, site.url).href}
+    />
+  )
+}
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content={site.name} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogImage} />
+<meta property="og:locale" content={localeTags[locale].replace('-', '_')} />
+<meta name="twitter:card" content="summary_large_image" />
+
+{
+  jsonLd.map((data) => (
+    <script
+      type="application/ld+json"
+      is:inline
+      set:html={JSON.stringify(data)}
+    />
+  ))
+}
