@@ -12,10 +12,16 @@
  * vilagos hatteren 1,81:1), ezert a felulet sotetebb, telitett valtozatokat
  * hasznal, es a logo a sajat szineivel marad meg markajelkent.
  *
+ * Az oldal mindig vilagos: nincs sotet tema. A `color-scheme: light` arrol is
+ * gondoskodik, hogy a bongeszo sajat elemei (gorgetosav, urlapmezok) se
+ * valtsanak sotetre, ha a latogato gepe sotet temara van allitva.
+ *
  * Minden itt szereplo szoveg- es gombszin legalabb 4,5:1 kontrasztu.
  * Ellenorzes: node scripts/check-contrast.mjs
  */
 :root {
+  color-scheme: light;
+
   --brand: #9c4f28; /* terrakotta, 5,58:1 */
   --brand-dark: #8a4522; /* 6,73:1 — lebegtetesre */
   --brand-soft: #f7e9df;
@@ -25,8 +31,8 @@
 
   --warm: #e0973f; /* meleg borostyan, csak dekoracio */
 
-  --bg: #fdf8f2;
-  --bg-raised: #fffdfa;
+  --bg: #fdf8f2; /* meleg krem */
+  --bg-raised: #ffffff; /* a kartyak tiszta feherek, ez emeli ki oket */
   --border: #eaddd0;
 
   --text: #332822; /* meleg sotetbarna, 13,55:1 */
@@ -41,27 +47,6 @@
   --section-gap: clamp(3.5rem, 9vw, 6.5rem);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --brand: #e59468; /* halvany terrakotta, 7,42:1 sotet hatteren */
-    --brand-dark: #eda877;
-    --brand-soft: #2c211a;
-
-    --accent: #e0973f; /* 7,33:1 */
-    --accent-soft: #2a2018;
-
-    --warm: #fdaa38;
-
-    --bg: #1c1714;
-    --bg-raised: #241d19;
-    --border: #3a302a;
-
-    --text: #f0e7dd;
-    --text-muted: #b3a496;
-
-    --shadow: 0 1px 2px rgb(0 0 0 / 0.35), 0 8px 24px -12px rgb(0 0 0 / 0.7);
-  }
-}
 
 *,
 *::before,
@@ -209,16 +194,6 @@ img {
   color: #fff;
 }
 
-/* Sotet temaban a gomb hattere vilagos, ezert sotet felirat kell ra. */
-@media (prefers-color-scheme: dark) {
-  .btn--primary {
-    color: #1c1714;
-  }
-  .btn--primary:hover {
-    color: #1c1714;
-  }
-}
-
 .btn--ghost {
   border-color: var(--border);
   color: var(--text);
@@ -311,12 +286,6 @@ img {
   background: var(--brand-soft);
   color: var(--brand-dark);
   margin-bottom: 0.9rem;
-}
-
-@media (prefers-color-scheme: dark) {
-  .badge {
-    color: var(--brand);
-  }
 }
 
 /* --- artablazat --- */
@@ -522,13 +491,6 @@ img {
 .lang [aria-current='true'] {
   background: var(--brand-soft);
   color: var(--brand-dark);
-}
-
-@media (prefers-color-scheme: dark) {
-  .lang [aria-current='true'],
-  .lang a:hover {
-    color: var(--brand);
-  }
 }
 
 /* Kisebb kijelzon a fonavigacio a hero ala kerul, nem tuntetjuk el. */

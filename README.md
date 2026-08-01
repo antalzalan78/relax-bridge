@@ -61,14 +61,19 @@ Csak akkor kell újra futtatni, ha a forráslogó változik.
 Meleg, világos paletta — homok, terrakotta és méz —, hogy a hangulat a
 masszázshoz és a relaxációhoz illeszkedjen.
 
-| Szerep | Világos téma | Kontraszt | Sötét téma |
-| --- | --- | --- | --- |
-| háttér | `#fdf8f2` | — | `#1c1714` |
-| szöveg | `#332822` | 13,55:1 | `#f0e7dd` |
-| halvány szöveg | `#6f6154` | 5,66:1 | `#b3a496` |
-| linkek, gombok | `#9c4f28` | 5,58:1 | `#e59468` |
-| kiemelés | `#9c6210` | 4,77:1 | `#e0973f` |
-| dekoráció | `#e0973f` | csak díszítés | `#fdaa38` |
+| Szerep | Szín | Kontraszt a háttéren |
+| --- | --- | --- |
+| háttér | `#fdf8f2` meleg krém | — |
+| kártyák háttere | `#ffffff` | — |
+| szöveg | `#332822` | 13,55:1 |
+| halvány szöveg | `#6f6154` | 5,66:1 |
+| linkek, gombok | `#9c4f28` terrakotta | 5,58:1 |
+| kiemelés | `#9c6210` méz | 4,77:1 |
+| dekoráció | `#e0973f` borostyán | csak díszítés |
+
+**Az oldal mindig világos, nincs sötét téma.** A `:root` `color-scheme: light`
+beállítása arról is gondoskodik, hogy a böngésző saját elemei (görgetősáv,
+űrlapmezők) se váltsanak sötétre, ha a látogató gépe sötét témára van állítva.
 
 A kiindulópont a logó narancsa — ez az egyetlen meleg szín benne. A logó saját
 színei szövegnek túl világosak (a narancs világos háttéren 1,81:1), ezért a
