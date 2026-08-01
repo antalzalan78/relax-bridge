@@ -43,6 +43,28 @@ src/
 szándékos: a régi oldalon a telefonszám szét volt szórva, és két hibás változat
 is bent maradt belőle.
 
+## A logó
+
+A forrás a `src/assets/logo-source.png` — fehér hátterű, átlátszóság nélkül.
+Ebből készül minden származtatott kép:
+
+```bash
+node scripts/prepare-logo.mjs
+```
+
+Ez kikulcsolja a fehéret (sötét témában különben fehér téglalapként látszana),
+és legyártja a `logo.png`, `logo-mark.png`, favikon- és megosztásképeket.
+Csak akkor kell újra futtatni, ha a forráslogó változik.
+
+A színpaletta a logóból jön: zöld `#56b44a`, lila `#8755b6`, narancs `#fdaa38`.
+A logó saját zöldje világos háttéren csak 2,47:1 kontrasztú, ezért szöveghez és
+gombhoz egy sötétebb változat megy (`#35782c`, 5,11:1), a logó zöldje pedig
+dekoráció marad. Az arányokat ellenőrizni:
+
+```bash
+node scripts/check-contrast.mjs
+```
+
 ## URL-ek
 
 A holland az alapértelmezett nyelv, előtag nélkül. 21 oldal készül.

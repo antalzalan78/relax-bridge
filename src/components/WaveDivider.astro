@@ -1,0 +1,44 @@
+---
+/**
+ * A logo alatti viz motivuma szakaszelvalasztokent: egy zold es egy lila
+ * hullamvonal. Tisztan dekoracio, ezert a kepolvasok szamara rejtett.
+ */
+---
+
+<div class="wave" aria-hidden="true">
+  <svg viewBox="0 0 1200 44" preserveAspectRatio="none" focusable="false">
+    <path d="M0 20 C 140 2 260 34 400 20 S 660 2 800 20 S 1060 36 1200 18" />
+    <path d="M0 32 C 150 16 280 44 420 32 S 680 14 820 32 S 1070 46 1200 30" />
+  </svg>
+</div>
+
+<style>
+  .wave {
+    width: 100%;
+    line-height: 0;
+    margin-block: 1rem;
+  }
+
+  .wave svg {
+    display: block;
+    width: 100%;
+    height: 2.75rem;
+  }
+
+  .wave path {
+    fill: none;
+    stroke-width: 3;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .wave path:first-child {
+    stroke: var(--brand-logo);
+    opacity: 0.75;
+  }
+
+  .wave path:last-child {
+    stroke: var(--accent);
+    opacity: 0.6;
+  }
+</style>

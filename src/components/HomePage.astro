@@ -10,6 +10,7 @@ import bikeImage from '../assets/home-service-fiets.jpg';
 import Base from '../layouts/Base.astro';
 import ServiceCard from './ServiceCard.astro';
 import PriceTable from './PriceTable.astro';
+import WaveDivider from './WaveDivider.astro';
 
 interface Props {
   locale: Locale;
@@ -68,6 +69,10 @@ const jsonLd = [
       </div>
     </div>
   </section>
+
+  <div class="wrap">
+    <WaveDivider />
+  </div>
 
   <section class="wrap section" id={anchors.services}>
     <div class="grid grid--2">

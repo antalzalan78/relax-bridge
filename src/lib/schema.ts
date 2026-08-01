@@ -20,7 +20,7 @@ export function localBusinessSchema(locale: Locale, description: string) {
     description,
     url: site.url,
     telephone: site.phone,
-    image: `${site.url}/images/relax-bridge-logo.png`,
+    image: `${site.url}/images/og-image.png`,
     inLanguage: localeTags[locale],
     priceRange: '€€',
     currenciesAccepted: 'EUR',

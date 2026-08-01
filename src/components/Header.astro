@@ -1,4 +1,6 @@
 ---
+import { Image } from 'astro:assets';
+import logoMark from '../assets/logo-mark.png';
 import { site, locales, pathFor, localeNames, type Locale } from '../data/site';
 import { anchors } from '../data/routes';
 import { t } from '../i18n';
@@ -15,7 +17,14 @@ const home = pathFor(locale);
 
 <header class="site-header">
   <div class="wrap site-header__inner">
-    <a class="brand" href={home}>{site.name}</a>
+    <a class="brand" href={home}>
+      {/* A nev mellette all, ezert a jel dekoraciokent ures alt-ot kap. */}
+      <Image class="brand__mark" src={logoMark} alt="" width={70} loading="eager" />
+      <span class="brand__name">
+        Relax Bridge
+        <small>Massage</small>
+      </span>
+    </a>
 
     <nav class="nav" aria-label={d.nav.menu}>
       <a href={`${home}#${anchors.services}`}>{d.nav.studio}</a>

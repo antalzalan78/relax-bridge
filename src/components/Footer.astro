@@ -1,4 +1,6 @@
 ---
+import { Image } from 'astro:assets';
+import logo from '../assets/logo.png';
 import { site, pathFor, type Locale } from '../data/site';
 import { t } from '../i18n';
 import { getServices, servicePath } from '../lib/services';
@@ -16,6 +18,10 @@ const year = new Date().getFullYear();
 
 <footer class="site-footer">
   <div class="wrap">
+    <a href={pathFor(locale)} aria-label={site.name}>
+      <Image class="footer-logo" src={logo} alt={site.name} width={400} loading="lazy" />
+    </a>
+
     <div class="grid grid--3">
       <div>
         <h3>{d.nav.studio}</h3>

@@ -18,7 +18,7 @@ const { locale, title, description, path, alternates, jsonLd = [], image } =
   Astro.props;
 
 const canonical = new URL(path, site.url).href;
-const ogImage = new URL(image ?? '/images/relax-bridge-logo.png', site.url).href;
+const ogImage = new URL(image ?? '/images/og-image.png', site.url).href;
 ---
 
 <title>{title}</title>

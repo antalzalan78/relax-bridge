@@ -4,10 +4,22 @@
    domainrol jon. Ez a betoltesi sebesseg miatt szamit.
    --------------------------------------------------------------- */
 
+/*
+ * A paletta a logobol jon: zold #56b44a, lila #8755b6, narancs #fdaa38.
+ * A logo sajat zoldje vilagos hatteren csak 2,47:1 kontrasztu, ezert szoveghez
+ * es gombhoz egy sotetebb valtozatot hasznalunk; a logo zoldje dekoracio marad.
+ * Az ertekeket a scripts/check-contrast.mjs ellenorzi.
+ */
 :root {
-  --brand: #2f7d5a;
-  --brand-dark: #246145;
-  --brand-soft: #e6f1ea;
+  --brand: #35782c; /* 5,11:1 — szoveghez is jo */
+  --brand-dark: #2d6626;
+  --brand-logo: #56b44a; /* a logo zoldje, csak dekoracio */
+  --brand-soft: #e9f4e5;
+
+  --accent: #8755b6; /* a logo lilaja, 4,95:1 */
+  --accent-soft: #f0e9f7;
+
+  --warm: #fdaa38; /* a logo narancsa, csak dekoracio */
 
   --bg: #faf8f5;
   --bg-raised: #ffffff;
@@ -27,9 +39,15 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --brand: #63bb90;
-    --brand-dark: #7fcda6;
-    --brand-soft: #1c2a24;
+    --brand: #7fd06f; /* 9,56:1 sotet hatteren */
+    --brand-dark: #a4e094;
+    --brand-logo: #56b44a;
+    --brand-soft: #1b2a19;
+
+    --accent: #b98ee0; /* 6,86:1 */
+    --accent-soft: #241c2e;
+
+    --warm: #fdaa38;
 
     --bg: #14171a;
     --bg-raised: #1b1f22;
@@ -406,13 +424,53 @@ img {
   min-height: 4rem;
 }
 
+/*
+ * A fejlecben a hid jel + a nev szerepel kulon. A teljes logo iras-betuje
+ * 34 pixeles magassagban mar olvashatatlan lenne.
+ */
 .brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   font-family: ui-serif, Georgia, serif;
   font-size: 1.2rem;
   font-weight: 600;
   color: var(--text);
   text-decoration: none;
   margin-right: auto;
+}
+
+.brand__mark {
+  height: 2.1rem;
+  width: auto;
+  flex: none;
+}
+
+.brand__name {
+  line-height: 1.1;
+}
+
+.brand__name small {
+  display: block;
+  font-family: inherit;
+  font-size: 0.6em;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+@media (max-width: 26rem) {
+  .brand__name {
+    font-size: 0.95rem;
+  }
+}
+
+/* Lablec: a teljes logo, ott van hely az iras-betunek. */
+.footer-logo {
+  width: min(200px, 60%);
+  height: auto;
+  margin-bottom: 1.25rem;
 }
 
 .nav {
