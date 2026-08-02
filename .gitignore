@@ -4,6 +4,7 @@ build/
 .cache/
 .astro/
 .vercel/
+.npm-cache/
 .env
 .env.*
 !.env.example

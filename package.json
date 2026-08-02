@@ -6,7 +6,10 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "check": "astro check"
+    "check": "astro check",
+    "test:booking": "node --experimental-strip-types --test tests/booking/*.test.ts",
+    "db:migrate": "node --env-file-if-exists=.env scripts/migrate-db.mjs",
+    "admin:hash": "node scripts/hash-admin-password.mjs"
   },
   "repository": {
     "type": "git",
@@ -21,8 +24,19 @@
   "homepage": "https://github.com/antalzalan78/relax-bridge#readme",
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
+    "@astrojs/vercel": "^11.0.4",
+    "@js-temporal/polyfill": "^0.5.1",
     "astro": "^7.1.6",
-    "sharp": "^0.35.3"
+    "postgres": "^3.4.9",
+    "sharp": "^0.35.3",
+    "zod": "^4.4.3"
   },
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "typescript": "^6.0.3"
+  },
+  "overrides": {
+    "path-to-regexp": "6.3.0"
+  }
 }

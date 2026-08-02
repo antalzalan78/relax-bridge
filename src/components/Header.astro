@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import logoMark from '../assets/logo-mark.png';
-import { site, locales, pathFor, localeNames, type Locale } from '../data/site';
+import { bookingPath, site, locales, pathFor, localeNames, type Locale } from '../data/site';
 import { anchors } from '../data/routes';
 import { t } from '../i18n';
 
@@ -13,7 +13,7 @@ interface Props {
 const { locale, alternates } = Astro.props;
 const d = t(locale);
 const home = pathFor(locale);
-const bookingHref = site.bookingUrl ?? site.whatsapp;
+const bookingHref = bookingPath(locale);
 ---
 
 <header class="site-header">
@@ -55,7 +55,7 @@ const bookingHref = site.bookingUrl ?? site.whatsapp;
       }
     </div>
 
-    <a class="header-booking" href={bookingHref} rel="noopener">
+    <a class="header-booking" href={bookingHref}>
       {d.service.bookCta}
     </a>
   </div>

@@ -39,9 +39,6 @@ export const site = {
   // --- kulso szolgaltatasok ---
   giftCardUrl: 'https://giftcards.sumup.com/order/MEMDT1BM',
 
-  /** TODO: a foglalorendszer URL-je, ha megvan. Addig a WhatsApp az elsodleges ut. */
-  bookingUrl: null as string | null,
-
   // --- kozossegi media ---
   social: {
     facebook: 'https://www.facebook.com/profile.php?id=61579145392339',
@@ -84,4 +81,9 @@ export function pathFor(locale: Locale, path = ''): string {
   const prefix = localePrefix(locale);
   if (!clean) return prefix || '/';
   return `${prefix}/${clean}`;
+}
+
+/** A sajat foglalasi oldal teljes, lokalizalt utvonala. */
+export function bookingPath(locale: Locale): string {
+  return pathFor(locale, 'booking');
 }

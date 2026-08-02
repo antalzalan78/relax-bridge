@@ -1255,7 +1255,7 @@ img {
 }
 
 @media (max-width: 47.99rem) {
-  body {
+  body.has-mobile-booking {
     padding-bottom: 5.3rem;
   }
 
