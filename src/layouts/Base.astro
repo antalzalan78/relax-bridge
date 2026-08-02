@@ -1,5 +1,6 @@
 ---
-import { localeTags, type Locale } from '../data/site';
+import { localeTags, site, type Locale } from '../data/site';
+import { t } from '../i18n';
 import Seo from '../components/Seo.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -15,6 +16,8 @@ interface Props {
 }
 
 const { locale, title, description, path, alternates, jsonLd } = Astro.props;
+const d = t(locale);
+const bookingHref = site.bookingUrl ?? site.whatsapp;
 ---
 
 <!doctype html>
@@ -39,6 +42,10 @@ const { locale, title, description, path, alternates, jsonLd } = Astro.props;
     <main id="main">
       <slot />
     </main>
+    <a class="mobile-booking" href={bookingHref} rel="noopener">
+      <span>{d.service.bookCta}</span>
+      <span aria-hidden="true">&rarr;</span>
+    </a>
     <Footer locale={locale} />
   </body>
 </html>

@@ -22,6 +22,7 @@ const d = t(locale);
 const studio = await getServices(locale, 'studio');
 const home = await getServices(locale, 'home');
 const cheapest = lowestPrice([...studio, ...home]);
+const bookingHref = site.bookingUrl ?? site.whatsapp;
 
 const alternates = homeAlternates();
 const path = pathFor(locale);
@@ -42,14 +43,21 @@ const jsonLd = [
 >
   <section class="wrap hero">
     <div class="hero__grid">
-      <div>
+      <div class="hero__copy">
         <span class="eyebrow">{d.tagline}</span>
-        {/* Egyetlen h1 az oldalon, benne a szolgaltatas es a varos. */}
         <h1>{d.hero.title}</h1>
         <p class="lead">{d.hero.intro}</p>
+        <div class="hero__meta" aria-label={`${d.nav.studio}, ${d.nav.homeService}, Tilburg`}>
+          <span>{d.nav.studio}</span>
+          <span aria-hidden="true">&middot;</span>
+          <span>{d.nav.homeService}</span>
+          <span aria-hidden="true">&middot;</span>
+          <span>Tilburg</span>
+        </div>
         <div class="btn-row">
-          <a class="btn btn--primary" href={`#${anchors.contact}`}>
+          <a class="btn btn--primary" href={bookingHref} rel="noopener">
             {d.hero.primaryCta}
+            <span aria-hidden="true">&rarr;</span>
           </a>
           <a class="btn btn--ghost" href={`#${anchors.prices}`}>
             {d.hero.secondaryCta}
@@ -57,15 +65,21 @@ const jsonLd = [
           </a>
         </div>
       </div>
+
       <div class="hero__media">
+        <div class="hero__arch" aria-hidden="true"></div>
         <Image
           src={studioImage}
           alt={d.images.studio}
           widths={[480, 800, 1200]}
-          sizes="(min-width: 54rem) 40vw, 100vw"
+          sizes="(min-width: 54rem) 42vw, 100vw"
           loading="eager"
           fetchpriority="high"
         />
+        <div class="hero__caption">
+          <span>{d.options.studio.label}</span>
+          <strong>Tilburg</strong>
+        </div>
       </div>
     </div>
   </section>
@@ -74,104 +88,140 @@ const jsonLd = [
     <WaveDivider />
   </div>
 
-  <section class="wrap section" id={anchors.services}>
-    <div class="grid grid--2">
-      <div class="card">
-        <span class="eyebrow">{d.options.studio.label}</span>
-        <h2>{d.options.studio.title}</h2>
-        <p>{d.options.studio.body}</p>
-      </div>
-      <div class="card">
+  <section class="wrap section place-section" id={anchors.services}>
+    <div class="section-heading section-heading--wide">
+      <span class="eyebrow">Relax Bridge</span>
+      <h2>
+        {d.options.studio.label}
+        <span class="heading-bridge" aria-hidden="true">&harr;</span>
+        {d.options.homeService.label}
+      </h2>
+    </div>
+
+    <div class="place-bridge">
+      <article class="place-panel place-panel--studio">
+        <span class="place-panel__number" aria-hidden="true">01</span>
+        <div class="place-panel__content">
+          <span class="eyebrow">{d.options.studio.label}</span>
+          <h3>{d.options.studio.title}</h3>
+          <p>{d.options.studio.body}</p>
+          <a class="text-link" href="#studio-services">
+            {d.options.studio.cta}<span aria-hidden="true">&rarr;</span>
+          </a>
+        </div>
+      </article>
+
+      <article class="place-panel place-panel--home">
         <Image
-          class="card__media"
+          class="place-panel__image"
           src={bikeImage}
           alt={d.images.homeService}
-          widths={[400, 700]}
-          sizes="(min-width: 40rem) 30vw, 90vw"
+          widths={[480, 800, 1200]}
+          sizes="(min-width: 48rem) 50vw, 100vw"
           loading="lazy"
         />
-        <span class="eyebrow">{d.options.homeService.label}</span>
-        <h2>{d.options.homeService.title}</h2>
-        <p>{d.options.homeService.body}</p>
+        <div class="place-panel__shade" aria-hidden="true"></div>
+        <span class="place-panel__number" aria-hidden="true">02</span>
+        <div class="place-panel__content">
+          <span class="eyebrow">{d.options.homeService.label}</span>
+          <h3>{d.options.homeService.title}</h3>
+          <p>{d.options.homeService.body}</p>
+          <a class="text-link" href="#home-services">
+            {d.options.homeService.cta}<span aria-hidden="true">&rarr;</span>
+          </a>
+        </div>
+      </article>
+    </div>
+
+    <div class="treatment-block" id="studio-services">
+      <div class="treatment-block__heading">
+        <span class="eyebrow">01</span>
+        <h2>{d.nav.studio}</h2>
+      </div>
+      <div class="service-list">
+        {studio.map((s, index) => <ServiceCard locale={locale} service={s} index={index} />)}
       </div>
     </div>
 
-    <h2 style="margin-top:3rem">{d.nav.studio}</h2>
-    <div class="grid grid--2">
-      {studio.map((s) => <ServiceCard locale={locale} service={s} />)}
-    </div>
-
-    <h2 style="margin-top:3rem">{d.nav.homeService}</h2>
-    <div class="grid grid--2">
-      {home.map((s) => <ServiceCard locale={locale} service={s} />)}
-    </div>
-  </section>
-
-  <section class="wrap section" id={anchors.prices}>
-    <h2>{d.prices.heading}</h2>
-    <p class="lead prose">{d.prices.intro}</p>
-    <div class="grid grid--2" style="margin-top:2rem">
-      <PriceTable
-        locale={locale}
-        caption={d.prices.studioHeading}
-        services={studio}
-      />
-      <PriceTable
-        locale={locale}
-        caption={d.prices.homeHeading}
-        services={home}
-      />
+    <div class="treatment-block" id="home-services">
+      <div class="treatment-block__heading">
+        <span class="eyebrow">02</span>
+        <h2>{d.nav.homeService}</h2>
+      </div>
+      <div class="service-list">
+        {home.map((s, index) => <ServiceCard locale={locale} service={s} index={index} />)}
+      </div>
     </div>
   </section>
 
-  <section class="wrap wrap--narrow section">
-    <h2>{d.goodToKnow.heading}</h2>
-    {
-      d.goodToKnow.items.map((item) => (
-        <details class="faq">
-          <summary>{item.title}</summary>
-          <div class="faq__body">{item.body}</div>
-        </details>
-      ))
-    }
-    <div class="btn-row">
+  <section class="section section--tint" id={anchors.prices}>
+    <div class="wrap">
+      <div class="section-heading">
+        <span class="eyebrow">Relax Bridge</span>
+        <h2>{d.prices.heading}</h2>
+        <p class="lead prose">{d.prices.intro}</p>
+      </div>
+      <div class="price-grid">
+        <div class="price-panel">
+          <span class="price-panel__number" aria-hidden="true">01</span>
+          <PriceTable locale={locale} caption={d.prices.studioHeading} services={studio} />
+        </div>
+        <div class="price-panel price-panel--dark">
+          <span class="price-panel__number" aria-hidden="true">02</span>
+          <PriceTable locale={locale} caption={d.prices.homeHeading} services={home} />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap section knowledge-grid">
+    <div class="knowledge-grid__intro">
+      <span class="eyebrow">Relax Bridge</span>
+      <h2>{d.goodToKnow.heading}</h2>
       <a class="btn btn--ghost" href={site.giftCardUrl} rel="noopener">
         {d.goodToKnow.giftCardCta}
       </a>
     </div>
+    <div>
+      {
+        d.goodToKnow.items.map((item) => (
+          <details class="faq">
+            <summary>{item.title}</summary>
+            <div class="faq__body">{item.body}</div>
+          </details>
+        ))
+      }
+    </div>
   </section>
 
-  <section class="wrap section" id={anchors.contact}>
-    <h2>{d.contact.heading}</h2>
-    <p class="lead prose">{d.contact.intro}</p>
+  <section class="booking-section" id={anchors.contact}>
+    <div class="wrap booking-section__grid">
+      <div>
+        <span class="eyebrow">{d.tagline}</span>
+        <h2>{d.contact.heading}</h2>
+        <p class="lead">{d.contact.intro}</p>
+        <a class="btn btn--light" href={bookingHref} rel="noopener">
+          {d.contact.whatsappCta}<span aria-hidden="true">&rarr;</span>
+        </a>
+      </div>
 
-    <div class="grid grid--3" style="margin-top:2rem">
-      <div class="card">
-        <h3>{d.contact.whatsapp}</h3>
-        <p>{site.phoneDisplay}</p>
-        <div class="btn-row">
-          <a class="btn btn--primary" href={site.whatsapp} rel="noopener">
-            {d.contact.whatsappCta}
-          </a>
+      <div class="booking-section__details">
+        <div>
+          <span class="detail-label">{d.contact.whatsapp}</span>
+          <a href={site.whatsapp} rel="noopener">{site.phoneDisplay}</a>
         </div>
-      </div>
-
-      <div class="card">
-        <h3>{d.contact.area}</h3>
-        <p>{d.contact.areaBody}</p>
-      </div>
-
-      <div class="card">
-        <h3>{d.contact.follow}</h3>
-        <p>
-          <a href={site.social.instagram} rel="noopener">Instagram</a> &middot;{' '}
-          <a href={site.social.facebook} rel="noopener">Facebook</a>
-        </p>
-        <h3 style="margin-top:1rem">{d.contact.playlists}</h3>
-        <p>
-          <a href={site.playlists.spotify} rel="noopener">Spotify</a> &middot;{' '}
-          <a href={site.playlists.youtubeMusic} rel="noopener">YouTube Music</a>
-        </p>
+        <div>
+          <span class="detail-label">{d.contact.area}</span>
+          <p>{d.contact.areaBody}</p>
+        </div>
+        <div>
+          <span class="detail-label">{d.contact.follow}</span>
+          <p>
+            <a href={site.social.instagram} rel="noopener">Instagram</a>
+            <span aria-hidden="true"> &middot; </span>
+            <a href={site.social.facebook} rel="noopener">Facebook</a>
+          </p>
+        </div>
       </div>
     </div>
   </section>

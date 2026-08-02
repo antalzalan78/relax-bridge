@@ -29,11 +29,10 @@ const d = t(locale);
         services.map((s) => (
           <>
             <tr>
-              <th scope="rowgroup" colspan="2" style="padding-top:1.1rem">
+              <th class="prices__service" scope="rowgroup" colspan="2">
                 {linked ? (
                   <a
                     href={servicePath(locale, s.data.category, s.data.slug)}
-                    style="color:inherit"
                   >
                     {s.data.title}
                   </a>

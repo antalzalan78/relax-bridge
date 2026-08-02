@@ -13,6 +13,7 @@ import { localBusinessSchema, serviceSchema } from '../lib/schema';
 import Base from '../layouts/Base.astro';
 import PriceTable from './PriceTable.astro';
 import ServiceCard from './ServiceCard.astro';
+import WaveDivider from './WaveDivider.astro';
 
 interface Props {
   locale: Locale;
@@ -26,6 +27,7 @@ const { title, summary, category, slug, key } = service.data;
 const path = servicePath(locale, category, slug);
 const alternates = await serviceAlternates(key, category);
 const { Content } = await render(service);
+const bookingHref = site.bookingUrl ?? site.whatsapp;
 
 const siblings = (await getServices(locale)).filter(
   (s) => !(s.data.key === key && s.data.category === category),
@@ -47,44 +49,62 @@ const jsonLd = [
   alternates={alternates}
   jsonLd={jsonLd}
 >
-  <article class="wrap wrap--narrow section">
-    <p>
-      <a href={`${pathFor(locale)}#${anchors.services}`}>
-        &larr; {d.service.backToAll}
-      </a>
-    </p>
+  <article class="service-page">
+    <section class="wrap section service-hero">
+      <div class="service-hero__copy">
+        <a class="back-link" href={`${pathFor(locale)}#${anchors.services}`}>
+          <span aria-hidden="true">&larr;</span> {d.service.backToAll}
+        </a>
 
-    <span class="badge">
-      {category === 'studio' ? d.service.studioBadge : d.service.homeBadge}
-    </span>
-    <h1>{title}</h1>
+        <span class="eyebrow">
+          {category === 'studio' ? d.service.studioBadge : d.service.homeBadge}
+        </span>
+        <h1>{title}</h1>
+        <p class="service-hero__summary">{summary}</p>
+        <div class="prose service-hero__prose">
+          <Content />
+        </div>
+      </div>
 
-    <div class="prose">
-      <Content />
-    </div>
+      <aside class="service-booking" aria-label={d.service.pricesHeading}>
+        <span class="service-booking__bridge" aria-hidden="true"></span>
+        <span class="eyebrow">{d.service.pricesHeading}</span>
+        <PriceTable
+          locale={locale}
+          caption={title}
+          services={[service]}
+          linked={false}
+        />
+        <a class="btn btn--primary btn--block" href={bookingHref} rel="noopener">
+          {d.service.bookCta}<span aria-hidden="true">&rarr;</span>
+        </a>
+        <a class="text-link service-booking__gift" href={site.giftCardUrl} rel="noopener">
+          {d.nav.giftCard}<span aria-hidden="true">&nearr;</span>
+        </a>
+      </aside>
+    </section>
 
-    <h2 style="margin-top:2.5rem">{d.service.pricesHeading}</h2>
-    <PriceTable
-      locale={locale}
-      caption={title}
-      services={[service]}
-      linked={false}
-    />
-
-    <div class="btn-row">
-      <a class="btn btn--primary" href={site.whatsapp} rel="noopener">
-        {d.service.bookCta}
-      </a>
-      <a class="btn btn--ghost" href={site.giftCardUrl} rel="noopener">
-        {d.nav.giftCard}
-      </a>
+    <div class="wrap service-page__divider">
+      <WaveDivider />
     </div>
   </article>
 
-  <section class="wrap section">
-    <h2>{d.service.otherServices}</h2>
-    <div class="grid grid--3">
-      {siblings.map((s) => <ServiceCard locale={locale} service={s} />)}
+  <section class="section section--tint related-services">
+    <div class="wrap">
+      <div class="section-heading section-heading--wide">
+        <span class="eyebrow">Relax Bridge</span>
+        <h2>{d.service.otherServices}</h2>
+      </div>
+      <div class="service-list">
+        {siblings.map((s, index) => (
+          <ServiceCard
+            locale={locale}
+            service={s}
+            index={index}
+            showLocation={true}
+          />
+        ))}
+      </div>
     </div>
   </section>
 </Base>

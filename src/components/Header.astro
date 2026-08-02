@@ -13,6 +13,7 @@ interface Props {
 const { locale, alternates } = Astro.props;
 const d = t(locale);
 const home = pathFor(locale);
+const bookingHref = site.bookingUrl ?? site.whatsapp;
 ---
 
 <header class="site-header">
@@ -53,5 +54,9 @@ const home = pathFor(locale);
         )
       }
     </div>
+
+    <a class="header-booking" href={bookingHref} rel="noopener">
+      {d.service.bookCta}
+    </a>
   </div>
 </header>
