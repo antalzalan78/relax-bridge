@@ -100,6 +100,15 @@ const jsonLd = [
 
     <div class="place-bridge">
       <article class="place-panel place-panel--studio">
+        <Image
+          class="place-panel__image place-panel__image--studio"
+          src={studioImage}
+          alt={d.images.studio}
+          widths={[480, 800, 1200]}
+          sizes="(min-width: 48rem) 50vw, 100vw"
+          loading="lazy"
+        />
+        <div class="place-panel__shade" aria-hidden="true"></div>
         <span class="place-panel__number" aria-hidden="true">01</span>
         <div class="place-panel__content">
           <span class="eyebrow">{d.options.studio.label}</span>
