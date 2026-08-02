@@ -140,6 +140,10 @@ const shortTime = (value: unknown) => String(value).slice(0, 5);
         <div>
           <span class="eyebrow">Egy közös naptár</span>
           <h1>Foglalások és szabad idők</h1>
+          <div class="booking-legend" aria-label="Foglalástípusok jelmagyarázata">
+            <span><i class="booking-legend__swatch booking-legend__swatch--studio"></i>Stúdió</span>
+            <span><i class="booking-legend__swatch booking-legend__swatch--home"></i>Home service</span>
+          </div>
         </div>
         <nav class="week-nav" aria-label="Hétválasztó">
           <a href={`/admin?week=${previousWeek}`} aria-label="Előző hét">&larr;</a>
@@ -170,7 +174,11 @@ const shortTime = (value: unknown) => String(value).slice(0, 5);
                   const start = localBooking(booking.starts_at);
                   const end = localBooking(booking.ends_at);
                   return (
-                    <details class:list={['booking-item', { 'booking-item--cancelled': booking.status === 'cancelled' }]}>
+                    <details class:list={[
+                      'booking-item',
+                      `booking-item--${booking.service_category}`,
+                      { 'booking-item--cancelled': booking.status === 'cancelled' },
+                    ]}>
                       <summary>
                         <strong>{String(start.hour).padStart(2, '0')}:{String(start.minute).padStart(2, '0')}</strong>
                         <span>{booking.customer_name}</span>
@@ -283,6 +291,11 @@ const shortTime = (value: unknown) => String(value).slice(0, 5);
   .week-nav a { display: grid; width: 2.25rem; height: 2.25rem; place-items: center; border-radius: 50%; color: var(--pine); text-decoration: none; }
   .week-nav a:hover { background: var(--pine-soft); }
   .week-nav strong { min-width: 15rem; font-size: 0.82rem; text-align: center; }
+  .booking-legend { display: flex; flex-wrap: wrap; gap: 0.55rem 1rem; margin-top: 0.8rem; color: var(--ink-soft); font-size: 0.72rem; font-weight: 700; }
+  .booking-legend span { display: inline-flex; align-items: center; gap: 0.4rem; }
+  .booking-legend__swatch { width: 0.65rem; height: 0.65rem; border-radius: 50%; }
+  .booking-legend__swatch--studio { background: var(--pine); }
+  .booking-legend__swatch--home { background: var(--clay); }
   .calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(9rem, 1fr)); overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow-soft); }
   .calendar-day { min-height: 24rem; padding: 0.75rem; border-right: 1px solid var(--border); }
   .calendar-day:last-child { border: 0; }
@@ -294,13 +307,18 @@ const shortTime = (value: unknown) => String(value).slice(0, 5);
   .exception-chip--open { background: var(--pine-soft); color: var(--pine-dark); }
   .exception-chip small { opacity: 0.78; }
   .empty-day { color: var(--ink-soft); font-size: 0.75rem; }
-  .booking-item { margin-bottom: 0.5rem; border-left: 3px solid var(--pine); border-radius: 0.4rem; background: var(--pine-soft); }
+  .booking-item { margin-bottom: 0.5rem; border-left: 3px solid; border-radius: 0.4rem; }
+  .booking-item--studio { border-left-color: var(--pine); background: var(--pine-soft); }
+  .booking-item--home { border-left-color: var(--clay); background: var(--clay-soft); }
   .booking-item summary { display: grid; gap: 0.12rem; padding: 0.6rem; cursor: pointer; list-style: none; }
   .booking-item summary::-webkit-details-marker { display: none; }
-  .booking-item summary strong { color: var(--pine-dark); font-size: 0.76rem; }
+  .booking-item summary strong { font-size: 0.76rem; }
+  .booking-item--studio summary strong { color: var(--pine-dark); }
+  .booking-item--home summary strong { color: var(--clay-dark); }
   .booking-item summary span { overflow: hidden; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
   .booking-item summary small { color: var(--ink-soft); }
   .booking-item > div { padding: 0 0.65rem 0.7rem; border-top: 1px solid rgb(40 82 71 / 0.16); font-size: 0.74rem; overflow-wrap: anywhere; }
+  .booking-item--home > div { border-top-color: rgb(155 86 62 / 0.18); }
   .booking-item p { margin: 0.55rem 0; }
   .booking-item--cancelled { border-color: var(--border); background: #eeeae3; opacity: 0.62; }
   .reference { font-family: ui-monospace, monospace; }
