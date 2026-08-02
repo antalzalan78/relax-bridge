@@ -6,24 +6,34 @@ import { servicePath, type Service } from '../lib/services';
 interface Props {
   locale: Locale;
   service: Service;
+  index?: number;
+  showLocation?: boolean;
 }
 
-const { locale, service } = Astro.props;
+const { locale, service, index = 0, showLocation = false } = Astro.props;
 const d = t(locale);
 const { title, summary, category, slug, prices } = service.data;
 const cheapest = Math.min(...prices.map((p) => p.eur));
 ---
 
 <a
-  class="card card--link"
+  class="service-row"
   href={servicePath(locale, category, slug)}
 >
-  <span class="badge">
-    {category === 'studio' ? d.service.studioBadge : d.service.homeBadge}
+  <span class="service-row__index" aria-hidden="true">
+    {String(index + 1).padStart(2, '0')}
   </span>
-  <h3>{title}</h3>
-  <p>{summary}</p>
-  <span class="card__foot">
-    {d.prices.from} &euro; {cheapest}
+  <span class="service-row__body">
+    {showLocation && (
+      <span class="service-row__meta">
+        {category === 'studio' ? d.service.studioBadge : d.service.homeBadge}
+      </span>
+    )}
+    <span class="service-row__title">{title}</span>
+    <span class="service-row__summary">{summary}</span>
+  </span>
+  <span class="service-row__price">
+    <span>{d.prices.from} &euro; {cheapest}</span>
+    <span class="service-row__arrow" aria-hidden="true">&nearr;</span>
   </span>
 </a>

@@ -1,45 +1,46 @@
 ---
-/**
- * A logo alatti viz motivuma szakaszelvalasztokent, a meleg palettaban:
- * borostyan es terrakotta hullamvonal — inkabb homokfodrok, mint viz.
- * Tisztan dekoracio, ezert a kepolvasok szamara rejtett.
- */
+/** A ket partot osszekoto, nyugodt hidvonal. Tisztan dekorativ. */
 ---
 
-<div class="wave" aria-hidden="true">
-  <svg viewBox="0 0 1200 44" preserveAspectRatio="none" focusable="false">
-    <path d="M0 20 C 140 2 260 34 400 20 S 660 2 800 20 S 1060 36 1200 18" />
-    <path d="M0 32 C 150 16 280 44 420 32 S 680 14 820 32 S 1070 46 1200 30" />
+<div class="bridge-divider" aria-hidden="true">
+  <svg viewBox="0 0 1200 92" preserveAspectRatio="none" focusable="false">
+    <path class="bridge-divider__shadow" d="M0 73 C 245 73 340 25 600 25 S 955 73 1200 73" />
+    <path class="bridge-divider__line" d="M0 65 C 245 65 340 17 600 17 S 955 65 1200 65" />
+    <circle cx="0" cy="65" r="4" />
+    <circle cx="1200" cy="65" r="4" />
   </svg>
 </div>
 
 <style>
-  .wave {
+  .bridge-divider {
     width: 100%;
     line-height: 0;
-    margin-block: 1rem;
+    margin-block: 0.5rem;
   }
 
-  .wave svg {
+  .bridge-divider svg {
     display: block;
     width: 100%;
-    height: 2.75rem;
+    height: clamp(3.5rem, 8vw, 5.75rem);
+    overflow: visible;
   }
 
-  .wave path {
+  .bridge-divider path {
     fill: none;
-    stroke-width: 3;
+    stroke-width: 2;
     stroke-linecap: round;
     vector-effect: non-scaling-stroke;
   }
 
-  .wave path:first-child {
-    stroke: var(--warm);
-    opacity: 0.85;
+  .bridge-divider__shadow {
+    stroke: var(--sand);
   }
 
-  .wave path:last-child {
-    stroke: var(--brand);
-    opacity: 0.55;
+  .bridge-divider__line {
+    stroke: var(--clay);
+  }
+
+  .bridge-divider circle {
+    fill: var(--pine);
   }
 </style>

@@ -58,27 +58,27 @@ Csak akkor kell újra futtatni, ha a forráslogó változik.
 
 ## Színek
 
-Meleg, világos paletta — homok, terrakotta és méz —, hogy a hangulat a
-masszázshoz és a relaxációhoz illeszkedjen.
+A „Csendes híd” rendszer meleg papírhátteret, mély fenyőzöldet és visszafogott
+terrakottát használ. A zöld adja a nyugalmat és a szakmai keretet, a terrakotta
+csak a fontos cselekvéseket és a hídszerű összekötő motívumokat emeli ki.
 
 | Szerep | Szín | Kontraszt a háttéren |
 | --- | --- | --- |
-| háttér | `#fdf8f2` meleg krém | — |
-| kártyák háttere | `#ffffff` | — |
-| szöveg | `#332822` | 13,55:1 |
-| halvány szöveg | `#6f6154` | 5,66:1 |
-| linkek, gombok | `#9c4f28` terrakotta | 5,58:1 |
-| kiemelés | `#9c6210` méz | 4,77:1 |
-| dekoráció | `#e0973f` borostyán | csak díszítés |
+| háttér | `#f6f1e8` meleg papír | — |
+| emelt felület | `#fffdfa` törtfehér | — |
+| szöveg | `#1f2d28` zöldes grafit | 12,75:1 |
+| halvány szöveg | `#625f56` meleg szürke | 5,67:1 |
+| fő márkaszín | `#285247` fenyőzöld | 7,82:1 |
+| linkek, CTA | `#a85030` terrakotta | 4,84:1 |
+| dekoráció | `#cdbb9d` homok | csak díszítés |
 
 **Az oldal mindig világos, nincs sötét téma.** A `:root` `color-scheme: light`
 beállítása arról is gondoskodik, hogy a böngésző saját elemei (görgetősáv,
 űrlapmezők) se váltsanak sötétre, ha a látogató gépe sötét témára van állítva.
 
-A kiindulópont a logó narancsa — ez az egyetlen meleg szín benne. A logó saját
-színei szövegnek túl világosak (a narancs világos háttéren 1,81:1), ezért a
-felület sötétebb, telítettebb változatokat használ, a logó pedig megmarad a
-saját színeivel márkajelként.
+A logó saját, világos színei továbbra is márkajelként maradnak meg. A felület
+sötétebb fenyőzöldje és terrakottája ezek karakteresebb, akadálymentes
+környezete; a hídívek végig összekötő vizuális elemként jelennek meg.
 
 Minden szöveg- és gombszín legalább 4,5:1 kontrasztú (WCAG AA). Ellenőrzés:
 

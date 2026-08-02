@@ -18,9 +18,12 @@ const year = new Date().getFullYear();
 
 <footer class="site-footer">
   <div class="wrap">
-    <a href={pathFor(locale)} aria-label={site.name}>
-      <Image class="footer-logo" src={logo} alt={site.name} width={400} loading="lazy" />
-    </a>
+    <div class="site-footer__intro">
+      <a href={pathFor(locale)} aria-label={site.name}>
+        <Image class="footer-logo" src={logo} alt={site.name} width={400} loading="lazy" />
+      </a>
+      <p>{d.tagline}</p>
+    </div>
 
     <div class="grid grid--3">
       <div>

@@ -1,5 +1,5 @@
 /**
- * Kontrasztellenorzes a logo szineire.
+ * A Csendes hid paletta kontrasztellenorzese.
  * A szoveghez hasznalt szineknek el kell erniuk a WCAG AA 4.5:1 aranyt.
  * Futtatas: node scripts/check-contrast.mjs
  */
@@ -18,29 +18,21 @@ const ratio = (a, b) => {
   return (hi + 0.05) / (lo + 0.05);
 };
 
-const backgrounds = { vilagos: '#fdf8f2', sotet: '#1c1714' };
+const backgrounds = { papir: '#f6f1e8', fenyo: '#193c34' };
 
 const candidates = {
-  // meleg szovegszinek
-  'meleg sotetbarna (szoveg)': '#332822',
-  'meleg szurkesbarna (halvany szoveg)': '#6f6154',
-  // terrakotta / agyag — fo interaktiv szin
-  'terrakotta': '#c2673a',
-  'terrakotta -1': '#b05c31',
-  'terrakotta -2': '#9c4f28',
-  'terrakotta -3': '#8a4522',
-  // meleg borostyan / mez
-  'borostyan': '#e0973f',
-  'borostyan -2': '#b9761f',
-  'borostyan -3': '#9c6210',
-  // a logo sajat szinei
+  'zoldes grafit (szoveg)': '#1f2d28',
+  'meleg szurke (halvany szoveg)': '#625f56',
+  'fenyozold (marka)': '#285247',
+  'sotet fenyo': '#193c34',
+  'terrakotta (CTA)': '#a85030',
+  'sotet terrakotta': '#873d24',
+  'tortfeher': '#fffdfa',
+  'feher': '#ffffff',
+  'homok (dekoracio)': '#cdbb9d',
   'logo narancs': '#fdaa38',
   'logo zold': '#56b44a',
   'logo lila': '#8755b6',
-  // sotet temara szant vilagos, meleg arnyalatok
-  'homok (sotet temara)': '#f2c9a0',
-  'barack (sotet temara)': '#eda877',
-  'halvany terrakotta (sotet temara)': '#e59468',
 };
 
 for (const [bgName, bg] of Object.entries(backgrounds)) {
