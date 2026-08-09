@@ -11,6 +11,7 @@ import {
   readJson,
   requestFingerprint,
 } from '../../lib/server/security';
+import { dispatchPendingBookingEmails } from '../../lib/server/booking-email';
 
 export const prerender = false;
 
@@ -71,6 +72,15 @@ export const POST: APIRoute = async ({ request }) => {
       homeAddress: parsed.data.homeAddress,
       notes: parsed.data.notes,
     });
+
+    try {
+      await dispatchPendingBookingEmails({ bookingId: booking.id, limit: 2 });
+    } catch (error) {
+      console.error('Booking saved, but email dispatch could not start', {
+        bookingId: booking.id,
+        error,
+      });
+    }
 
     return Response.json({ booking }, { status: 201 });
   } catch (error) {

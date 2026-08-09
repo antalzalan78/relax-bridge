@@ -76,6 +76,34 @@ Első beállítás:
 6. Az `/admin` oldalon add meg a heti nyitvatartási sávokat. Egyedi napot vagy
    idősávot lezárhatsz, illetve extra nyitvatartást is felvehetsz.
 
+### Foglalási e-mailek
+
+Minden végleges foglalás két e-mailt hoz létre: az ügyfél a foglalás nyelvén
+kap visszaigazolást, az `info@relaxbridge.nl` pedig magyar nyelvű értesítést.
+A kézbesítési feladatok ugyanabban az adatbázis-tranzakcióban készülnek el,
+mint a foglalás, ezért átmeneti e-mail-hiba esetén is megmaradnak és
+újrapróbálhatók.
+
+A küldéshez a `relaxbridge.nl` domaint hitelesíteni kell a Resendben, majd a
+Resend által megadott SPF-, DKIM- és MX-rekordokat fel kell venni a TransIP DNS
+beállításaiban. Ezután a következő változókat kell megadni a Vercel projektben:
+
+```text
+RESEND_API_KEY
+BOOKING_EMAIL_FROM="Relax Bridge <info@relaxbridge.nl>"
+BOOKING_OWNER_EMAIL=info@relaxbridge.nl
+BOOKING_STUDIO_ADDRESS="A stúdió teljes címe"
+CRON_SECRET
+```
+
+Az azonnali küldés mellett egy naponta futó, titkosított Vercel Cron végzi az
+esetlegesen elakadt levelek újrapróbálását. Az adatbázis frissítését a kód
+telepítése előtt kell futtatni:
+
+```powershell
+npm.cmd run db:migrate
+```
+
 Az alapbeállítás 15 perces időrács, 12 órás minimum előfoglalás és 60 napos
 foglalási horizont. A stúdióidőpont után 15 perc, az otthoni kezelés előtt és
 után 30–30 perc automatikus puffer foglalódik a közös naptárban.
@@ -164,8 +192,6 @@ Minden `main`-re push automatikusan új verziót telepít.
 
 A `src/data/site.ts` fájlban `TODO` jelöléssel:
 
-- **e-mail cím** — a régi oldalon üresen állt, a sablonban pedig egy nem létező
-  `info@relaxbridge.com` maradt. Amíg nincs valódi cím, sehol nem jelenik meg.
 - **a stúdió pontos címe** és a **nyitvatartás** — ezek nélkül a strukturált
   adat hiányos, és a Google Cégprofil sem tud rendesen bekötni.
 

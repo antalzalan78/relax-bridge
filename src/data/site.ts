@@ -15,13 +15,7 @@ export const site = {
   phoneDisplay: '+31 6 53964923',
   whatsapp: 'https://wa.me/31653964923',
 
-  /**
-   * TODO: nincs meg valodi e-mail cim.
-   * A regi oldalon az "E-mail :" felirat utan uresen volt hagyva, a sablonban
-   * pedig egy nem letezo info@relaxbridge.com maradt. Amig ez null, az e-mail
-   * sor egyszeruen nem jelenik meg sehol.
-   */
-  email: null as string | null,
+  email: 'info@relaxbridge.nl' as string | null,
 
   // --- helyszin ---
   city: 'Tilburg',

@@ -238,6 +238,8 @@ export async function createConfirmedBooking(
 
       const id = randomUUID();
       const reference = referenceFor(selected.start, settings.timeZone);
+      const customerEmailDeliveryId = randomUUID();
+      const ownerEmailDeliveryId = randomUUID();
       await transaction`
         INSERT INTO bookings (
           id, reference, service_key, service_category, service_title,
@@ -253,6 +255,13 @@ export async function createConfirmedBooking(
           ${selected.busyStart}::timestamptz, ${selected.busyEnd}::timestamptz,
           'confirmed'
         )
+      `;
+
+      await transaction`
+        INSERT INTO booking_email_deliveries (id, booking_id, kind)
+        VALUES
+          (${customerEmailDeliveryId}, ${id}, 'customer_confirmation'),
+          (${ownerEmailDeliveryId}, ${id}, 'owner_notification')
       `;
 
       return { id, reference, start: selected.start, end: selected.end };
@@ -311,12 +320,23 @@ export async function listAvailabilityExceptions(from: string, to: string) {
 
 export async function listBookings(from: string, to: string) {
   return getDatabase()`
-    SELECT id, reference, service_title, service_category, duration_minutes,
-      price_eur, customer_name, customer_email, customer_phone, home_address,
-      notes, locale, starts_at, ends_at, status, created_at
-    FROM bookings
-    WHERE starts_at >= ${from}::timestamptz AND starts_at < ${to}::timestamptz
-    ORDER BY starts_at
+    SELECT booking.id, booking.reference, booking.service_title,
+      booking.service_category, booking.duration_minutes, booking.price_eur,
+      booking.customer_name, booking.customer_email, booking.customer_phone,
+      booking.home_address, booking.notes, booking.locale, booking.starts_at,
+      booking.ends_at, booking.status, booking.created_at,
+      customer_delivery.status AS customer_email_status,
+      owner_delivery.status AS owner_email_status
+    FROM bookings AS booking
+    LEFT JOIN booking_email_deliveries AS customer_delivery
+      ON customer_delivery.booking_id = booking.id
+      AND customer_delivery.kind = 'customer_confirmation'
+    LEFT JOIN booking_email_deliveries AS owner_delivery
+      ON owner_delivery.booking_id = booking.id
+      AND owner_delivery.kind = 'owner_notification'
+    WHERE booking.starts_at >= ${from}::timestamptz
+      AND booking.starts_at < ${to}::timestamptz
+    ORDER BY booking.starts_at
   `;
 }
 

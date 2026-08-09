@@ -14,6 +14,7 @@ import {
   listBookings,
 } from '../../lib/server/booking-repository';
 import { assertSameOrigin } from '../../lib/server/security';
+import { retryBookingEmails } from '../../lib/server/booking-email';
 import '../../styles/global.css';
 
 export const prerender = false;
@@ -75,6 +76,9 @@ if (Astro.request.method === 'POST') {
     } else if (action === 'cancel_booking') {
       const { id } = z.object({ id: z.uuid() }).parse(form);
       await cancelBooking(id);
+    } else if (action === 'retry_booking_emails') {
+      const { id } = z.object({ id: z.uuid() }).parse(form);
+      await retryBookingEmails(id);
     }
     return Astro.redirect(`/admin?week=${weekStart.toString()}`, 303);
   } catch (error) {
@@ -114,6 +118,12 @@ for (const booking of bookings) {
 const exceptionsByDay = new Map(days.map((day) => [day.toString(), [] as any[]]));
 for (const exception of exceptions) exceptionsByDay.get(localDate(exception.day))?.push(exception);
 const shortTime = (value: unknown) => String(value).slice(0, 5);
+const emailStatusLabel = (value: unknown) => ({
+  pending: 'függőben',
+  sending: 'küldés alatt',
+  sent: 'elküldve',
+  failed: 'sikertelen',
+}[String(value)] || 'nem volt ütemezve');
 ---
 
 <!doctype html>
@@ -191,6 +201,24 @@ const shortTime = (value: unknown) => String(value).slice(0, 5);
                         {booking.home_address && <p><strong>Cím:</strong> {booking.home_address}</p>}
                         {booking.notes && <p><strong>Megjegyzés:</strong> {booking.notes}</p>}
                         <p class="reference">{booking.reference}</p>
+                        {(booking.customer_email_status || booking.owner_email_status) && (
+                          <div class="email-delivery" aria-label="E-mail-kézbesítés">
+                            <span class:list={{ 'email-delivery--sent': booking.customer_email_status === 'sent' }}>
+                              Ügyfél: {emailStatusLabel(booking.customer_email_status)}
+                            </span>
+                            <span class:list={{ 'email-delivery--sent': booking.owner_email_status === 'sent' }}>
+                              Saját: {emailStatusLabel(booking.owner_email_status)}
+                            </span>
+                          </div>
+                        )}
+                        {(booking.customer_email_status && booking.customer_email_status !== 'sent') ||
+                        (booking.owner_email_status && booking.owner_email_status !== 'sent') ? (
+                          <form method="post">
+                            <input type="hidden" name="action" value="retry_booking_emails" />
+                            <input type="hidden" name="id" value={booking.id} />
+                            <button class="retry-link" type="submit">E-mailek újrapróbálása</button>
+                          </form>
+                        ) : null}
                         {booking.status === 'confirmed' ? (
                           <form method="post" onsubmit="return confirm('Biztosan lemondod ezt a foglalást?')">
                             <input type="hidden" name="action" value="cancel_booking" />
@@ -322,6 +350,10 @@ const shortTime = (value: unknown) => String(value).slice(0, 5);
   .booking-item p { margin: 0.55rem 0; }
   .booking-item--cancelled { border-color: var(--border); background: #eeeae3; opacity: 0.62; }
   .reference { font-family: ui-monospace, monospace; }
+  .email-delivery { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-block: 0.55rem; }
+  .email-delivery span { padding: 0.2rem 0.42rem; border-radius: 999px; background: #eee7db; color: var(--ink-soft); font-size: 0.64rem; font-weight: 700; }
+  .email-delivery .email-delivery--sent { background: var(--pine-soft); color: var(--pine-dark); }
+  .retry-link { margin-bottom: 0.55rem; padding: 0; border: 0; background: none; color: var(--clay-dark); cursor: pointer; font: inherit; font-weight: 700; }
   .danger-link { padding: 0; border: 0; background: none; color: #8f2f24; cursor: pointer; font: inherit; font-weight: 700; }
   .cancelled-label { color: #8f2f24; font-weight: 700; }
   .admin-panels { display: grid; gap: 1.25rem; margin-top: 1.5rem; }

@@ -79,6 +79,26 @@ CREATE TABLE IF NOT EXISTS bookings (
 CREATE INDEX IF NOT EXISTS bookings_starts_at_idx
   ON bookings (starts_at);
 
+CREATE TABLE IF NOT EXISTS booking_email_deliveries (
+  id uuid PRIMARY KEY,
+  booking_id uuid NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
+  kind text NOT NULL CHECK (kind IN ('customer_confirmation', 'owner_notification')),
+  status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'sending', 'sent', 'failed')),
+  attempts smallint NOT NULL DEFAULT 0 CHECK (attempts >= 0),
+  next_attempt_at timestamptz NOT NULL DEFAULT now(),
+  claimed_at timestamptz,
+  provider_message_id text,
+  last_error text,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  sent_at timestamptz,
+  UNIQUE (booking_id, kind)
+);
+
+CREATE INDEX IF NOT EXISTS booking_email_deliveries_pending_idx
+  ON booking_email_deliveries (next_attempt_at, created_at)
+  WHERE status IN ('pending', 'sending', 'failed');
+
 ALTER TABLE bookings
   DROP CONSTRAINT IF EXISTS bookings_no_confirmed_overlap;
 
