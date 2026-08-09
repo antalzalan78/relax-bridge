@@ -1,7 +1,8 @@
 # Relax Bridge
 
-A [relaxbridge.nl](https://www.relaxbridge.nl/) weboldala. Astro alapú statikus
-oldal, három nyelven, Vercelre telepítve.
+A [relaxbridge.nl](https://www.relaxbridge.nl/) weboldala. Astro-alapú hibrid
+oldal három nyelven: a tartalmi oldalak statikusak, a saját foglalórendszer
+Vercel-függvényeken és PostgreSQL-adatbázison fut.
 
 A régi, Strikingly-alapú oldal mentése a `snapshot/` és `content/` mappában
 maradt meg — abból készült ez az átépítés.
@@ -20,6 +21,9 @@ A fejlesztői szerver a <http://localhost:4321> címen fut.
 | `npm run dev` | fejlesztői szerver, mentésre azonnal frissül |
 | `npm run build` | legyártja a kész oldalt a `dist/` mappába |
 | `npm run preview` | a legyártott oldalt szolgálja ki, telepítés előtti ellenőrzésre |
+| `npm run test:booking` | a foglalási időpontmotor automatikus tesztjei |
+| `npm run db:migrate` | létrehozza vagy frissíti a foglalási adatbázist |
+| `npm run admin:hash` | biztonságos admin-jelszóhash készítése |
 
 ## Felépítés
 
@@ -42,6 +46,67 @@ src/
 **Ha elérhetőség változik**, csak a `src/data/site.ts` fájlt kell átírni. Ez
 szándékos: a régi oldalon a telefonszám szét volt szórva, és két hibás változat
 is bent maradt belőle.
+
+## Saját foglalórendszer
+
+A publikus foglalóoldal a `/booking`, `/en/booking` és `/hu/booking` útvonalon,
+az adminfelület a `/admin` útvonalon érhető el. Egy masszőr egyetlen közös
+naptárát kezeli. A még szabad időpont elküldéskor azonnal véglegessé válik; az
+adatbázis akkor is megakadályozza a dupla foglalást, ha két látogató egyszerre
+küldi el ugyanazt az időpontot.
+
+Első beállítás:
+
+1. Hozz létre egy menedzselt PostgreSQL-adatbázist.
+2. Másold le a `.env.example` fájlt `.env` néven, és töltsd ki a változókat.
+3. Készíts legalább 12 karakteres adminjelszóhoz hash-t:
+
+   ```powershell
+   $env:ADMIN_PASSWORD='egy-hosszú-egyedi-jelszó'
+   npm.cmd run admin:hash
+   ```
+
+4. A kapott értéket add meg `ADMIN_PASSWORD_HASH` néven, majd futtasd:
+
+   ```powershell
+   npm.cmd run db:migrate
+   ```
+
+5. Ugyanezeket a környezeti változókat állítsd be a Vercel projektben is.
+6. Az `/admin` oldalon add meg a heti nyitvatartási sávokat. Egyedi napot vagy
+   idősávot lezárhatsz, illetve extra nyitvatartást is felvehetsz.
+
+### Foglalási e-mailek
+
+Minden végleges foglalás két e-mailt hoz létre: az ügyfél a foglalás nyelvén
+kap visszaigazolást, az `info@relaxbridge.nl` pedig magyar nyelvű értesítést.
+A kézbesítési feladatok ugyanabban az adatbázis-tranzakcióban készülnek el,
+mint a foglalás, ezért átmeneti e-mail-hiba esetén is megmaradnak és
+újrapróbálhatók.
+
+A küldéshez a `relaxbridge.nl` domaint hitelesíteni kell a Resendben, majd a
+Resend által megadott SPF-, DKIM- és MX-rekordokat fel kell venni a TransIP DNS
+beállításaiban. Ezután a következő változókat kell megadni a Vercel projektben:
+
+```text
+RESEND_API_KEY
+BOOKING_EMAIL_FROM="Relax Bridge <info@relaxbridge.nl>"
+BOOKING_OWNER_EMAIL=info@relaxbridge.nl
+BOOKING_STUDIO_ADDRESS="A stúdió teljes címe"
+CRON_SECRET
+```
+
+Az azonnali küldés mellett egy naponta futó, titkosított Vercel Cron végzi az
+esetlegesen elakadt levelek újrapróbálását. Az adatbázis frissítését a kód
+telepítése előtt kell futtatni:
+
+```powershell
+npm.cmd run db:migrate
+```
+
+Az alapbeállítás 15 perces időrács, 12 órás minimum előfoglalás és 60 napos
+foglalási horizont. A stúdióidőpont után 15 perc, az otthoni kezelés előtt és
+után 30–30 perc automatikus puffer foglalódik a közös naptárban.
 
 ## A logó
 
@@ -127,12 +192,8 @@ Minden `main`-re push automatikusan új verziót telepít.
 
 A `src/data/site.ts` fájlban `TODO` jelöléssel:
 
-- **e-mail cím** — a régi oldalon üresen állt, a sablonban pedig egy nem létező
-  `info@relaxbridge.com` maradt. Amíg nincs valódi cím, sehol nem jelenik meg.
 - **a stúdió pontos címe** és a **nyitvatartás** — ezek nélkül a strukturált
   adat hiányos, és a Google Cégprofil sem tud rendesen bekötni.
-- **foglalórendszer** — jelenleg a WhatsApp az egyetlen út. A `bookingUrl`
-  kitöltésével köthető be.
 
 Ezen felül: **„rólam" rész és vélemények.** Masszázsnál ez dönt a bizalomról, és
 a régi oldalon egyik sem volt. A fotók megvannak hozzá, a szöveg hiányzik.

@@ -15,13 +15,7 @@ export const site = {
   phoneDisplay: '+31 6 53964923',
   whatsapp: 'https://wa.me/31653964923',
 
-  /**
-   * TODO: nincs meg valodi e-mail cim.
-   * A regi oldalon az "E-mail :" felirat utan uresen volt hagyva, a sablonban
-   * pedig egy nem letezo info@relaxbridge.com maradt. Amig ez null, az e-mail
-   * sor egyszeruen nem jelenik meg sehol.
-   */
-  email: null as string | null,
+  email: 'info@relaxbridge.nl' as string | null,
 
   // --- helyszin ---
   city: 'Tilburg',
@@ -38,9 +32,6 @@ export const site = {
 
   // --- kulso szolgaltatasok ---
   giftCardUrl: 'https://giftcards.sumup.com/order/MEMDT1BM',
-
-  /** TODO: a foglalorendszer URL-je, ha megvan. Addig a WhatsApp az elsodleges ut. */
-  bookingUrl: null as string | null,
 
   // --- kozossegi media ---
   social: {
@@ -84,4 +75,9 @@ export function pathFor(locale: Locale, path = ''): string {
   const prefix = localePrefix(locale);
   if (!clean) return prefix || '/';
   return `${prefix}/${clean}`;
+}
+
+/** A sajat foglalasi oldal teljes, lokalizalt utvonala. */
+export function bookingPath(locale: Locale): string {
+  return pathFor(locale, 'booking');
 }

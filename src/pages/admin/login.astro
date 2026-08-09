@@ -1,0 +1,91 @@
+---
+import { z } from 'zod';
+import {
+  getAdminSession,
+  startAdminSession,
+  verifyAdminCredentials,
+} from '../../lib/server/admin-auth';
+import { consumeRateLimit } from '../../lib/server/booking-repository';
+import { assertSameOrigin, requestFingerprint } from '../../lib/server/security';
+import '../../styles/global.css';
+
+export const prerender = false;
+
+if (await getAdminSession(Astro.cookies)) {
+  return Astro.redirect('/admin');
+}
+
+let error = '';
+if (Astro.request.method === 'POST') {
+  try {
+    assertSameOrigin(Astro.request);
+    const form = Object.fromEntries(await Astro.request.formData());
+    const parsed = z.object({
+      email: z.email().max(200),
+      password: z.string().min(1).max(300),
+    }).safeParse(form);
+    const allowed = await consumeRateLimit({
+      key: requestFingerprint(Astro.request, 'admin-login'),
+      limit: 10,
+      windowSeconds: 15 * 60,
+    });
+
+    if (
+      allowed &&
+      parsed.success &&
+      verifyAdminCredentials(parsed.data.email, parsed.data.password)
+    ) {
+      await startAdminSession(
+        Astro.cookies,
+        parsed.data.email,
+        new URL(Astro.request.url).protocol === 'https:',
+      );
+      return Astro.redirect('/admin');
+    }
+    error = allowed
+      ? 'A megadott e-mail-cím vagy jelszó nem megfelelő.'
+      : 'Túl sok próbálkozás. Kérlek, próbáld újra később.';
+  } catch (caught) {
+    if (caught instanceof Response) return caught;
+    console.error('Admin login failed', caught);
+    error = 'A belépés most nem érhető el. Ellenőrizd az adatbázis beállításait.';
+  }
+}
+---
+
+<!doctype html>
+<html lang="hu">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Admin belépés — Relax Bridge</title>
+  </head>
+  <body class="admin-login-page">
+    <main class="admin-login">
+      <span class="admin-login__bridge" aria-hidden="true"></span>
+      <span class="eyebrow">Relax Bridge</span>
+      <h1>Foglalási admin</h1>
+      <p>Itt kezelheted a szabad időket és a beérkezett foglalásokat.</p>
+      <form method="post">
+        <label for="email">E-mail-cím</label>
+        <input id="email" name="email" type="email" autocomplete="username" required />
+        <label for="password">Jelszó</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required />
+        <button class="btn btn--primary btn--block" type="submit">Belépés</button>
+        {error && <p class="login-error" role="alert">{error}</p>}
+      </form>
+    </main>
+  </body>
+</html>
+
+<style>
+  .admin-login-page { min-height: 100vh; display: grid; place-items: center; padding: 1rem; background: var(--pine-dark); }
+  .admin-login { width: min(100%, 28rem); padding: clamp(1.5rem, 5vw, 3rem); border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow-raised); }
+  .admin-login__bridge { display: block; width: 6rem; height: 2.2rem; margin-bottom: 1.4rem; border: 1px solid var(--sand); border-bottom: 0; border-radius: 50% 50% 0 0; }
+  .admin-login h1 { max-width: none; font-size: clamp(2.4rem, 8vw, 3.7rem); }
+  .admin-login form { display: grid; gap: 0.7rem; margin-top: 2rem; }
+  .admin-login label { color: var(--pine-dark); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+  .admin-login input { min-height: 3rem; margin-bottom: 0.55rem; padding: 0.7rem 0.8rem; border: 1px solid var(--border); border-radius: var(--radius-sm); font: inherit; }
+  .login-error { margin: 0.5rem 0 0; color: #8f2f24; font-weight: 700; }
+</style>

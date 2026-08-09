@@ -1,0 +1,388 @@
+---
+import { Temporal } from '@js-temporal/polyfill';
+import { z } from 'zod';
+import { getAdminSession } from '../../lib/server/admin-auth';
+import {
+  addAvailabilityException,
+  addAvailabilityRule,
+  cancelBooking,
+  deleteAvailabilityException,
+  deleteAvailabilityRule,
+  getBookingSettings,
+  listAvailabilityExceptions,
+  listAvailabilityRules,
+  listBookings,
+} from '../../lib/server/booking-repository';
+import { assertSameOrigin } from '../../lib/server/security';
+import { retryBookingEmails } from '../../lib/server/booking-email';
+import '../../styles/global.css';
+
+export const prerender = false;
+
+const session = await getAdminSession(Astro.cookies);
+if (!session) return Astro.redirect('/admin/login');
+
+const settings = await getBookingSettings();
+const today = Temporal.Now.zonedDateTimeISO(settings.timeZone).toPlainDate();
+const requestedWeek = Astro.url.searchParams.get('week');
+let selected = today;
+try {
+  if (requestedWeek) selected = Temporal.PlainDate.from(requestedWeek);
+} catch {}
+const weekStart = selected.subtract({ days: selected.dayOfWeek - 1 });
+const weekEnd = weekStart.add({ days: 7 });
+const previousWeek = weekStart.subtract({ days: 7 }).toString();
+const nextWeek = weekStart.add({ days: 7 }).toString();
+
+if (Astro.request.method === 'POST') {
+  try {
+    assertSameOrigin(Astro.request);
+    const form = Object.fromEntries(await Astro.request.formData());
+    const action = String(form.action || '');
+
+    if (action === 'add_rule') {
+      const input = z.object({
+        weekday: z.coerce.number().int().min(1).max(7),
+        startTime: z.string().regex(/^\d{2}:\d{2}$/),
+        endTime: z.string().regex(/^\d{2}:\d{2}$/),
+      }).parse(form);
+      if (input.startTime >= input.endTime) throw new Error('Invalid time range');
+      await addAvailabilityRule(input);
+    } else if (action === 'delete_rule') {
+      const { id } = z.object({ id: z.uuid() }).parse(form);
+      await deleteAvailabilityRule(id);
+    } else if (action === 'add_exception') {
+      const input = z.object({
+        day: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+        kind: z.enum(['open', 'blocked']),
+        startTime: z.string().optional(),
+        endTime: z.string().optional(),
+        reason: z.string().trim().max(200).optional(),
+        allDay: z.string().optional(),
+      }).parse(form);
+      const allDay = input.allDay === 'on';
+      const startTime = allDay ? undefined : input.startTime || undefined;
+      const endTime = allDay ? undefined : input.endTime || undefined;
+      if ((!startTime && endTime) || (startTime && !endTime) || (startTime && endTime && startTime >= endTime)) {
+        throw new Error('Invalid exception range');
+      }
+      if (input.kind === 'open' && (!startTime || !endTime)) {
+        throw new Error('Open exceptions require a time range');
+      }
+      await addAvailabilityException({ ...input, startTime, endTime });
+    } else if (action === 'delete_exception') {
+      const { id } = z.object({ id: z.uuid() }).parse(form);
+      await deleteAvailabilityException(id);
+    } else if (action === 'cancel_booking') {
+      const { id } = z.object({ id: z.uuid() }).parse(form);
+      await cancelBooking(id);
+    } else if (action === 'retry_booking_emails') {
+      const { id } = z.object({ id: z.uuid() }).parse(form);
+      await retryBookingEmails(id);
+    }
+    return Astro.redirect(`/admin?week=${weekStart.toString()}`, 303);
+  } catch (error) {
+    if (error instanceof Response) return error;
+    console.error('Admin action failed', error);
+    return new Response('A módosítás nem menthető. Ellenőrizd a megadott adatokat.', { status: 400 });
+  }
+}
+
+const startInstant = weekStart.toZonedDateTime({
+  timeZone: settings.timeZone,
+  plainTime: Temporal.PlainTime.from('00:00'),
+}).toInstant().toString();
+const endInstant = weekEnd.toZonedDateTime({
+  timeZone: settings.timeZone,
+  plainTime: Temporal.PlainTime.from('00:00'),
+}).toInstant().toString();
+
+const [rules, exceptions, bookings] = await Promise.all([
+  listAvailabilityRules(),
+  listAvailabilityExceptions(weekStart.toString(), weekEnd.subtract({ days: 1 }).toString()),
+  listBookings(startInstant, endInstant),
+]);
+
+const weekdays = ['Hétfő', 'Kedd', 'Szerda', 'Csütörtök', 'Péntek', 'Szombat', 'Vasárnap'];
+const localDate = (value: unknown) =>
+  value instanceof Date ? value.toISOString().slice(0, 10) : String(value).slice(0, 10);
+const localBooking = (value: unknown) =>
+  Temporal.Instant.from(value instanceof Date ? value.toISOString() : String(value))
+    .toZonedDateTimeISO(settings.timeZone);
+const days = Array.from({ length: 7 }, (_, index) => weekStart.add({ days: index }));
+const bookingsByDay = new Map(days.map((day) => [day.toString(), [] as any[]]));
+for (const booking of bookings) {
+  const key = localBooking(booking.starts_at).toPlainDate().toString();
+  bookingsByDay.get(key)?.push(booking);
+}
+const exceptionsByDay = new Map(days.map((day) => [day.toString(), [] as any[]]));
+for (const exception of exceptions) exceptionsByDay.get(localDate(exception.day))?.push(exception);
+const shortTime = (value: unknown) => String(value).slice(0, 5);
+const emailStatusLabel = (value: unknown) => ({
+  pending: 'függőben',
+  sending: 'küldés alatt',
+  sent: 'elküldve',
+  failed: 'sikertelen',
+}[String(value)] || 'nem volt ütemezve');
+---
+
+<!doctype html>
+<html lang="hu">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Foglalási admin — Relax Bridge</title>
+  </head>
+  <body class="admin-page">
+    <header class="admin-header">
+      <div class="admin-wrap admin-header__inner">
+        <a class="admin-brand" href="/admin">Relax Bridge <small>Foglalási admin</small></a>
+        <span>{session.email}</span>
+        <form method="post" action="/admin/logout">
+          <button class="admin-link" type="submit">Kilépés</button>
+        </form>
+      </div>
+    </header>
+
+    <main class="admin-wrap admin-main">
+      <section class="admin-title">
+        <div>
+          <span class="eyebrow">Egy közös naptár</span>
+          <h1>Foglalások és szabad idők</h1>
+          <div class="booking-legend" aria-label="Foglalástípusok jelmagyarázata">
+            <span><i class="booking-legend__swatch booking-legend__swatch--studio"></i>Stúdió</span>
+            <span><i class="booking-legend__swatch booking-legend__swatch--home"></i>Home service</span>
+          </div>
+        </div>
+        <nav class="week-nav" aria-label="Hétválasztó">
+          <a href={`/admin?week=${previousWeek}`} aria-label="Előző hét">&larr;</a>
+          <strong>{weekStart.toLocaleString('hu-HU', { day: 'numeric', month: 'long' })} – {weekEnd.subtract({ days: 1 }).toLocaleString('hu-HU', { day: 'numeric', month: 'long', year: 'numeric' })}</strong>
+          <a href={`/admin?week=${nextWeek}`} aria-label="Következő hét">&rarr;</a>
+        </nav>
+      </section>
+
+      <section class="calendar-grid" aria-label="Heti foglalások">
+        {days.map((day, index) => {
+          const dayBookings = bookingsByDay.get(day.toString()) || [];
+          const dayExceptions = exceptionsByDay.get(day.toString()) || [];
+          return (
+            <article class:list={['calendar-day', { 'calendar-day--today': day.equals(today) }]}>
+              <header>
+                <span>{weekdays[index]}</span>
+                <strong>{day.day}</strong>
+              </header>
+              {dayExceptions.map((exception) => (
+                <div class:list={['exception-chip', `exception-chip--${exception.kind}`]}>
+                  <span>{exception.kind === 'blocked' ? 'Zárva' : 'Extra nyitva'}</span>
+                  <small>{exception.start_time ? `${shortTime(exception.start_time)}–${shortTime(exception.end_time)}` : 'egész nap'}{exception.reason ? ` · ${exception.reason}` : ''}</small>
+                </div>
+              ))}
+              <div class="day-bookings">
+                {dayBookings.length === 0 && <p class="empty-day">Nincs foglalás</p>}
+                {dayBookings.map((booking) => {
+                  const start = localBooking(booking.starts_at);
+                  const end = localBooking(booking.ends_at);
+                  return (
+                    <details class:list={[
+                      'booking-item',
+                      `booking-item--${booking.service_category}`,
+                      { 'booking-item--cancelled': booking.status === 'cancelled' },
+                    ]}>
+                      <summary>
+                        <strong>{String(start.hour).padStart(2, '0')}:{String(start.minute).padStart(2, '0')}</strong>
+                        <span>{booking.customer_name}</span>
+                        <small>{booking.service_category === 'home' ? 'Otthoni' : 'Stúdió'}</small>
+                      </summary>
+                      <div>
+                        <p>{booking.service_title} · {booking.duration_minutes} perc · € {Number(booking.price_eur)}</p>
+                        <p>{String(start.hour).padStart(2, '0')}:{String(start.minute).padStart(2, '0')}–{String(end.hour).padStart(2, '0')}:{String(end.minute).padStart(2, '0')}</p>
+                        <p><a href={`tel:${booking.customer_phone}`}>{booking.customer_phone}</a><br /><a href={`mailto:${booking.customer_email}`}>{booking.customer_email}</a></p>
+                        {booking.home_address && <p><strong>Cím:</strong> {booking.home_address}</p>}
+                        {booking.notes && <p><strong>Megjegyzés:</strong> {booking.notes}</p>}
+                        <p class="reference">{booking.reference}</p>
+                        {(booking.customer_email_status || booking.owner_email_status) && (
+                          <div class="email-delivery" aria-label="E-mail-kézbesítés">
+                            <span class:list={{ 'email-delivery--sent': booking.customer_email_status === 'sent' }}>
+                              Ügyfél: {emailStatusLabel(booking.customer_email_status)}
+                            </span>
+                            <span class:list={{ 'email-delivery--sent': booking.owner_email_status === 'sent' }}>
+                              Saját: {emailStatusLabel(booking.owner_email_status)}
+                            </span>
+                          </div>
+                        )}
+                        {(booking.customer_email_status && booking.customer_email_status !== 'sent') ||
+                        (booking.owner_email_status && booking.owner_email_status !== 'sent') ? (
+                          <form method="post">
+                            <input type="hidden" name="action" value="retry_booking_emails" />
+                            <input type="hidden" name="id" value={booking.id} />
+                            <button class="retry-link" type="submit">E-mailek újrapróbálása</button>
+                          </form>
+                        ) : null}
+                        {booking.status === 'confirmed' ? (
+                          <form method="post" onsubmit="return confirm('Biztosan lemondod ezt a foglalást?')">
+                            <input type="hidden" name="action" value="cancel_booking" />
+                            <input type="hidden" name="id" value={booking.id} />
+                            <button class="danger-link" type="submit">Foglalás lemondása</button>
+                          </form>
+                        ) : <span class="cancelled-label">Lemondva</span>}
+                      </div>
+                    </details>
+                  );
+                })}
+              </div>
+            </article>
+          );
+        })}
+      </section>
+
+      <section class="admin-panels">
+        <article class="admin-panel">
+          <span class="panel-number">01</span>
+          <h2>Heti nyitvatartás</h2>
+          <p>Ismétlődő idősávok. Egy naphoz több sáv is felvehető.</p>
+          <form class="compact-form" method="post">
+            <input type="hidden" name="action" value="add_rule" />
+            <label>Nap
+              <select name="weekday" required>{weekdays.map((day, index) => <option value={index + 1}>{day}</option>)}</select>
+            </label>
+            <label>Kezdés<input name="startTime" type="time" step="900" required /></label>
+            <label>Vége<input name="endTime" type="time" step="900" required /></label>
+            <button class="btn btn--primary" type="submit">Idősáv hozzáadása</button>
+          </form>
+          <div class="rule-list">
+            {rules.length === 0 && <p>Még nincs heti nyitvatartás beállítva.</p>}
+            {rules.map((rule) => (
+              <div class="rule-row">
+                <span><strong>{weekdays[Number(rule.weekday) - 1]}</strong> {shortTime(rule.start_time)}–{shortTime(rule.end_time)}</span>
+                <form method="post">
+                  <input type="hidden" name="action" value="delete_rule" />
+                  <input type="hidden" name="id" value={rule.id} />
+                  <button class="icon-button" type="submit" aria-label="Idősáv törlése">×</button>
+                </form>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <article class="admin-panel admin-panel--dark">
+          <span class="panel-number">02</span>
+          <h2>Egyedi nap módosítása</h2>
+          <p>Zárj le egy napot vagy idősávot, illetve adj hozzá extra nyitvatartást.</p>
+          <form class="compact-form" method="post">
+            <input type="hidden" name="action" value="add_exception" />
+            <label>Dátum<input name="day" type="date" value={weekStart.toString()} required /></label>
+            <label>Típus
+              <select name="kind" required>
+                <option value="blocked">Nem elérhető</option>
+                <option value="open">Extra nyitva</option>
+              </select>
+            </label>
+            <label>Kezdés<input name="startTime" type="time" step="900" /></label>
+            <label>Vége<input name="endTime" type="time" step="900" /></label>
+            <label class="checkbox-label"><input name="allDay" type="checkbox" /> Egész nap (csak lezárásnál)</label>
+            <label class="wide-field">Megjegyzés<input name="reason" maxlength="200" placeholder="pl. szabadság" /></label>
+            <button class="btn btn--light" type="submit">Módosítás hozzáadása</button>
+          </form>
+          <div class="rule-list">
+            {exceptions.length === 0 && <p>Ezen a héten nincs egyedi módosítás.</p>}
+            {exceptions.map((exception) => (
+              <div class="rule-row">
+                <span><strong>{localDate(exception.day)}</strong> {exception.kind === 'blocked' ? 'zárva' : 'extra nyitva'} {exception.start_time ? `${shortTime(exception.start_time)}–${shortTime(exception.end_time)}` : 'egész nap'}</span>
+                <form method="post">
+                  <input type="hidden" name="action" value="delete_exception" />
+                  <input type="hidden" name="id" value={exception.id} />
+                  <button class="icon-button" type="submit" aria-label="Módosítás törlése">×</button>
+                </form>
+              </div>
+            ))}
+          </div>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>
+
+<style>
+  .admin-page { min-height: 100vh; padding: 0; background: #f3eee5; font-size: 0.94rem; }
+  .admin-wrap { width: min(94vw, 92rem); margin-inline: auto; }
+  .admin-header { position: sticky; z-index: 10; top: 0; border-bottom: 1px solid var(--border); background: rgb(246 241 232 / 0.94); backdrop-filter: blur(14px); }
+  .admin-header__inner { display: flex; min-height: 4.5rem; align-items: center; gap: 1.25rem; }
+  .admin-brand { margin-right: auto; color: var(--ink); font-family: 'Iowan Old Style', Georgia, serif; font-size: 1.2rem; font-weight: 700; text-decoration: none; }
+  .admin-brand small { display: block; color: var(--clay-dark); font-family: 'Avenir Next', sans-serif; font-size: 0.55rem; letter-spacing: 0.1em; text-transform: uppercase; }
+  .admin-header__inner > span { color: var(--ink-soft); font-size: 0.8rem; }
+  .admin-link { border: 0; background: none; color: var(--pine); cursor: pointer; font: inherit; font-weight: 700; }
+  .admin-main { padding-block: 3rem 6rem; }
+  .admin-title { display: flex; align-items: end; justify-content: space-between; gap: 2rem; margin-bottom: 2rem; }
+  .admin-title h1 { max-width: none; font-size: clamp(2.5rem, 5vw, 4.4rem); }
+  .week-nav { display: flex; align-items: center; gap: 0.8rem; padding: 0.45rem; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); }
+  .week-nav a { display: grid; width: 2.25rem; height: 2.25rem; place-items: center; border-radius: 50%; color: var(--pine); text-decoration: none; }
+  .week-nav a:hover { background: var(--pine-soft); }
+  .week-nav strong { min-width: 15rem; font-size: 0.82rem; text-align: center; }
+  .booking-legend { display: flex; flex-wrap: wrap; gap: 0.55rem 1rem; margin-top: 0.8rem; color: var(--ink-soft); font-size: 0.72rem; font-weight: 700; }
+  .booking-legend span { display: inline-flex; align-items: center; gap: 0.4rem; }
+  .booking-legend__swatch { width: 0.65rem; height: 0.65rem; border-radius: 50%; }
+  .booking-legend__swatch--studio { background: var(--pine); }
+  .booking-legend__swatch--home { background: var(--clay); }
+  .calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(9rem, 1fr)); overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow-soft); }
+  .calendar-day { min-height: 24rem; padding: 0.75rem; border-right: 1px solid var(--border); }
+  .calendar-day:last-child { border: 0; }
+  .calendar-day > header { display: flex; align-items: center; justify-content: space-between; margin: -0.75rem -0.75rem 0.75rem; padding: 0.85rem; border-bottom: 1px solid var(--border); }
+  .calendar-day > header span { color: var(--ink-soft); font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+  .calendar-day > header strong { display: grid; width: 2rem; height: 2rem; place-items: center; border-radius: 50%; font-family: 'Iowan Old Style', Georgia, serif; }
+  .calendar-day--today > header strong { background: var(--clay); color: #fff; }
+  .exception-chip { display: grid; margin-bottom: 0.5rem; padding: 0.5rem; border-radius: 0.45rem; background: var(--clay-soft); color: var(--clay-dark); font-size: 0.72rem; }
+  .exception-chip--open { background: var(--pine-soft); color: var(--pine-dark); }
+  .exception-chip small { opacity: 0.78; }
+  .empty-day { color: var(--ink-soft); font-size: 0.75rem; }
+  .booking-item { margin-bottom: 0.5rem; border-left: 3px solid; border-radius: 0.4rem; }
+  .booking-item--studio { border-left-color: var(--pine); background: var(--pine-soft); }
+  .booking-item--home { border-left-color: var(--clay); background: var(--clay-soft); }
+  .booking-item summary { display: grid; gap: 0.12rem; padding: 0.6rem; cursor: pointer; list-style: none; }
+  .booking-item summary::-webkit-details-marker { display: none; }
+  .booking-item summary strong { font-size: 0.76rem; }
+  .booking-item--studio summary strong { color: var(--pine-dark); }
+  .booking-item--home summary strong { color: var(--clay-dark); }
+  .booking-item summary span { overflow: hidden; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+  .booking-item summary small { color: var(--ink-soft); }
+  .booking-item > div { padding: 0 0.65rem 0.7rem; border-top: 1px solid rgb(40 82 71 / 0.16); font-size: 0.74rem; overflow-wrap: anywhere; }
+  .booking-item--home > div { border-top-color: rgb(155 86 62 / 0.18); }
+  .booking-item p { margin: 0.55rem 0; }
+  .booking-item--cancelled { border-color: var(--border); background: #eeeae3; opacity: 0.62; }
+  .reference { font-family: ui-monospace, monospace; }
+  .email-delivery { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-block: 0.55rem; }
+  .email-delivery span { padding: 0.2rem 0.42rem; border-radius: 999px; background: #eee7db; color: var(--ink-soft); font-size: 0.64rem; font-weight: 700; }
+  .email-delivery .email-delivery--sent { background: var(--pine-soft); color: var(--pine-dark); }
+  .retry-link { margin-bottom: 0.55rem; padding: 0; border: 0; background: none; color: var(--clay-dark); cursor: pointer; font: inherit; font-weight: 700; }
+  .danger-link { padding: 0; border: 0; background: none; color: #8f2f24; cursor: pointer; font: inherit; font-weight: 700; }
+  .cancelled-label { color: #8f2f24; font-weight: 700; }
+  .admin-panels { display: grid; gap: 1.25rem; margin-top: 1.5rem; }
+  @media (min-width: 64rem) { .admin-panels { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .admin-panel { position: relative; overflow: hidden; padding: clamp(1.4rem, 3vw, 2.5rem); border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); }
+  .admin-panel--dark { border: 0; background: var(--pine-dark); color: #fff; }
+  .admin-panel h2 { max-width: none; font-size: 2rem; }
+  .admin-panel > p { color: var(--ink-soft); }
+  .admin-panel--dark > p { color: rgb(255 255 255 / 0.7); }
+  .panel-number { position: absolute; top: 1rem; right: 1.5rem; color: var(--clay); font-family: 'Iowan Old Style', Georgia, serif; font-size: 4rem; opacity: 0.18; }
+  .compact-form { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem; margin-block: 1.5rem; }
+  .compact-form label { color: var(--pine-dark); font-size: 0.67rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+  .admin-panel--dark .compact-form label { color: #fff; }
+  .compact-form input, .compact-form select { display: block; width: 100%; min-height: 2.75rem; margin-top: 0.35rem; padding: 0.55rem; border: 1px solid var(--border); border-radius: var(--radius-sm); background: #fff; color: var(--ink); font: inherit; }
+  .compact-form .btn { grid-column: 1 / -1; justify-content: center; }
+  .compact-form .checkbox-label { grid-column: 1 / -1; display: flex; align-items: center; gap: 0.5rem; }
+  .compact-form .checkbox-label input { width: 1rem; min-height: 1rem; margin: 0; }
+  .compact-form .wide-field { grid-column: 1 / -1; }
+  .rule-list { border-top: 1px solid var(--border); }
+  .admin-panel--dark .rule-list { border-color: var(--border-dark); }
+  .rule-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-block: 0.75rem; border-bottom: 1px solid var(--border); }
+  .admin-panel--dark .rule-row { border-color: var(--border-dark); }
+  .rule-row span { font-size: 0.84rem; }
+  .icon-button { width: 2rem; height: 2rem; border: 0; border-radius: 50%; background: var(--clay-soft); color: var(--clay-dark); cursor: pointer; font-size: 1.2rem; }
+  @media (max-width: 52rem) {
+    .admin-title { display: block; }
+    .week-nav { width: fit-content; margin-top: 1rem; }
+    .admin-header__inner > span { display: none; }
+    .compact-form { grid-template-columns: 1fr; }
+    .compact-form .btn, .compact-form .checkbox-label, .compact-form .wide-field { grid-column: auto; }
+  }
+</style>

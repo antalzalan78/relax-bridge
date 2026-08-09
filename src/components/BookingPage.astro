@@ -1,0 +1,435 @@
+---
+import Base from '../layouts/Base.astro';
+import { bookingPath, pathFor, type Locale } from '../data/site';
+import { bookingText } from '../i18n/booking';
+import { getBookingOptions } from '../lib/booking/catalog';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = bookingText(locale);
+const options = await getBookingOptions(locale);
+const path = bookingPath(locale);
+const alternates = {
+  nl: bookingPath('nl'),
+  en: bookingPath('en'),
+  hu: bookingPath('hu'),
+};
+const dateLocale = locale === 'nl' ? 'nl-NL' : locale === 'hu' ? 'hu-HU' : 'en-GB';
+---
+
+<Base
+  locale={locale}
+  title={`${copy.title} — Relax Bridge`}
+  description={copy.intro}
+  path={path}
+  alternates={alternates}
+>
+  <section class="booking-hero">
+    <div class="wrap booking-hero__inner">
+      <a class="back-link" href={pathFor(locale)}>
+        <span aria-hidden="true">&larr;</span> Relax Bridge
+      </a>
+      <span class="eyebrow">{copy.eyebrow}</span>
+      <h1>{copy.title}</h1>
+      <p class="lead">{copy.intro}</p>
+      <ol class="booking-steps" aria-label={copy.eyebrow}>
+        {copy.steps.map((step, index) => (
+          <li><span>{String(index + 1).padStart(2, '0')}</span>{step}</li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="wrap booking-shell">
+    <form
+      class="booking-form"
+      id="booking-form"
+      data-options={JSON.stringify(options)}
+      data-locale={locale}
+      data-date-locale={dateLocale}
+      data-copy={JSON.stringify(copy)}
+    >
+      <div class="booking-card booking-card--choice">
+        <span class="booking-card__number">01</span>
+        <div>
+          <label for="service">{copy.service}</label>
+          <select id="service" name="service" required>
+            <option value="">{copy.chooseService}</option>
+            {options.map((option) => (
+              <option value={option.id}>
+                {option.category === 'studio' ? copy.studio : copy.home}
+                {' · '}{option.title}{' · '}{option.minutes} min{' · € '}{option.priceEur}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label for="booking-date">{copy.date}</label>
+          <input id="booking-date" name="date" type="date" required />
+        </div>
+
+        <fieldset class="slot-fieldset">
+          <legend>{copy.time}</legend>
+          <p class="slot-status" id="slot-status">{copy.chooseFirst}</p>
+          <div class="slot-grid" id="slot-grid"></div>
+        </fieldset>
+      </div>
+
+      <div class="booking-card booking-card--details" id="details-card" hidden>
+        <span class="booking-card__number">02</span>
+        <div class="appointment-summary" id="appointment-summary" aria-live="polite"></div>
+        <input type="hidden" id="start" name="start" />
+
+        <div class="field-grid">
+          <div>
+            <label for="customer-name">{copy.name}</label>
+            <input id="customer-name" name="customerName" autocomplete="name" required maxlength="100" />
+          </div>
+          <div>
+            <label for="customer-email">{copy.email}</label>
+            <input id="customer-email" name="customerEmail" type="email" autocomplete="email" required maxlength="200" />
+          </div>
+          <div>
+            <label for="customer-phone">{copy.phone}</label>
+            <input id="customer-phone" name="customerPhone" type="tel" autocomplete="tel" required maxlength="40" />
+          </div>
+          <div id="address-field" hidden>
+            <label for="home-address">{copy.address}</label>
+            <input id="home-address" name="homeAddress" autocomplete="street-address" maxlength="300" />
+          </div>
+        </div>
+
+        <label for="notes">{copy.notes}</label>
+        <textarea id="notes" name="notes" rows="3" maxlength="1000"></textarea>
+
+        <div class="honeypot" aria-hidden="true">
+          <label for="website">Website</label>
+          <input id="website" name="website" tabindex="-1" autocomplete="off" />
+        </div>
+
+        <label class="consent">
+          <input name="consent" type="checkbox" required />
+          <span>{copy.consent}</span>
+        </label>
+        <p class="privacy-note">{copy.privacy}</p>
+
+        <button class="btn btn--primary btn--block" id="submit-booking" type="submit">
+          {copy.submit}<span aria-hidden="true">&rarr;</span>
+        </button>
+        <p class="form-error" id="form-error" role="alert" hidden></p>
+      </div>
+    </form>
+
+    <div class="booking-confirmation" id="booking-confirmation" hidden aria-live="polite">
+      <span class="confirmation-mark" aria-hidden="true">✓</span>
+      <span class="eyebrow">Relax Bridge</span>
+      <h2>{copy.confirmed}</h2>
+      <p>{copy.confirmedBody}</p>
+      <div class="confirmation-reference">
+        <span>{copy.reference}</span>
+        <strong id="confirmation-reference"></strong>
+      </div>
+      <button class="btn btn--ghost" id="another-booking" type="button">{copy.another}</button>
+    </div>
+  </section>
+</Base>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('#booking-form');
+
+  if (form) {
+    const options = JSON.parse(form.dataset.options || '[]');
+    const locale = form.dataset.locale || 'nl';
+    const dateLocale = form.dataset.dateLocale || 'nl-NL';
+    const copy = JSON.parse(form.dataset.copy || '{}');
+    const service = form.querySelector<HTMLSelectElement>('#service')!;
+    const date = form.querySelector<HTMLInputElement>('#booking-date')!;
+    const slotStatus = form.querySelector<HTMLElement>('#slot-status')!;
+    const slotGrid = form.querySelector<HTMLElement>('#slot-grid')!;
+    const start = form.querySelector<HTMLInputElement>('#start')!;
+    const details = form.querySelector<HTMLElement>('#details-card')!;
+    const summary = form.querySelector<HTMLElement>('#appointment-summary')!;
+    const addressField = form.querySelector<HTMLElement>('#address-field')!;
+    const address = form.querySelector<HTMLInputElement>('#home-address')!;
+    const submit = form.querySelector<HTMLButtonElement>('#submit-booking')!;
+    const formError = form.querySelector<HTMLElement>('#form-error')!;
+    const confirmation = document.querySelector<HTMLElement>('#booking-confirmation')!;
+    const reference = document.querySelector<HTMLElement>('#confirmation-reference')!;
+    const another = document.querySelector<HTMLButtonElement>('#another-booking')!;
+
+    const dateInAmsterdam = (value = new Date()) =>
+      new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Europe/Amsterdam',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      }).format(value);
+    const today = dateInAmsterdam();
+    const maximum = new Date(`${today}T12:00:00Z`);
+    maximum.setUTCDate(maximum.getUTCDate() + 60);
+    date.min = today;
+    date.max = dateInAmsterdam(maximum);
+    date.value = today;
+
+    const selectedOption = () => options.find((option: any) => option.id === service.value);
+    const readableDate = () =>
+      new Intl.DateTimeFormat(dateLocale, {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        timeZone: 'Europe/Amsterdam',
+      }).format(new Date(`${date.value}T12:00:00Z`));
+
+    async function loadSlots() {
+      start.value = '';
+      details.hidden = true;
+      slotGrid.replaceChildren();
+      const option = selectedOption();
+      if (!option || !date.value) {
+        slotStatus.textContent = copy.chooseFirst;
+        return;
+      }
+
+      slotStatus.textContent = copy.loading;
+      try {
+        const params = new URLSearchParams({
+          date: date.value,
+          category: option.category,
+          minutes: String(option.minutes),
+        });
+        const response = await fetch(`/api/availability?${params}`);
+        if (!response.ok) throw new Error('availability');
+        const payload = await response.json();
+        slotStatus.textContent = payload.slots.length ? '' : copy.noSlots;
+
+        for (const slot of payload.slots) {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'slot-button';
+          button.textContent = slot.label;
+          button.addEventListener('click', () => {
+            slotGrid.querySelectorAll('button').forEach((item) => item.removeAttribute('aria-pressed'));
+            button.setAttribute('aria-pressed', 'true');
+            start.value = slot.start;
+            summary.innerHTML = `<span>${copy.selected}</span><strong>${readableDate()} · ${slot.label}</strong><small>${option.title} · ${option.minutes} min · € ${option.priceEur}</small>`;
+            const home = option.category === 'home';
+            addressField.hidden = !home;
+            address.required = home;
+            details.hidden = false;
+            details.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          });
+          slotGrid.append(button);
+        }
+      } catch {
+        slotStatus.textContent = copy.error;
+      }
+    }
+
+    service.addEventListener('change', loadSlots);
+    date.addEventListener('change', loadSlots);
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const option = selectedOption();
+      if (!option || !start.value || !form.reportValidity()) return;
+      submit.disabled = true;
+      submit.firstChild!.textContent = copy.submitting;
+      formError.hidden = true;
+
+      const data = new FormData(form);
+      const payload = {
+        locale,
+        key: option.key,
+        category: option.category,
+        minutes: option.minutes,
+        start: start.value,
+        customerName: data.get('customerName'),
+        customerEmail: data.get('customerEmail'),
+        customerPhone: data.get('customerPhone'),
+        homeAddress: data.get('homeAddress') || undefined,
+        notes: data.get('notes') || undefined,
+        website: data.get('website') || undefined,
+        consent: data.get('consent') === 'on',
+      };
+
+      try {
+        const response = await fetch('/api/bookings', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const result = await response.json();
+        if (!response.ok) {
+          if (response.status === 409) {
+            formError.textContent = copy.unavailable;
+            formError.hidden = false;
+            await loadSlots();
+            return;
+          }
+          throw new Error(result.error);
+        }
+
+        reference.textContent = result.booking.reference;
+        form.hidden = true;
+        confirmation.hidden = false;
+        confirmation.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } catch {
+        formError.textContent = copy.error;
+        formError.hidden = false;
+      } finally {
+        submit.disabled = false;
+        submit.firstChild!.textContent = copy.submit;
+      }
+    });
+
+    another.addEventListener('click', () => {
+      form.reset();
+      date.value = today;
+      start.value = '';
+      details.hidden = true;
+      slotGrid.replaceChildren();
+      slotStatus.textContent = copy.chooseFirst;
+      confirmation.hidden = true;
+      form.hidden = false;
+      form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+</script>
+
+<style>
+  .booking-hero {
+    position: relative;
+    overflow: hidden;
+    padding-block: clamp(3rem, 7vw, 6rem);
+    background: var(--pine-dark);
+    color: #fff;
+  }
+
+  .booking-hero::after {
+    position: absolute;
+    inset: 20% -12% -135%;
+    border: 1px solid rgb(255 255 255 / 0.16);
+    border-radius: 50% 50% 0 0;
+    content: '';
+  }
+
+  .booking-hero__inner { position: relative; z-index: 1; }
+  .booking-hero .back-link,
+  .booking-hero .eyebrow,
+  .booking-hero .lead { color: #fff; }
+  .booking-hero .back-link { margin-bottom: 2.5rem; opacity: 0.72; }
+  .booking-hero .lead { max-width: 44rem; opacity: 0.76; }
+
+  .booking-steps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 2rem;
+    margin: 2.5rem 0 0;
+    padding: 1.25rem 0 0;
+    border-top: 1px solid rgb(255 255 255 / 0.2);
+    list-style: none;
+  }
+
+  .booking-steps li { display: flex; align-items: center; gap: 0.65rem; font-size: 0.86rem; }
+  .booking-steps span { color: var(--sand); font-family: 'Iowan Old Style', Georgia, serif; }
+
+  .booking-shell { padding-block: clamp(3rem, 7vw, 6rem); }
+  .booking-form { display: grid; gap: 1.25rem; }
+
+  .booking-card,
+  .booking-confirmation {
+    position: relative;
+    padding: clamp(1.4rem, 4vw, 3rem);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .booking-card--choice { display: grid; gap: 1.5rem; }
+  @media (min-width: 50rem) {
+    .booking-card--choice { grid-template-columns: minmax(0, 1.3fr) minmax(14rem, 0.7fr); }
+    .slot-fieldset { grid-column: 1 / -1; }
+  }
+
+  .booking-card__number {
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    color: var(--clay);
+    font-family: 'Iowan Old Style', Georgia, serif;
+    font-size: 3.8rem;
+    opacity: 0.16;
+    pointer-events: none;
+  }
+
+  label,
+  legend {
+    display: block;
+    margin-bottom: 0.45rem;
+    color: var(--pine-dark);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    min-height: 3rem;
+    padding: 0.7rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: #fff;
+    color: var(--ink);
+    font: inherit;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus { outline: 2px solid var(--pine); outline-offset: 2px; }
+  textarea { resize: vertical; }
+  .slot-fieldset { min-width: 0; margin: 0; padding: 1.5rem 0 0; border: 0; border-top: 1px solid var(--border); }
+  .slot-status { margin: 0; color: var(--ink-soft); }
+  .slot-status:empty { display: none; }
+  .slot-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(5.2rem, 1fr)); gap: 0.65rem; }
+
+  :global(.slot-button) {
+    min-height: 3rem;
+    border: 1px solid var(--pine);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--pine-dark);
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+  }
+
+  :global(.slot-button:hover),
+  :global(.slot-button[aria-pressed='true']) { background: var(--pine); color: #fff; }
+  .booking-card--details { scroll-margin-top: 7rem; }
+  .appointment-summary { display: grid; gap: 0.2rem; margin-bottom: 2rem; padding: 1.2rem; border-left: 3px solid var(--clay); background: var(--clay-soft); }
+  :global(.appointment-summary span) { color: var(--clay-dark); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+  :global(.appointment-summary strong) { font-family: 'Iowan Old Style', Georgia, serif; font-size: 1.35rem; }
+  :global(.appointment-summary small) { color: var(--ink-soft); }
+  .field-grid { display: grid; gap: 1rem; margin-bottom: 1rem; }
+  @media (min-width: 45rem) { .field-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .consent { display: flex; gap: 0.65rem; align-items: flex-start; margin-top: 1.25rem; color: var(--ink); font-size: 0.9rem; font-weight: 500; letter-spacing: 0; text-transform: none; }
+  .consent input { width: 1.1rem; min-height: 1.1rem; margin-top: 0.25rem; }
+  .privacy-note { margin: 0 0 1rem 1.75rem; color: var(--ink-soft); font-size: 0.8rem; }
+  .honeypot { position: absolute; left: -10000px; }
+  .form-error { margin: 1rem 0 0; color: #8f2f24; font-weight: 700; }
+  .booking-confirmation { max-width: 46rem; margin-inline: auto; text-align: center; }
+  .confirmation-mark { display: grid; width: 4rem; height: 4rem; place-items: center; margin: 0 auto 1.5rem; border-radius: 50%; background: var(--pine); color: #fff; font-size: 1.7rem; }
+  .booking-confirmation h2 { max-width: none; }
+  .confirmation-reference { display: grid; gap: 0.25rem; margin: 2rem 0; padding: 1.25rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--paper); }
+  .confirmation-reference span { color: var(--ink-soft); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; }
+  .confirmation-reference strong { color: var(--pine-dark); font-family: ui-monospace, monospace; font-size: 1.25rem; letter-spacing: 0.05em; }
+</style>
