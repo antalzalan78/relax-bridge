@@ -4,6 +4,7 @@ import {
   type BookingEmailDetails,
   type BookingEmailMessage,
 } from '../booking/email-templates';
+import { ensureBookingEmailDeliverySchema } from './booking-email-schema';
 import { getDatabase } from './db';
 
 type DeliveryKind = 'customer_confirmation' | 'owner_notification';
@@ -166,6 +167,8 @@ export async function dispatchPendingBookingEmails(input: {
     return { sent: 0, failed: 0, skipped: true };
   }
 
+  await ensureBookingEmailDeliverySchema();
+
   const result: BookingEmailDispatchResult = { sent: 0, failed: 0, skipped: false };
   const limit = Math.max(1, Math.min(input.limit || 10, 25));
 
@@ -211,6 +214,7 @@ export async function dispatchPendingBookingEmails(input: {
 export async function retryBookingEmails(
   bookingId: string,
 ): Promise<BookingEmailDispatchResult> {
+  await ensureBookingEmailDeliverySchema();
   await getDatabase()`
     UPDATE booking_email_deliveries
     SET status = 'pending', next_attempt_at = now(), claimed_at = NULL,

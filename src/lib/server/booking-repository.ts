@@ -14,6 +14,7 @@ import type {
   InstantWindow,
   LocalTimeWindow,
 } from '../booking/types';
+import { ensureBookingEmailDeliverySchema } from './booking-email-schema';
 import { getDatabase } from './db';
 
 type Queryable = any;
@@ -210,6 +211,7 @@ function referenceFor(start: string, timeZone: string): string {
 export async function createConfirmedBooking(
   input: ConfirmedBookingInput,
 ): Promise<{ id: string; reference: string; start: string; end: string }> {
+  await ensureBookingEmailDeliverySchema();
   const database = getDatabase();
 
   try {
@@ -319,6 +321,7 @@ export async function listAvailabilityExceptions(from: string, to: string) {
 }
 
 export async function listBookings(from: string, to: string) {
+  await ensureBookingEmailDeliverySchema();
   return getDatabase()`
     SELECT booking.id, booking.reference, booking.service_title,
       booking.service_category, booking.duration_minutes, booking.price_eur,
