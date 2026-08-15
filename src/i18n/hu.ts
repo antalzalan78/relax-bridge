@@ -21,6 +21,8 @@ export default {
     about: 'Rólam',
     contact: 'Kapcsolat',
     giftCard: 'Ajándékkártya',
+    bookingsOpen: 'Foglalás nyitva',
+    bookingsOpenShort: 'Nyitva',
     menu: 'Menü',
     language: 'Nyelv',
   },

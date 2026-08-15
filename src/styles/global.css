@@ -380,6 +380,49 @@ img {
   transform: scaleX(1);
 }
 
+.booking-status {
+  display: inline-flex;
+  min-height: 2rem;
+  flex: none;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid color-mix(in srgb, var(--pine) 35%, var(--border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--pine-soft) 68%, var(--surface));
+  color: var(--pine-dark);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.075em;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    transform 180ms ease;
+}
+
+.booking-status:hover {
+  border-color: var(--pine);
+  background: var(--pine-soft);
+  color: var(--pine-dark);
+  transform: translateY(-1px);
+}
+
+.booking-status__dot {
+  width: 0.46rem;
+  height: 0.46rem;
+  flex: none;
+  border-radius: 50%;
+  background: var(--pine);
+  box-shadow: 0 0 0 0.22rem color-mix(in srgb, var(--pine) 13%, transparent);
+}
+
+.booking-status__short {
+  display: none;
+}
+
 .lang {
   display: flex;
   align-items: center;
@@ -1246,6 +1289,16 @@ img {
 
   .service-booking {
     position: static;
+  }
+}
+
+@media (max-width: 38rem) {
+  .booking-status__label {
+    display: none;
+  }
+
+  .booking-status__short {
+    display: inline;
   }
 }
 
