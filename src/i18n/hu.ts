@@ -9,6 +9,10 @@ export default {
 
   tagline: 'A híd a feszültség és a felüdülés között.',
 
+  accessibility: {
+    skipToContent: 'Ugrás a fő tartalomhoz',
+  },
+
   nav: {
     home: 'Főoldal',
     studio: 'Stúdióban',

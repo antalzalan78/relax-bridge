@@ -9,6 +9,10 @@ export default {
 
   tagline: 'The bridge between tension and relaxation.',
 
+  accessibility: {
+    skipToContent: 'Skip to main content',
+  },
+
   nav: {
     home: 'Home',
     studio: 'Studio visit',
