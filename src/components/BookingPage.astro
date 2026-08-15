@@ -147,6 +147,12 @@ const dateLocale = locale === 'nl' ? 'nl-NL' : locale === 'hu' ? 'hu-HU' : 'en-G
     const dateLocale = form.dataset.dateLocale || 'nl-NL';
     const copy = JSON.parse(form.dataset.copy || '{}');
     const service = form.querySelector<HTMLSelectElement>('#service')!;
+    const requestedService = new URLSearchParams(window.location.search).get('service');
+    const preselectedOption = requestedService
+      ? options.find(
+          (option: any) => `${option.category}:${option.key}` === requestedService,
+        )
+      : undefined;
     const date = form.querySelector<HTMLInputElement>('#booking-date')!;
     const slotStatus = form.querySelector<HTMLElement>('#slot-status')!;
     const slotGrid = form.querySelector<HTMLElement>('#slot-grid')!;
@@ -232,6 +238,11 @@ const dateLocale = locale === 'nl' ? 'nl-NL' : locale === 'hu' ? 'hu-HU' : 'en-G
 
     service.addEventListener('change', loadSlots);
     date.addEventListener('change', loadSlots);
+
+    if (preselectedOption) {
+      service.value = preselectedOption.id;
+      void loadSlots();
+    }
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
