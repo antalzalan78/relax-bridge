@@ -107,7 +107,7 @@ const dateLocale = locale === 'nl' ? 'nl-NL' : locale === 'hu' ? 'hu-HU' : 'en-G
         <label for="notes">{copy.notes}</label>
         <textarea id="notes" name="notes" rows="3" maxlength="1000"></textarea>
 
-        <div class="honeypot" aria-hidden="true">
+        <div hidden>
           <label for="website">Website</label>
           <input id="website" name="website" tabindex="-1" autocomplete="off" />
         </div>
@@ -438,7 +438,6 @@ const dateLocale = locale === 'nl' ? 'nl-NL' : locale === 'hu' ? 'hu-HU' : 'en-G
   .consent { display: flex; gap: 0.65rem; align-items: flex-start; margin-top: 1.25rem; color: var(--ink); font-size: 0.9rem; font-weight: 500; letter-spacing: 0; text-transform: none; }
   .consent input { width: 1.1rem; min-height: 1.1rem; margin-top: 0.25rem; }
   .privacy-note { margin: 0 0 1rem 1.75rem; color: var(--ink-soft); font-size: 0.8rem; }
-  .honeypot { position: absolute; left: -10000px; }
   .form-error { margin: 1rem 0 0; color: #8f2f24; font-weight: 700; }
   .booking-confirmation { max-width: 46rem; margin-inline: auto; text-align: center; }
   .confirmation-mark { display: grid; width: 4rem; height: 4rem; place-items: center; margin: 0 auto 1.5rem; border-radius: 50%; background: var(--pine); color: #fff; font-size: 1.7rem; }

@@ -37,7 +37,7 @@ const bookingHref = bookingPath(locale);
     />
   </head>
   <body class:list={{ 'has-mobile-booking': path !== bookingHref }}>
-    <a class="skip-link" href="#main">Direct naar de inhoud</a>
+    <a class="skip-link" href="#main">{d.accessibility.skipToContent}</a>
     <Header locale={locale} alternates={alternates} />
     <main id="main">
       <slot />

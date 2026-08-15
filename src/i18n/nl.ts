@@ -9,6 +9,10 @@ export default {
 
   tagline: 'De brug tussen spanning en ontspanning.',
 
+  accessibility: {
+    skipToContent: 'Direct naar de inhoud',
+  },
+
   nav: {
     home: 'Home',
     studio: 'Studio visit',
