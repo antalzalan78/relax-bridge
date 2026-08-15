@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import logo from '../assets/logo.png';
-import { site, pathFor, type Locale } from '../data/site';
+import { site, pathFor, privacyPath, type Locale } from '../data/site';
 import { t } from '../i18n';
 import { getServices, servicePath } from '../lib/services';
 
@@ -88,7 +88,10 @@ const year = new Date().getFullYear();
 
     <div class="site-footer__bottom">
       <span>&copy; {year} {site.name}. {d.footer.rights}</span>
-      <a href={pathFor(locale)}>www.relaxbridge.nl</a>
+      <nav class="site-footer__legal" aria-label={d.footer.privacy}>
+        <a href={privacyPath(locale)}>{d.footer.privacy}</a>
+        <a href={pathFor(locale)}>www.relaxbridge.nl</a>
+      </nav>
     </div>
   </div>
 </footer>
