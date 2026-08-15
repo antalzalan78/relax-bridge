@@ -21,6 +21,8 @@ export default {
     about: 'Over mij',
     contact: 'Contact',
     giftCard: 'Cadeaubon',
+    bookingsOpen: 'Boekingen geopend',
+    bookingsOpenShort: 'Open',
     menu: 'Menu',
     language: 'Taal',
   },

@@ -21,6 +21,8 @@ export default {
     about: 'About me',
     contact: 'Contact',
     giftCard: 'Gift card',
+    bookingsOpen: 'Bookings open',
+    bookingsOpenShort: 'Open',
     menu: 'Menu',
     language: 'Language',
   },

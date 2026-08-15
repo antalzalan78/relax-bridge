@@ -34,6 +34,12 @@ const bookingHref = bookingPath(locale);
       <a href={site.giftCardUrl} rel="noopener">{d.nav.giftCard}</a>
     </nav>
 
+    <a class="booking-status" href={bookingHref} title={d.nav.bookingsOpen}>
+      <span class="booking-status__dot" aria-hidden="true"></span>
+      <span class="booking-status__label">{d.nav.bookingsOpen}</span>
+      <span class="booking-status__short">{d.nav.bookingsOpenShort}</span>
+    </a>
+
     <div class="lang">
       <span class="visually-hidden">{d.nav.language}</span>
       {
