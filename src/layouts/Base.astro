@@ -43,10 +43,12 @@ const bookingHref = bookingPath(locale);
       <slot />
     </main>
     {path !== bookingHref && (
-      <a class="mobile-booking" href={bookingHref}>
-        <span>{d.service.bookCta}</span>
-        <span aria-hidden="true">&rarr;</span>
-      </a>
+      <nav class="mobile-booking-dock" aria-label={d.service.bookCta}>
+        <a class="mobile-booking" href={bookingHref}>
+          <span>{d.service.bookCta}</span>
+          <span aria-hidden="true">&rarr;</span>
+        </a>
+      </nav>
     )}
     <Footer locale={locale} />
   </body>
