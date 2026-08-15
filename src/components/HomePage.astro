@@ -209,7 +209,12 @@ const jsonLd = [
         <span class="eyebrow">{d.tagline}</span>
         <h2>{d.contact.heading}</h2>
         <p class="lead">{d.contact.intro}</p>
-        <a class="btn btn--light" href={bookingHref}>
+        <a
+          class="btn btn--light"
+          href={site.whatsapp}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           {d.contact.whatsappCta}<span aria-hidden="true">&rarr;</span>
         </a>
       </div>
