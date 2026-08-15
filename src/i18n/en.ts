@@ -111,5 +111,6 @@ export default {
   footer: {
     rights: 'All rights reserved.',
     cookies: 'Cookie policy',
+    privacy: 'Privacy notice',
   },
 } as const;

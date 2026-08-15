@@ -1,0 +1,129 @@
+---
+import Base from '../layouts/Base.astro';
+import { pathFor, privacyPath, site, type Locale } from '../data/site';
+import { privacyAuthorityUrl, privacyText } from '../i18n/privacy';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = privacyText(locale);
+const path = privacyPath(locale);
+const alternates = {
+  nl: privacyPath('nl'),
+  en: privacyPath('en'),
+  hu: privacyPath('hu'),
+};
+---
+
+<Base
+  locale={locale}
+  title={`${copy.title} — ${site.name}`}
+  description={copy.metaDescription}
+  path={path}
+  alternates={alternates}
+>
+  <section class="privacy-hero">
+    <div class="wrap privacy-hero__inner">
+      <a class="back-link" href={pathFor(locale)}>
+        <span aria-hidden="true">&larr;</span> {site.name}
+      </a>
+      <span class="eyebrow">{copy.eyebrow}</span>
+      <h1>{copy.title}</h1>
+      <p class="lead">{copy.intro}</p>
+      <p class="privacy-updated">{copy.updated}</p>
+    </div>
+  </section>
+
+  <section class="wrap privacy-layout">
+    <aside class="privacy-controller" aria-labelledby="privacy-controller-title">
+      <span class="eyebrow">{site.name}</span>
+      <h2 id="privacy-controller-title">{copy.controllerTitle}</h2>
+      <p>{copy.controllerBody}</p>
+      {site.email && <a href={`mailto:${site.email}`}>{site.email}</a>}
+    </aside>
+
+    <div class="privacy-content">
+      {
+        copy.sections.map((section) => (
+          <section id={section.id} class="privacy-section">
+            <h2>{section.title}</h2>
+            {section.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+            {'items' in section && section.items && (
+              <ul>
+                {section.items.map((item) => <li>{item}</li>)}
+              </ul>
+            )}
+            {'note' in section && section.note && (
+              <p class="privacy-note-box">{section.note}</p>
+            )}
+          </section>
+        ))
+      }
+
+      <section class="privacy-section privacy-contact">
+        <h2>{copy.contactTitle}</h2>
+        <p>{copy.contactBody}</p>
+        <p>{copy.complaint}</p>
+        <a href={privacyAuthorityUrl} target="_blank" rel="noopener noreferrer">
+          {copy.complaintLink}<span aria-hidden="true">&nearr;</span>
+        </a>
+      </section>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .privacy-hero {
+    padding-block: clamp(3rem, 7vw, 6rem);
+    background: var(--pine-dark);
+    color: #fff;
+  }
+
+  .privacy-hero__inner { max-width: 58rem; }
+  .privacy-hero .back-link { color: rgb(255 255 255 / 0.72); }
+  .privacy-hero .eyebrow { color: var(--sand); }
+  .privacy-hero h1 { max-width: 13ch; }
+  .privacy-hero .lead { max-width: 46rem; color: rgb(255 255 255 / 0.78); }
+  .privacy-updated { margin: 1.4rem 0 0; color: rgb(255 255 255 / 0.58); font-size: 0.82rem; }
+
+  .privacy-layout {
+    display: grid;
+    gap: clamp(2rem, 5vw, 5rem);
+    padding-block: clamp(3rem, 7vw, 6rem);
+  }
+
+  @media (min-width: 58rem) {
+    .privacy-layout { grid-template-columns: minmax(15rem, 0.72fr) minmax(0, 1.65fr); }
+  }
+
+  .privacy-controller {
+    align-self: start;
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--paper);
+  }
+
+  @media (min-width: 58rem) {
+    .privacy-controller { position: sticky; top: 7rem; }
+  }
+
+  .privacy-controller h2 { margin-top: 0.4rem; font-size: clamp(1.7rem, 3vw, 2.2rem); }
+  .privacy-controller p { color: var(--ink-soft); }
+  .privacy-controller a,
+  .privacy-contact a { color: var(--clay-dark); font-weight: 700; }
+
+  .privacy-content { min-width: 0; }
+  .privacy-section { scroll-margin-top: 7rem; }
+  .privacy-section + .privacy-section { margin-top: 2.5rem; padding-top: 2.5rem; border-top: 1px solid var(--border); }
+  .privacy-section h2 { max-width: none; margin-bottom: 1rem; font-size: clamp(1.8rem, 4vw, 2.5rem); }
+  .privacy-section p,
+  .privacy-section li { color: var(--ink-soft); line-height: 1.75; }
+  .privacy-section ul { padding-left: 1.25rem; }
+  .privacy-section li + li { margin-top: 0.45rem; }
+  .privacy-note-box { padding: 1rem 1.1rem; border-left: 3px solid var(--clay); background: var(--clay-soft); color: var(--ink) !important; }
+  .privacy-contact { padding: clamp(1.5rem, 4vw, 2.5rem) !important; border: 1px solid var(--border) !important; border-radius: var(--radius); background: var(--pine-soft); }
+  .privacy-contact a { display: inline-flex; gap: 0.35rem; align-items: center; }
+</style>

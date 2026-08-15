@@ -81,3 +81,8 @@ export function pathFor(locale: Locale, path = ''): string {
 export function bookingPath(locale: Locale): string {
   return pathFor(locale, 'booking');
 }
+
+/** A lokalizalt adatvedelmi tajekoztato utvonala. */
+export function privacyPath(locale: Locale): string {
+  return pathFor(locale, 'privacy');
+}

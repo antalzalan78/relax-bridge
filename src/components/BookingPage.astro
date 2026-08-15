@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import { bookingPath, pathFor, type Locale } from '../data/site';
+import { bookingPath, pathFor, privacyPath, type Locale } from '../data/site';
 import { bookingText } from '../i18n/booking';
 import { getBookingOptions } from '../lib/booking/catalog';
 
@@ -12,6 +12,7 @@ const { locale } = Astro.props;
 const copy = bookingText(locale);
 const options = await getBookingOptions(locale);
 const path = bookingPath(locale);
+const privacyHref = privacyPath(locale);
 const alternates = {
   nl: bookingPath('nl'),
   en: bookingPath('en'),
@@ -115,7 +116,9 @@ const dateLocale = locale === 'nl' ? 'nl-NL' : locale === 'hu' ? 'hu-HU' : 'en-G
           <input name="consent" type="checkbox" required />
           <span>{copy.consent}</span>
         </label>
-        <p class="privacy-note">{copy.privacy}</p>
+        <p class="privacy-note">
+          {copy.privacy} <a href={privacyHref}>{copy.privacyLink}</a>.
+        </p>
 
         <button class="btn btn--primary btn--block" id="submit-booking" type="submit">
           {copy.submit}<span aria-hidden="true">&rarr;</span>

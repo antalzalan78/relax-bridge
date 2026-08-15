@@ -1175,6 +1175,12 @@ img {
   font-size: 0.78rem;
 }
 
+.site-footer__legal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+}
+
 /* Globalis mobil foglalas */
 
 .mobile-booking {

@@ -40,7 +40,7 @@
     },
     {
       "source": "/pages/cookie-policy",
-      "destination": "/",
+      "destination": "/privacy#cookies",
       "permanent": true
     }
   ]

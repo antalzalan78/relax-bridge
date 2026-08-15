@@ -111,5 +111,6 @@ export default {
   footer: {
     rights: 'Minden jog fenntartva.',
     cookies: 'Süti-szabályzat',
+    privacy: 'Adatvédelmi tájékoztató',
   },
 } as const;
