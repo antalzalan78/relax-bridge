@@ -378,15 +378,15 @@ img {
   --wave-from: 0%;
   --wave-to: -20%;
   animation: logo-wave-flow 4.6s linear infinite;
-  opacity: 0.88;
-  stroke-width: 1.65;
+  opacity: 0.78;
+  stroke-width: 1.15;
 }
 
 .brand__wave-track--front {
   --wave-from: -25%;
   --wave-to: 0%;
   animation: logo-wave-flow 3.4s linear infinite;
-  stroke-width: 2;
+  stroke-width: 1.4;
 }
 
 @keyframes logo-wave-flow {
