@@ -29,13 +29,26 @@ const bookingHref = bookingPath(locale);
           width={70}
           loading="eager"
         />
-        <Image
-          class="brand__mark-image brand__mark-image--wave"
-          src={logoMark}
-          alt=""
-          width={70}
-          loading="eager"
-        />
+        <svg
+          class="brand__waves"
+          viewBox="0 0 180 34"
+          preserveAspectRatio="none"
+          focusable="false"
+          aria-hidden="true"
+        >
+          <g class="brand__wave-track brand__wave-track--back">
+            <rect width="240" height="34" fill="transparent" />
+            <path
+              d="M0 10 C8 4 16 4 24 10 C32 16 40 16 48 10 C56 4 64 4 72 10 C80 16 88 16 96 10 C104 4 112 4 120 10 C128 16 136 16 144 10 C152 4 160 4 168 10 C176 16 184 16 192 10 C200 4 208 4 216 10 C224 16 232 16 240 10"
+            />
+          </g>
+          <g class="brand__wave-track brand__wave-track--front">
+            <rect width="240" height="34" fill="transparent" />
+            <path
+              d="M0 24 C10 17 20 17 30 24 C40 31 50 31 60 24 C70 17 80 17 90 24 C100 31 110 31 120 24 C130 17 140 17 150 24 C160 31 170 31 180 24 C190 17 200 17 210 24 C220 31 230 31 240 24"
+            />
+          </g>
+        </svg>
       </span>
       <span class="brand__name">
         <Image
