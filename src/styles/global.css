@@ -347,65 +347,6 @@ img {
   object-fit: contain;
 }
 
-.brand__mark-image--bridge {
-  clip-path: inset(0 0 30% 0);
-}
-
-.brand__waves {
-  position: absolute;
-  right: -5%;
-  bottom: 4%;
-  width: 110%;
-  height: 31%;
-  overflow: visible;
-}
-
-.brand__wave-track {
-  fill: none;
-  stroke: #602790;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  transform-box: fill-box;
-  transform-origin: left center;
-  will-change: transform;
-}
-
-.brand__wave-track path {
-  vector-effect: non-scaling-stroke;
-}
-
-.brand__wave-track--back {
-  --wave-from: 0%;
-  --wave-to: -20%;
-  animation: logo-wave-flow 4.6s linear infinite;
-  opacity: 0.78;
-  stroke-width: 1.15;
-}
-
-.brand__wave-track--front {
-  --wave-from: -25%;
-  --wave-to: 0%;
-  animation: logo-wave-flow 3.4s linear infinite;
-  stroke-width: 1.4;
-}
-
-@keyframes logo-wave-flow {
-  from {
-    transform: translateX(var(--wave-from));
-  }
-
-  to {
-    transform: translateX(var(--wave-to));
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .brand__wave-track {
-    animation: none;
-    transform: translateX(0);
-  }
-}
-
 .brand__name,
 .brand__wordmark {
   display: block;
