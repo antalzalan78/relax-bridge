@@ -20,7 +20,22 @@ const bookingHref = bookingPath(locale);
   <div class="wrap site-header__inner">
     <a class="brand" href={home}>
       {/* A nev mellette all, ezert a jel dekoraciokent ures alt-ot kap. */}
-      <Image class="brand__mark" src={logoMark} alt="" width={70} loading="eager" />
+      <span class="brand__mark" aria-hidden="true">
+        <Image
+          class="brand__mark-image brand__mark-image--bridge"
+          src={logoMark}
+          alt=""
+          width={70}
+          loading="eager"
+        />
+        <Image
+          class="brand__mark-image brand__mark-image--wave"
+          src={logoMark}
+          alt=""
+          width={70}
+          loading="eager"
+        />
+      </span>
       <span class="brand__name">
         Relax Bridge
         <small>Massage</small>
