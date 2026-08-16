@@ -354,7 +354,7 @@ img {
 .brand__waves {
   position: absolute;
   right: -5%;
-  bottom: 0;
+  bottom: 4%;
   width: 110%;
   height: 31%;
   overflow: visible;
