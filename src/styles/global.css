@@ -348,7 +348,7 @@ img {
 }
 
 .brand__mark-image--bridge {
-  clip-path: inset(0 0 25% 0);
+  clip-path: inset(0 0 30% 0);
 }
 
 .brand__waves {
@@ -356,7 +356,7 @@ img {
   right: -5%;
   bottom: 0;
   width: 110%;
-  height: 29%;
+  height: 31%;
   overflow: visible;
 }
 
