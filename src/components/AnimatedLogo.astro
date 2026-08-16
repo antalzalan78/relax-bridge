@@ -1,0 +1,166 @@
+---
+/**
+ * A logo animalt valtozata: a hid alatti harom hullam lassan hullamzik.
+ *
+ * A logo raszterkep, abban egy reszlet nem mozgathato. Ezert a hullamokat
+ * kitoroltuk a kepbol (scripts/prepare-wave.mjs), es SVG-ben rajzoljuk ujra
+ * oket ugyanoda, ugyanazzal a lila szinnel es vonalvastagsaggal.
+ *
+ * A harom hullam vizszintesen csuszik, egyenkent mas sebesseggel es
+ * hullamhosszal — ezert nem egyszerre mozdulnak, hanem egymashoz kepest is
+ * elcsusznak. A ket vegen egy maszk elhalvanyitja oket, igy nincs levagott el.
+ *
+ * A meretek merese: scripts/inspect-waves.mjs es scripts/measure-wave.mjs
+ */
+import { Image } from 'astro:assets';
+import logoNoWave from '../assets/logo-nowave.png';
+
+interface Props {
+  alt: string;
+  width?: number;
+  class?: string;
+  loading?: 'eager' | 'lazy';
+}
+
+const { alt, width = 400, class: className, loading = 'lazy' } = Astro.props;
+
+/** A kep sajat koordinatai (logo-nowave.png: 803 x 803). */
+const VIEW = 803;
+
+/** A hullamsav helye a kepen belul. Forras: scripts/prepare-wave.mjs */
+const BAND = { x0: 173, x1: 630, top: 498, bottom: 564 };
+
+const STROKE = 7; // a kimert vonalvastagsag medianja
+const COLOR = '#62319a'; // a hullamok kimert lilaja
+
+/**
+ * A harom hullam. Kulonbozo hullamhossz es idotartam kell, kulonben egyutt
+ * mozognanak, ami gepiesnek latszik.
+ */
+const waves = [
+  { cy: 512, amplitude: 10, wavelength: 152, duration: 15, opacity: 0.85 },
+  { cy: 530, amplitude: 12, wavelength: 178, duration: 19, opacity: 1 },
+  { cy: 547, amplitude: 9, wavelength: 132, duration: 13, opacity: 0.85 },
+];
+
+/**
+ * Egy teljes szinuszhullam. Egy hullamhossznyival tulnyulik mindket oldalon,
+ * hogy a vizszintes csuszas kozben ne fogyjon el a vonal.
+ */
+function wavePath({ cy, amplitude, wavelength }: (typeof waves)[number]): string {
+  const from = BAND.x0 - wavelength;
+  const to = BAND.x1 + wavelength;
+  const step = 8;
+  const points: string[] = [];
+
+  for (let x = from; x <= to; x += step) {
+    const y = cy + amplitude * Math.sin((2 * Math.PI * x) / wavelength);
+    points.push(`${x} ${y.toFixed(1)}`);
+  }
+
+  return `M ${points.join(' L ')}`;
+}
+
+// Egy oldalon tobbszor is szerepelhet, ezert az SVG azonositok egyediek.
+const uid = Math.random().toString(36).slice(2, 8);
+---
+
+<span class:list={['animated-logo', className]}>
+  <Image src={logoNoWave} alt={alt} width={width} loading={loading} />
+
+  <svg
+    class="animated-logo__water"
+    viewBox={`0 0 ${VIEW} ${VIEW}`}
+    aria-hidden="true"
+    focusable="false"
+  >
+    <defs>
+      <linearGradient
+        id={`fade-${uid}`}
+        gradientUnits="userSpaceOnUse"
+        x1={BAND.x0}
+        x2={BAND.x1}
+      >
+        <stop offset="0" stop-color="#fff" stop-opacity="0" />
+        <stop offset="0.08" stop-color="#fff" stop-opacity="1" />
+        <stop offset="0.92" stop-color="#fff" stop-opacity="1" />
+        <stop offset="1" stop-color="#fff" stop-opacity="0" />
+      </linearGradient>
+
+      <mask id={`band-${uid}`} maskUnits="userSpaceOnUse"
+        x={BAND.x0} y={BAND.top - 8}
+        width={BAND.x1 - BAND.x0} height={BAND.bottom - BAND.top + 16}>
+        <rect
+          x={BAND.x0}
+          y={BAND.top - 8}
+          width={BAND.x1 - BAND.x0}
+          height={BAND.bottom - BAND.top + 16}
+          fill={`url(#fade-${uid})`}
+        />
+      </mask>
+    </defs>
+
+    <g mask={`url(#band-${uid})`}>
+      {
+        waves.map((wave) => (
+          <path
+            class="animated-logo__wave"
+            d={wavePath(wave)}
+            opacity={wave.opacity}
+            style={`--shift:${-wave.wavelength}px; animation-duration:${wave.duration}s`}
+          />
+        ))
+      }
+    </g>
+  </svg>
+</span>
+
+<style define:vars={{ waveColor: COLOR, waveStroke: `${STROKE}` }}>
+  .animated-logo {
+    position: relative;
+    display: block;
+  }
+
+  .animated-logo :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .animated-logo__water {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .animated-logo__wave {
+    fill: none;
+    stroke: var(--waveColor);
+    stroke-width: var(--waveStroke);
+    stroke-linecap: round;
+    animation-name: rb-drift;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+
+  /*
+   * Pontosan egy hullamhossznyit csuszik, ezert a ciklus varrat nelkul zarodik:
+   * az utolso keret ugyanaz a kep, mint az elso.
+   */
+  @keyframes rb-drift {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(var(--shift));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animated-logo__wave {
+      animation: none;
+    }
+  }
+</style>
