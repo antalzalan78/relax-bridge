@@ -348,12 +348,12 @@ img {
 }
 
 .brand__mark-image--bridge {
-  clip-path: inset(0 0 17% 0);
+  clip-path: inset(0 0 28% 0);
 }
 
 .brand__mark-image--wave {
-  clip-path: inset(81% 0 0 0);
-  animation: logo-wave-drift 4.8s ease-in-out infinite;
+  clip-path: inset(71% 0 0 0);
+  animation: logo-wave-drift 3.8s ease-in-out infinite;
   transform-origin: center bottom;
   will-change: transform;
 }
@@ -361,11 +361,11 @@ img {
 @keyframes logo-wave-drift {
   0%,
   100% {
-    transform: translate3d(-1.2%, 0, 0) scaleX(1.015);
+    transform: translate3d(-3.4%, 0.35px, 0) scaleX(1.035);
   }
 
   50% {
-    transform: translate3d(1.2%, -0.35px, 0) scaleX(0.99);
+    transform: translate3d(3.4%, -0.9px, 0) scaleX(0.975);
   }
 }
 
