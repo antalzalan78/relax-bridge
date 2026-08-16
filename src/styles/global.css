@@ -333,8 +333,8 @@ img {
 
 .brand__mark {
   position: relative;
-  width: 3.68rem;
-  height: 2.25rem;
+  width: 3.45rem;
+  height: 1.91rem;
   flex: none;
   overflow: hidden;
 }
@@ -348,11 +348,11 @@ img {
 }
 
 .brand__mark-image--bridge {
-  clip-path: inset(0 0 28% 0);
+  clip-path: inset(0 0 25% 0);
 }
 
 .brand__mark-image--wave {
-  clip-path: inset(71% 0 0 0);
+  clip-path: inset(74% 0 0 0);
   animation: logo-wave-drift 3.8s ease-in-out infinite;
   transform-origin: center bottom;
   will-change: transform;
@@ -376,15 +376,14 @@ img {
   }
 }
 
-.brand__name small {
+.brand__name,
+.brand__wordmark {
   display: block;
-  margin-top: 0.25rem;
-  color: var(--clay-dark);
-  font-family: 'Avenir Next', 'Segoe UI', sans-serif;
-  font-size: 0.49em;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+}
+
+.brand__wordmark {
+  width: 7rem;
+  height: auto;
 }
 
 .nav {
@@ -1213,7 +1212,7 @@ img {
 }
 
 .footer-logo {
-  width: min(190px, 54vw);
+  width: min(220px, 60vw);
   margin: 0;
   filter: drop-shadow(0 8px 18px rgb(0 0 0 / 0.12));
 }
@@ -1437,8 +1436,12 @@ img {
   }
 
   .brand__mark {
-    width: 3.27rem;
-    height: 2rem;
+    width: 3rem;
+    height: 1.66rem;
+  }
+
+  .brand__wordmark {
+    width: 6.1rem;
   }
 
   .lang a,
