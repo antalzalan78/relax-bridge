@@ -34,6 +34,7 @@ export const GET: APIRoute = async () => {
       },
       {
         headers: {
+          // Keep the badge fresh without querying the database for every page view.
           'Cache-Control': 'public, max-age=0, s-maxage=30, stale-while-revalidate=60',
         },
       },
