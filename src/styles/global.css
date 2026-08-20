@@ -67,6 +67,11 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+main {
+  position: relative;
+  z-index: 1;
+}
+
 body::before {
   position: fixed;
   inset: 0;

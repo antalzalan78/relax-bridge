@@ -1,0 +1,77 @@
+<div class="site-botanical" aria-hidden="true">
+  <svg
+    class="site-botanical__art"
+    viewBox="0 0 720 520"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <g class="site-botanical__tree site-botanical__tree--left">
+      <path d="M284 416 190 282" />
+      <path d="M190 282c-76-5-122 52-98 116 61 22 122-28 98-116Z" />
+      <path d="m176 307-66 78" />
+      <circle cx="106" cy="237" r="13" />
+    </g>
+
+    <g class="site-botanical__tree site-botanical__tree--centre">
+      <path d="M360 420V164" />
+      <path d="M360 164c-54 58-47 139 0 174 47-35 54-116 0-174Z" />
+      <path d="M360 194v128" />
+    </g>
+
+    <g class="site-botanical__tree site-botanical__tree--right">
+      <path d="m436 416 94-134" />
+      <path d="M530 282c76-5 122 52 98 116-61 22-122-28-98-116Z" />
+      <path d="m544 307 66 78" />
+      <circle cx="614" cy="237" r="13" />
+    </g>
+  </svg>
+</div>
+
+<style>
+  .site-botanical {
+    position: absolute;
+    z-index: 0;
+    top: 4.75rem;
+    right: 0;
+    left: 0;
+    height: clamp(32rem, 58vw, 48rem);
+    overflow: hidden;
+    pointer-events: none;
+    color: var(--pine);
+  }
+
+  .site-botanical__art {
+    position: absolute;
+    top: clamp(2.5rem, 5vw, 5rem);
+    left: max(-7rem, calc((100vw - var(--wrap)) / 2 - 7rem));
+    width: clamp(30rem, 46vw, 43rem);
+    height: auto;
+    opacity: 0.06;
+    transform: rotate(-1.5deg);
+  }
+
+  .site-botanical__tree {
+    stroke: currentColor;
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .site-botanical__tree circle {
+    fill: currentColor;
+    stroke: none;
+  }
+
+  @media (max-width: 52rem) {
+    .site-botanical {
+      height: 35rem;
+    }
+
+    .site-botanical__art {
+      top: 5.5rem;
+      left: -2rem;
+      width: 27rem;
+      opacity: 0.045;
+    }
+  }
+</style>
