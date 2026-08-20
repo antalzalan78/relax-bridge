@@ -48,7 +48,20 @@ const bookingHref = bookingPath(locale);
       <a href={site.giftCardUrl} rel="noopener">{d.nav.giftCard}</a>
     </nav>
 
-    <a class="booking-status" href={bookingHref} title={d.nav.bookingsOpen}>
+    <a
+      class="booking-status"
+      href={bookingHref}
+      title={d.nav.bookingsOpen}
+      aria-live="polite"
+      data-booking-status
+      data-locale={d.htmlLang}
+      data-today-label={d.nav.bookingsToday}
+      data-today-short={d.nav.bookingsTodayShort}
+      data-next-label={d.nav.bookingsNext}
+      data-next-short={d.nav.bookingsNextShort}
+      data-none-label={d.nav.bookingsNone}
+      data-none-short={d.nav.bookingsNoneShort}
+    >
       <span class="booking-status__dot" aria-hidden="true"></span>
       <span class="booking-status__label">{d.nav.bookingsOpen}</span>
       <span class="booking-status__short">{d.nav.bookingsOpenShort}</span>
@@ -80,3 +93,53 @@ const bookingHref = bookingPath(locale);
     </a>
   </div>
 </header>
+
+<script>
+  interface BookingStatusResponse {
+    today: string;
+    nextAvailableDate: string | null;
+  }
+
+  const status = document.querySelector<HTMLElement>('[data-booking-status]');
+
+  if (status) {
+    const label = status.querySelector<HTMLElement>('.booking-status__label');
+    const shortLabel = status.querySelector<HTMLElement>('.booking-status__short');
+
+    fetch('/api/booking-status', { headers: { Accept: 'application/json' } })
+      .then((response) => {
+        if (!response.ok) throw new Error('booking-status');
+        return response.json() as Promise<BookingStatusResponse>;
+      })
+      .then(({ today, nextAvailableDate }) => {
+        let fullText = status.dataset.noneLabel ?? '';
+        let shortText = status.dataset.noneShort ?? fullText;
+        status.dataset.availability = 'none';
+
+        if (nextAvailableDate) {
+          const formatter = new Intl.DateTimeFormat(status.dataset.locale ?? 'nl-NL', {
+            weekday: 'long',
+            timeZone: 'UTC',
+          });
+          const day = formatter.format(new Date(`${nextAvailableDate}T12:00:00Z`));
+          if (nextAvailableDate === today) {
+            fullText = status.dataset.todayLabel ?? fullText;
+            shortText = status.dataset.todayShort ?? fullText;
+            status.dataset.availability = 'today';
+          } else {
+            fullText = (status.dataset.nextLabel ?? '').replace('{day}', day);
+            shortText = (status.dataset.nextShort ?? '{day}').replace('{day}', day);
+            status.dataset.availability = 'future';
+          }
+        }
+
+        if (label) label.textContent = fullText;
+        if (shortLabel) shortLabel.textContent = shortText;
+        status.title = fullText;
+        status.setAttribute('aria-label', fullText);
+      })
+      .catch(() => {
+        // Hiba eseten a stabil, altalanos foglalasi jelzes marad lathato.
+      });
+  }
+</script>

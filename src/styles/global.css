@@ -429,6 +429,17 @@ img {
   box-shadow: 0 0 0 0.22rem color-mix(in srgb, var(--pine) 13%, transparent);
 }
 
+.booking-status[data-availability='none'] {
+  border-color: var(--border);
+  background: color-mix(in srgb, var(--paper) 78%, var(--surface));
+  color: var(--ink-soft);
+}
+
+.booking-status[data-availability='none'] .booking-status__dot {
+  background: var(--ink-soft);
+  box-shadow: 0 0 0 0.22rem color-mix(in srgb, var(--ink-soft) 10%, transparent);
+}
+
 .booking-status__short {
   display: none;
 }
