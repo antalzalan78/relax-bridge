@@ -20,7 +20,7 @@ export default {
     prices: 'Prijzen',
     about: 'Over mij',
     contact: 'Contact',
-    giftCard: 'Cadeaubon',
+    questionnaire: 'Vragenlijst',
     bookingsOpen: 'Boekingen geopend',
     bookingsOpenShort: 'Open',
     bookingsToday: 'Vandaag plek beschikbaar',
@@ -90,11 +90,11 @@ export default {
         body: 'Ik kom bij je thuis en neem alles mee wat nodig is — jij hoeft alleen maar te ontspannen. De prijs is inclusief reistijd, voorbereiding en de behandeling. Ik vraag je om je exacte adres en telefoonnummer, zodat ik je makkelijk kan bereiken. Let op: bij Home service zijn kortere behandelingen niet beschikbaar.',
       },
       {
-        title: 'Cadeaubon',
-        body: 'Wil je iemand een bijzonder moment van rust cadeau geven? Met een cadeaubon van Relax Bridge geef je ontspanning op maat. Cadeaubonnen zijn 6 maanden geldig vanaf de aankoopdatum. Terugbetaling is niet mogelijk en de bon kan niet worden ingewisseld voor contant geld. Bij verlies of diefstal kan de cadeaubon helaas niet worden vervangen.',
+        title: 'Korte vragenlijst',
+        body: 'Welke momenten en mogelijkheden zijn voor jou belangrijk bij het boeken van een massage? Met vier korte, anonieme vragen help je mij het aanbod van Relax Bridge beter te laten aansluiten.',
       },
     ],
-    giftCardCta: 'Cadeaubon bestellen',
+    questionnaireCta: 'Vul de vragenlijst in',
   },
 
   service: {

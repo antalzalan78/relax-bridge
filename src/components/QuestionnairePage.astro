@@ -1,0 +1,396 @@
+---
+import { pathFor, privacyPath, questionnairePath, type Locale } from '../data/site';
+import { questionnaireText } from '../i18n/questionnaire';
+import Base from '../layouts/Base.astro';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = questionnaireText(locale);
+const path = questionnairePath(locale);
+const alternates = {
+  nl: questionnairePath('nl'),
+  en: questionnairePath('en'),
+  hu: questionnairePath('hu'),
+};
+const weekdayTiming = copy.timing.filter((option) => option.key.startsWith('weekday_'));
+const weekendTiming = copy.timing.filter((option) => option.key.startsWith('weekend_'));
+---
+
+<Base
+  locale={locale}
+  title={copy.metaTitle}
+  description={copy.metaDescription}
+  path={path}
+  alternates={alternates}
+  showMobileBooking={false}
+>
+  <section class="questionnaire-hero">
+    <div class="wrap questionnaire-hero__inner">
+      <a class="back-link" href={pathFor(locale)}>
+        <span aria-hidden="true">&larr;</span> {copy.backHome}
+      </a>
+      <span class="eyebrow">{copy.eyebrow}</span>
+      <h1>{copy.title}</h1>
+      <p class="lead">{copy.intro}</p>
+      <p class="questionnaire-anonymous">
+        <span aria-hidden="true">✓</span>
+        {copy.anonymous}
+      </p>
+    </div>
+  </section>
+
+  <section class="wrap questionnaire-layout">
+    <form
+      class="questionnaire-form"
+      data-questionnaire-form
+      data-locale={locale}
+      data-required={copy.required}
+      data-error={copy.error}
+      novalidate
+    >
+      <fieldset class="question-card" data-required-group="situations">
+        <span class="question-card__number" aria-hidden="true">01</span>
+        <legend>{copy.questions.situations}</legend>
+        <p class="question-hint" id="situations-hint">{copy.requiredHint}</p>
+        <div class="option-list" aria-describedby="situations-hint situations-error">
+          {copy.situations.map((option) => (
+            <label class="option-card">
+              <input type="checkbox" name="situations" value={option.key} />
+              <span>{option.label}</span>
+            </label>
+          ))}
+        </div>
+        <div class="other-answer" data-other-for="situations" hidden>
+          <label for="situations-other">{copy.otherLabel}</label>
+          <input id="situations-other" name="situationsOther" type="text" maxlength="300" placeholder={copy.otherPlaceholder} />
+          <small>{copy.sensitiveWarning}</small>
+        </div>
+        <p class="question-error" id="situations-error" data-group-error hidden>{copy.required}</p>
+      </fieldset>
+
+      <fieldset class="question-card" data-required-group="priorities">
+        <span class="question-card__number" aria-hidden="true">02</span>
+        <legend>{copy.questions.priorities}</legend>
+        <p class="question-hint" id="priorities-hint">{copy.requiredHint}</p>
+        <div class="option-list" aria-describedby="priorities-hint priorities-error">
+          {copy.priorities.map((option) => (
+            <label class="option-card">
+              <input type="checkbox" name="priorities" value={option.key} />
+              <span>{option.label}</span>
+            </label>
+          ))}
+        </div>
+        <div class="other-answer" data-other-for="priorities" hidden>
+          <label for="priorities-other">{copy.otherLabel}</label>
+          <input id="priorities-other" name="prioritiesOther" type="text" maxlength="300" placeholder={copy.otherPlaceholder} />
+          <small>{copy.sensitiveWarning}</small>
+        </div>
+        <p class="question-error" id="priorities-error" data-group-error hidden>{copy.required}</p>
+      </fieldset>
+
+      <fieldset class="question-card" data-required-group="timing">
+        <span class="question-card__number" aria-hidden="true">03</span>
+        <legend>{copy.questions.timing}</legend>
+        <p class="question-hint" id="timing-hint">{copy.requiredHint}</p>
+        <div class="timing-grid" aria-describedby="timing-hint timing-error">
+          <div>
+            <h2>{copy.groups.weekday}</h2>
+            <div class="option-list">
+              {weekdayTiming.map((option) => (
+                <label class="option-card">
+                  <input type="checkbox" name="timing" value={option.key} />
+                  <span>{option.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+          <div>
+            <h2>{copy.groups.weekend}</h2>
+            <div class="option-list">
+              {weekendTiming.map((option) => (
+                <label class="option-card">
+                  <input type="checkbox" name="timing" value={option.key} />
+                  <span>{option.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        </div>
+        <p class="question-error" id="timing-error" data-group-error hidden>{copy.required}</p>
+      </fieldset>
+
+      <fieldset class="question-card" data-required-group="homeService">
+        <span class="question-card__number" aria-hidden="true">04</span>
+        <legend>{copy.questions.homeService}</legend>
+        <div class="option-list option-list--compact" aria-describedby="home-service-error">
+          {copy.homeService.map((option) => (
+            <label class="option-card">
+              <input type="radio" name="homeService" value={option.key} />
+              <span>{option.label}</span>
+            </label>
+          ))}
+        </div>
+        <p class="question-error" id="home-service-error" data-group-error hidden>{copy.required}</p>
+      </fieldset>
+
+      <div hidden aria-hidden="true">
+        <label for="questionnaire-website">Website</label>
+        <input id="questionnaire-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+      </div>
+
+      <div class="questionnaire-submit">
+        <p>{copy.privacyPrefix} <a href={privacyPath(locale)}>{copy.privacyLink}</a>.</p>
+        <button class="btn btn--primary" type="submit" data-submit data-label={copy.submit} data-loading={copy.submitting}>
+          <span data-submit-label>{copy.submit}</span><span aria-hidden="true">&rarr;</span>
+        </button>
+        <p class="form-status" data-form-status role="alert" hidden></p>
+      </div>
+    </form>
+
+    <div class="questionnaire-success" data-questionnaire-success tabindex="-1" hidden>
+      <span class="success-mark" aria-hidden="true">✓</span>
+      <span class="eyebrow">{copy.successEyebrow}</span>
+      <h2>{copy.successTitle}</h2>
+      <p>{copy.successBody}</p>
+      <a class="btn btn--ghost" href={pathFor(locale)}>{copy.backHome}</a>
+    </div>
+  </section>
+</Base>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-questionnaire-form]');
+
+  if (form) {
+    const toggleOther = (name: 'situations' | 'priorities') => {
+      const selected = form.querySelector<HTMLInputElement>(`input[name="${name}"][value="other"]`)?.checked ?? false;
+      const container = form.querySelector<HTMLElement>(`[data-other-for="${name}"]`);
+      const input = container?.querySelector<HTMLInputElement>('input');
+      if (container) container.hidden = !selected;
+      if (input) {
+        input.required = selected;
+        if (!selected) input.value = '';
+      }
+    };
+
+    form.addEventListener('change', (event) => {
+      const target = event.target as HTMLInputElement;
+      if (target.name === 'situations' || target.name === 'priorities') toggleOther(target.name);
+    });
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const submit = form.querySelector<HTMLButtonElement>('[data-submit]');
+      const submitLabel = submit?.querySelector<HTMLElement>('[data-submit-label]');
+      const status = form.querySelector<HTMLElement>('[data-form-status]');
+      const values = (name: string) =>
+        [...form.querySelectorAll<HTMLInputElement>(`input[name="${name}"]:checked`)].map((input) => input.value);
+
+      let firstInvalid: HTMLElement | undefined;
+      for (const fieldset of form.querySelectorAll<HTMLElement>('[data-required-group]')) {
+        const name = fieldset.dataset.requiredGroup ?? '';
+        const invalid = values(name).length === 0;
+        const error = fieldset.querySelector<HTMLElement>('[data-group-error]');
+        if (error) error.hidden = !invalid;
+        fieldset.classList.toggle('question-card--invalid', invalid);
+        if (invalid && !firstInvalid) firstInvalid = fieldset.querySelector<HTMLInputElement>('input') ?? fieldset;
+      }
+
+      for (const name of ['situations', 'priorities'] as const) {
+        const otherSelected = values(name).includes('other');
+        const other = form.elements.namedItem(`${name}Other`) as HTMLInputElement;
+        if (otherSelected && !other.value.trim()) {
+          other.setCustomValidity(form.dataset.required ?? 'Required');
+          other.reportValidity();
+          firstInvalid ??= other;
+        } else {
+          other.setCustomValidity('');
+        }
+      }
+
+      if (firstInvalid) {
+        firstInvalid.focus();
+        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      if (submit) {
+        submit.disabled = true;
+        if (submitLabel) submitLabel.textContent = submit.dataset.loading ?? '';
+      }
+      if (status) status.hidden = true;
+
+      const payload = {
+        locale: form.dataset.locale,
+        situations: values('situations'),
+        situationsOther: (form.elements.namedItem('situationsOther') as HTMLInputElement).value.trim() || undefined,
+        priorities: values('priorities'),
+        prioritiesOther: (form.elements.namedItem('prioritiesOther') as HTMLInputElement).value.trim() || undefined,
+        timing: values('timing'),
+        homeService: values('homeService')[0],
+        website: (form.elements.namedItem('website') as HTMLInputElement).value,
+      };
+
+      try {
+        const response = await fetch('/api/questionnaire', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!response.ok) throw new Error('questionnaire');
+        form.hidden = true;
+        const success = document.querySelector<HTMLElement>('[data-questionnaire-success]');
+        if (success) {
+          success.hidden = false;
+          success.focus();
+        }
+      } catch {
+        if (status) {
+          status.textContent = form.dataset.error ?? '';
+          status.hidden = false;
+        }
+        if (submit) {
+          submit.disabled = false;
+          if (submitLabel) submitLabel.textContent = submit.dataset.label ?? '';
+        }
+      }
+    });
+  }
+</script>
+
+<style>
+  .questionnaire-hero {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(4rem, 10vw, 7rem) 0 clamp(6rem, 12vw, 9rem);
+    background: var(--pine);
+    color: var(--paper);
+  }
+  .questionnaire-hero::after {
+    position: absolute;
+    right: -8rem;
+    bottom: -12rem;
+    width: 28rem;
+    height: 28rem;
+    border: 1px solid rgb(255 255 255 / 0.16);
+    border-radius: 50%;
+    content: '';
+  }
+  .questionnaire-hero__inner { position: relative; z-index: 1; max-width: 50rem; }
+  .questionnaire-hero .back-link { color: rgb(255 255 255 / 0.72); }
+  .questionnaire-hero .eyebrow { display: block; margin-top: 2.5rem; color: var(--sand); }
+  .questionnaire-hero h1 { max-width: 11ch; margin: 0.65rem 0 1.2rem; }
+  .questionnaire-hero .lead { max-width: 45rem; color: rgb(255 255 255 / 0.8); }
+  .questionnaire-anonymous {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    max-width: 43rem;
+    margin-top: 1.8rem;
+    color: rgb(255 255 255 / 0.76);
+    font-size: 0.92rem;
+  }
+  .questionnaire-anonymous span {
+    display: grid;
+    flex: 0 0 1.45rem;
+    width: 1.45rem;
+    height: 1.45rem;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--sand);
+    color: var(--pine);
+    font-weight: 800;
+  }
+  .questionnaire-layout { position: relative; z-index: 2; margin-top: clamp(-3.5rem, -6vw, -2.5rem); padding-bottom: clamp(5rem, 10vw, 8rem); }
+  .questionnaire-form { display: grid; gap: 1.25rem; max-width: 58rem; margin-inline: auto; }
+  .question-card {
+    position: relative;
+    min-width: 0;
+    margin: 0;
+    padding: clamp(1.5rem, 5vw, 3rem);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--paper);
+    box-shadow: var(--shadow-soft);
+  }
+  .question-card--invalid { border-color: var(--clay); }
+  .question-card__number {
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    color: var(--pine-soft);
+    font-family: var(--font-display);
+    font-size: clamp(2.8rem, 7vw, 5rem);
+    line-height: 1;
+  }
+  .question-card legend {
+    position: relative;
+    z-index: 1;
+    max-width: 40rem;
+    margin-left: -0.75rem;
+    padding: 0.25rem 4.5rem 0.35rem 0.75rem;
+    border-radius: 0.5rem;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: clamp(1.45rem, 3.5vw, 2rem);
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  .question-hint { margin: 0.65rem 0 1.35rem; color: var(--ink-soft); font-size: 0.86rem; }
+  .option-list { display: grid; gap: 0.65rem; }
+  .option-card {
+    display: flex;
+    gap: 0.85rem;
+    align-items: flex-start;
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 0.85rem;
+    background: var(--cream);
+    color: var(--ink);
+    cursor: pointer;
+    transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+  }
+  .option-card:hover { border-color: var(--pine); transform: translateY(-1px); }
+  .option-card:has(input:checked) { border-color: var(--pine); background: var(--pine-soft); }
+  .option-card input { flex: 0 0 auto; width: 1.05rem; height: 1.05rem; margin: 0.15rem 0 0; accent-color: var(--pine); }
+  .option-card span { line-height: 1.45; }
+  .option-list--compact { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .timing-grid { display: grid; gap: 1.5rem; }
+  .timing-grid h2 { margin: 0 0 0.75rem; font-family: var(--font-body); font-size: 0.82rem; letter-spacing: 0.12em; text-transform: uppercase; }
+  .other-answer { margin-top: 1rem; }
+  .other-answer label { display: block; margin-bottom: 0.45rem; font-weight: 700; }
+  .other-answer input { width: 100%; min-height: 3.2rem; padding: 0.8rem 0.9rem; border: 1px solid var(--border); border-radius: 0.75rem; background: var(--paper); font: inherit; }
+  .other-answer input:focus { border-color: var(--pine); outline: 3px solid rgb(30 91 74 / 0.12); }
+  .other-answer small { display: block; margin-top: 0.45rem; color: var(--ink-soft); }
+  .question-error, .form-status { color: var(--clay-dark); font-weight: 700; }
+  .question-error { margin: 1rem 0 0; }
+  .questionnaire-submit { padding: clamp(1.3rem, 4vw, 2rem); text-align: center; }
+  .questionnaire-submit p { margin: 0 0 1rem; color: var(--ink-soft); font-size: 0.84rem; }
+  .questionnaire-submit a { color: var(--clay-dark); font-weight: 700; }
+  .questionnaire-submit .btn { min-width: min(100%, 18rem); justify-content: center; }
+  .questionnaire-submit .form-status { margin-top: 1rem; }
+  .questionnaire-success {
+    max-width: 46rem;
+    margin-inline: auto;
+    padding: clamp(2.5rem, 8vw, 5rem);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--paper);
+    box-shadow: var(--shadow-soft);
+    text-align: center;
+  }
+  .success-mark { display: grid; width: 4rem; height: 4rem; margin: 0 auto 1.5rem; place-items: center; border-radius: 50%; background: var(--pine); color: white; font-size: 1.8rem; }
+  .questionnaire-success h2 { margin: 0.7rem auto 1rem; }
+  .questionnaire-success p { max-width: 36rem; margin: 0 auto 2rem; color: var(--ink-soft); }
+  @media (min-width: 44rem) {
+    .timing-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 35rem) {
+    .option-list--compact { grid-template-columns: 1fr; }
+    .question-card legend { padding-right: 2.5rem; }
+    .question-card__number { right: 1rem; font-size: 2.8rem; }
+  }
+</style>

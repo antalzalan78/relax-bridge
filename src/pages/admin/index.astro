@@ -15,6 +15,7 @@ import {
 } from '../../lib/server/booking-repository';
 import { assertSameOrigin } from '../../lib/server/security';
 import { retryBookingEmails } from '../../lib/server/booking-email';
+import AdminHeader from '../../components/AdminHeader.astro';
 import '../../styles/global.css';
 
 export const prerender = false;
@@ -135,15 +136,7 @@ const emailStatusLabel = (value: unknown) => ({
     <title>Foglalási admin — Relax Bridge</title>
   </head>
   <body class="admin-page">
-    <header class="admin-header">
-      <div class="admin-wrap admin-header__inner">
-        <a class="admin-brand" href="/admin">Relax Bridge <small>Foglalási admin</small></a>
-        <span>{session.email}</span>
-        <form method="post" action="/admin/logout">
-          <button class="admin-link" type="submit">Kilépés</button>
-        </form>
-      </div>
-    </header>
+    <AdminHeader email={session.email} active="bookings" />
 
     <main class="admin-wrap admin-main">
       <section class="admin-title">
@@ -306,12 +299,6 @@ const emailStatusLabel = (value: unknown) => ({
 <style>
   .admin-page { min-height: 100vh; padding: 0; background: #f3eee5; font-size: 0.94rem; }
   .admin-wrap { width: min(94vw, 92rem); margin-inline: auto; }
-  .admin-header { position: sticky; z-index: 10; top: 0; border-bottom: 1px solid var(--border); background: rgb(246 241 232 / 0.94); backdrop-filter: blur(14px); }
-  .admin-header__inner { display: flex; min-height: 4.5rem; align-items: center; gap: 1.25rem; }
-  .admin-brand { margin-right: auto; color: var(--ink); font-family: 'Iowan Old Style', Georgia, serif; font-size: 1.2rem; font-weight: 700; text-decoration: none; }
-  .admin-brand small { display: block; color: var(--clay-dark); font-family: 'Avenir Next', sans-serif; font-size: 0.55rem; letter-spacing: 0.1em; text-transform: uppercase; }
-  .admin-header__inner > span { color: var(--ink-soft); font-size: 0.8rem; }
-  .admin-link { border: 0; background: none; color: var(--pine); cursor: pointer; font: inherit; font-weight: 700; }
   .admin-main { padding-block: 3rem 6rem; }
   .admin-title { display: flex; align-items: end; justify-content: space-between; gap: 2rem; margin-bottom: 2rem; }
   .admin-title h1 { max-width: none; font-size: clamp(2.5rem, 5vw, 4.4rem); }
@@ -381,7 +368,6 @@ const emailStatusLabel = (value: unknown) => ({
   @media (max-width: 52rem) {
     .admin-title { display: block; }
     .week-nav { width: fit-content; margin-top: 1rem; }
-    .admin-header__inner > span { display: none; }
     .compact-form { grid-template-columns: 1fr; }
     .compact-form .btn, .compact-form .checkbox-label, .compact-form .wide-field { grid-column: auto; }
   }

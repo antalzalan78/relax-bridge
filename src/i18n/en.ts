@@ -20,7 +20,7 @@ export default {
     prices: 'Prices',
     about: 'About me',
     contact: 'Contact',
-    giftCard: 'Gift card',
+    questionnaire: 'Questionnaire',
     bookingsOpen: 'Bookings open',
     bookingsOpenShort: 'Open',
     bookingsToday: 'Available today',
@@ -90,11 +90,11 @@ export default {
         body: 'I come to your home and bring everything needed — you only need to relax. The price includes travel time, preparation and the treatment. I will ask for your exact address and phone number so I can reach you easily. Please note: shorter treatments are not available for home service.',
       },
       {
-        title: 'Gift card',
-        body: 'Looking for a special way to give someone a moment of rest? With a Relax Bridge gift card you give relaxation, tailored to them. Gift cards are valid for 6 months from the date of purchase. Refunds are not possible and gift cards cannot be exchanged for cash. In case of loss or theft, a gift card unfortunately cannot be replaced.',
+        title: 'Short questionnaire',
+        body: 'Which times and options matter to you when booking a massage? Four short, anonymous questions help me shape Relax Bridge around what people need.',
       },
     ],
-    giftCardCta: 'Order a gift card',
+    questionnaireCta: 'Take the questionnaire',
   },
 
   service: {

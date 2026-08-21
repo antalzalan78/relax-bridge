@@ -8,6 +8,8 @@
     "preview": "astro preview",
     "check": "astro check",
     "test:booking": "node --experimental-strip-types --test tests/booking/*.test.ts",
+    "test:questionnaire": "node --experimental-strip-types --test tests/questionnaire/*.test.ts",
+    "test": "npm run test:booking && npm run test:questionnaire",
     "db:migrate": "node --env-file-if-exists=.env scripts/migrate-db.mjs",
     "admin:hash": "node scripts/hash-admin-password.mjs"
   },

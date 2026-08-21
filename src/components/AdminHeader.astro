@@ -1,0 +1,41 @@
+---
+interface Props {
+  email: string;
+  active: 'bookings' | 'questionnaire';
+}
+
+const { email, active } = Astro.props;
+---
+
+<header class="admin-header">
+  <div class="admin-header__inner">
+    <a class="admin-brand" href="/admin">Relax Bridge <small>Admin</small></a>
+    <nav aria-label="Admin menü">
+      <a href="/admin" aria-current={active === 'bookings' ? 'page' : undefined}>Foglalások</a>
+      <a href="/admin/questionnaire" aria-current={active === 'questionnaire' ? 'page' : undefined}>Kérdőív</a>
+    </nav>
+    <span class="admin-email">{email}</span>
+    <form method="post" action="/admin/logout">
+      <button class="admin-link" type="submit">Kilépés</button>
+    </form>
+  </div>
+</header>
+
+<style>
+  .admin-header { position: sticky; z-index: 10; top: 0; border-bottom: 1px solid var(--border); background: rgb(246 241 232 / 0.94); backdrop-filter: blur(14px); }
+  .admin-header__inner { display: flex; width: min(94vw, 92rem); min-height: 4.5rem; margin-inline: auto; align-items: center; gap: 1.25rem; }
+  .admin-brand { margin-right: 0.5rem; color: var(--ink); font-family: 'Iowan Old Style', Georgia, serif; font-size: 1.2rem; font-weight: 700; text-decoration: none; }
+  .admin-brand small { display: block; color: var(--clay-dark); font-family: 'Avenir Next', sans-serif; font-size: 0.55rem; letter-spacing: 0.1em; text-transform: uppercase; }
+  nav { display: flex; gap: 0.25rem; margin-right: auto; }
+  nav a { padding: 0.55rem 0.75rem; border-radius: 999px; color: var(--ink-soft); font-size: 0.78rem; font-weight: 700; text-decoration: none; }
+  nav a:hover, nav a[aria-current='page'] { background: var(--pine-soft); color: var(--pine-dark); }
+  .admin-email { color: var(--ink-soft); font-size: 0.8rem; }
+  .admin-link { border: 0; background: none; color: var(--pine); cursor: pointer; font: inherit; font-weight: 700; }
+  @media (max-width: 42rem) {
+    .admin-header__inner { gap: 0.35rem; }
+    .admin-brand { margin-right: auto; }
+    .admin-email { display: none; }
+    nav { order: 3; width: 100%; margin: 0; padding-bottom: 0.55rem; }
+    .admin-header__inner { flex-wrap: wrap; padding-top: 0.55rem; }
+  }
+</style>
