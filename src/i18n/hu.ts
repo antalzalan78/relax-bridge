@@ -20,7 +20,7 @@ export default {
     prices: 'Árak',
     about: 'Rólam',
     contact: 'Kapcsolat',
-    giftCard: 'Ajándékkártya',
+    questionnaire: 'Kérdőív',
     bookingsOpen: 'Foglalás nyitva',
     bookingsOpenShort: 'Nyitva',
     bookingsToday: 'Ma van szabad időpont',
@@ -90,11 +90,11 @@ export default {
         body: 'Hozzád megyek, és mindent viszek, amire szükség van — neked csak pihenned kell. Az ár tartalmazza az utazási időt, a felkészülést és a kezelést. Elkérem a pontos címedet és a telefonszámodat, hogy könnyen elérjelek. Fontos: a rövidebb kezelések házhoz nem elérhetők.',
       },
       {
-        title: 'Ajándékkártya',
-        body: 'Szeretnél valakinek egy különleges, kikapcsolódást nyújtó pillanatot ajándékozni? A Relax Bridge ajándékkártyával ezt megteheted. A kártya a vásárlás dátumától számított 6 hónapig érvényes. Visszatérítés nem lehetséges, és készpénzre nem váltható. Elvesztés vagy lopás esetén sajnos nem pótolható.',
+        title: 'Rövid kérdőív',
+        body: 'Mely időpontok és lehetőségek fontosak neked egy masszázs foglalásakor? Négy rövid, névtelen kérdéssel segíthetsz, hogy a Relax Bridge jobban igazodjon az igényekhez.',
       },
     ],
-    giftCardCta: 'Ajándékkártya megrendelése',
+    questionnaireCta: 'Kérdőív kitöltése',
   },
 
   service: {

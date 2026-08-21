@@ -1,6 +1,6 @@
 ---
 import { render } from 'astro:content';
-import { bookingPath, site, pathFor, type Locale } from '../data/site';
+import { bookingPath, questionnairePath, site, pathFor, type Locale } from '../data/site';
 import { anchors } from '../data/routes';
 import { t } from '../i18n';
 import {
@@ -78,8 +78,8 @@ const jsonLd = [
         <a class="btn btn--primary btn--block" href={bookingHref}>
           {d.service.bookCta}<span aria-hidden="true">&rarr;</span>
         </a>
-        <a class="text-link service-booking__gift" href={site.giftCardUrl} rel="noopener">
-          {d.nav.giftCard}<span aria-hidden="true">&nearr;</span>
+        <a class="text-link service-booking__gift" href={questionnairePath(locale)}>
+          {d.nav.questionnaire}<span aria-hidden="true">&rarr;</span>
         </a>
       </aside>
     </section>

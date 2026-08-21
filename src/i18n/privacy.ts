@@ -11,7 +11,7 @@ const privacy = {
       'Lees welke persoonsgegevens Relax Bridge verwerkt voor afspraken, waarom dat gebeurt en welke privacyrechten je hebt.',
     intro:
       'Relax Bridge gaat zorgvuldig om met je persoonsgegevens. Hier lees je welke gegevens we verwerken wanneer je een afspraak maakt, waarom we dat doen en welke keuzes en rechten je hebt.',
-    updated: 'Laatst bijgewerkt: 15 augustus 2026',
+    updated: 'Laatst bijgewerkt: 21 augustus 2026',
     controllerTitle: 'Wie is verantwoordelijk?',
     controllerBody:
       'Relax Bridge in Tilburg is de verwerkingsverantwoordelijke voor de persoonsgegevens die via deze website en het boekingssysteem worden verwerkt.',
@@ -29,9 +29,10 @@ const privacy = {
           'een eventuele vrijwillige opmerking bij de reservering;',
           'technische verzendinformatie over de bevestigingsmails;',
           'een eenrichtingshash van het netwerkadres voor beveiliging en het beperken van misbruik.',
+          'bij de vragenlijst: de gekozen antwoorden, taal, verzendtijd en eventueel zelf ingevoerde tekst; de vragenlijst vraagt niet om naam of contactgegevens.',
         ],
         note:
-          'Vul in het vrije opmerkingenveld geen medische gegevens of andere gevoelige informatie in. Bespreek informatie die voor de behandeling nodig is liever rechtstreeks met Relax Bridge.',
+          'Vul in vrije tekstvelden geen naam, contactgegevens, medische gegevens of andere gevoelige informatie in. Bespreek informatie die voor een behandeling nodig is liever rechtstreeks met Relax Bridge.',
       },
       {
         id: 'doelen',
@@ -40,6 +41,7 @@ const privacy = {
           'Boekings- en contactgegevens worden verwerkt om je verzoek uit te voeren, de afspraak vast te leggen en daarover te communiceren. De rechtsgrond is het uitvoeren van een overeenkomst of het nemen van stappen vóór het sluiten daarvan.',
           'Gegevens die deel uitmaken van de financiële administratie worden verwerkt om aan wettelijke verplichtingen te voldoen. Beperkte technische gegevens worden verwerkt op basis van het gerechtvaardigde belang om de website en het boekingssysteem te beveiligen en misbruik te voorkomen.',
           'De boekingsgegevens worden niet gebruikt voor nieuwsbrieven of andere marketing zonder een afzonderlijke, vrijwillige toestemming.',
+          'Antwoorden op de vragenlijst worden verwerkt om voorkeuren in geaggregeerde vorm te begrijpen en het aanbod en de beschikbaarheid van Relax Bridge te verbeteren. Hiervoor geldt het gerechtvaardigde belang in zorgvuldige dienstverlening; er worden geen directe identificatiegegevens gevraagd en de antwoorden worden niet gekoppeld aan een boeking.',
         ],
       },
       {
@@ -56,6 +58,7 @@ const privacy = {
         paragraphs: [
           'Boekings- en contactgegevens die niet bij de fiscale administratie horen, worden in beginsel uiterlijk twee jaar na de afspraak verwijderd of geanonimiseerd. Gegevens die onderdeel zijn van de wettelijk verplichte financiële administratie kunnen zeven jaar worden bewaard.',
           'Technische beveiligings- en e-mailverzendgegevens worden niet langer bewaard dan nodig voor beveiliging, foutoplossing en betrouwbare aflevering. Een langere bewaartermijn geldt alleen wanneer dat nodig is voor een wettelijke verplichting of een juridisch geschil.',
+          'Losse antwoorden op de vragenlijst worden maximaal twee jaar bewaard. Daarna worden ze verwijderd of uitsluitend in samengevoegde, niet tot een persoon herleidbare statistieken behouden.',
         ],
       },
       {
@@ -101,7 +104,7 @@ const privacy = {
       'Learn which personal data Relax Bridge processes for appointments, why it is used and which privacy rights you have.',
     intro:
       'Relax Bridge handles your personal data with care. This notice explains which information is processed when you book an appointment, why it is needed and which choices and rights you have.',
-    updated: 'Last updated: 15 August 2026',
+    updated: 'Last updated: 21 August 2026',
     controllerTitle: 'Who is responsible?',
     controllerBody:
       'Relax Bridge in Tilburg is the data controller for personal data processed through this website and booking system.',
@@ -119,9 +122,10 @@ const privacy = {
           'any optional note added to the booking;',
           'technical delivery information for confirmation emails;',
           'a one-way hash of the network address for security and abuse prevention.',
+          'for the questionnaire: selected answers, language, submission time and any text entered voluntarily; the questionnaire does not ask for a name or contact details.',
         ],
         note:
-          'Do not enter medical information or other sensitive data in the optional notes field. Please discuss information needed for the treatment directly with Relax Bridge.',
+          'Do not enter your name, contact details, medical information or other sensitive data in free-text fields. Please discuss information needed for a treatment directly with Relax Bridge.',
       },
       {
         id: 'purposes',
@@ -130,6 +134,7 @@ const privacy = {
           'Booking and contact details are processed to handle your request, record the appointment and communicate with you about it. The legal basis is the performance of a contract or steps taken before entering into one.',
           'Information forming part of the financial administration is processed to comply with legal obligations. Limited technical data is processed on the basis of the legitimate interest in securing the website and booking system and preventing abuse.',
           'Booking details are not used for newsletters or other marketing without separate, freely given consent.',
+          'Questionnaire answers are processed to understand preferences in aggregate and improve the services and availability offered by Relax Bridge. This is based on the legitimate interest in providing a thoughtful service; no direct identifiers are requested and answers are not linked to a booking.',
         ],
       },
       {
@@ -146,6 +151,7 @@ const privacy = {
         paragraphs: [
           'Booking and contact details that do not form part of the tax administration are generally deleted or anonymised no later than two years after the appointment. Information that forms part of legally required financial records may be retained for seven years.',
           'Technical security and email-delivery data is kept only as long as needed for security, troubleshooting and reliable delivery. A longer period applies only where required by law or needed for a legal dispute.',
+          'Individual questionnaire answers are retained for no more than two years. They are then deleted or kept only as combined statistics that cannot be linked to a person.',
         ],
       },
       {
@@ -191,7 +197,7 @@ const privacy = {
       'Ismerd meg, milyen személyes adatokat kezel a Relax Bridge a foglalásokhoz, miért használja azokat, és milyen jogaid vannak.',
     intro:
       'A Relax Bridge gondosan kezeli a személyes adataidat. Itt megtudhatod, milyen adatokat kezelünk az időpontfoglalás során, miért van rájuk szükség, és milyen jogaid vannak.',
-    updated: 'Utolsó frissítés: 2026. augusztus 15.',
+    updated: 'Utolsó frissítés: 2026. augusztus 21.',
     controllerTitle: 'Ki felel az adatkezelésért?',
     controllerBody:
       'A tilburgi Relax Bridge az adatkezelő a weboldalon és a foglalási rendszerben kezelt személyes adatok tekintetében.',
@@ -209,9 +215,10 @@ const privacy = {
           'a foglaláshoz írt nem kötelező megjegyzés;',
           'a visszaigazoló e-mailek technikai kézbesítési adatai;',
           'a hálózati címből készült egyirányú lenyomat a biztonság és a visszaélések megelőzése érdekében.',
+          'a kérdőívnél a kiválasztott válaszok, az oldal nyelve, a beküldés ideje és az esetleg önként megadott szöveg; a kérdőív nem kér nevet vagy elérhetőséget.',
         ],
         note:
-          'A szabad szöveges megjegyzésben ne adj meg egészségügyi vagy más érzékeny adatot. A kezeléshez szükséges információt inkább közvetlenül egyeztesd a Relax Bridge-dzsel.',
+          'A szabad szöveges mezőkben ne adj meg nevet, elérhetőséget, egészségügyi vagy más érzékeny adatot. A kezeléshez szükséges információt inkább közvetlenül egyeztesd a Relax Bridge-dzsel.',
       },
       {
         id: 'celok',
@@ -220,6 +227,7 @@ const privacy = {
           'A foglalási és kapcsolattartási adatokat a kérésed teljesítéséhez, az időpont rögzítéséhez és az ezzel kapcsolatos kommunikációhoz kezeljük. A jogalap a szerződés teljesítése, illetve a szerződéskötést megelőző lépések megtétele.',
           'A pénzügyi nyilvántartás részét képező adatokat jogi kötelezettség teljesítéséhez kezeljük. Korlátozott technikai adatokat jogos érdek alapján használunk a weboldal és a foglalási rendszer védelmére, valamint a visszaélések megelőzésére.',
           'A foglalási adatokat külön, önkéntes hozzájárulás nélkül nem használjuk hírlevélhez vagy más marketinghez.',
+          'A kérdőív válaszait összesített formában az igények megértéséhez, valamint a Relax Bridge kínálatának és elérhetőségének fejlesztéséhez kezeljük. Ennek jogalapja a gondos szolgáltatásfejlesztéshez fűződő jogos érdek; közvetlen azonosító adatot nem kérünk, és a válaszokat nem kapcsoljuk foglaláshoz.',
         ],
       },
       {
@@ -236,6 +244,7 @@ const privacy = {
         paragraphs: [
           'Az adóügyi nyilvántartás részét nem képező foglalási és kapcsolattartási adatokat főszabály szerint legkésőbb az időpont után két évvel töröljük vagy anonimizáljuk. A jogszabály alapján megőrzendő pénzügyi nyilvántartás adatait hét évig őrizhetjük meg.',
           'A technikai biztonsági és e-mail-kézbesítési adatokat csak a biztonsághoz, a hibakereséshez és a megbízható kézbesítéshez szükséges ideig tartjuk meg. Hosszabb megőrzésre csak jogi kötelezettség vagy jogvita esetén kerül sor.',
+          'A kérdőív egyedi válaszait legfeljebb két évig őrizzük meg. Ezután töröljük őket, vagy kizárólag személyhez nem köthető, összesített statisztikaként tartjuk meg.',
         ],
       },
       {

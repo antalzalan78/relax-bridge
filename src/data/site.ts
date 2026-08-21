@@ -30,9 +30,6 @@ export const site = {
    */
   openingHours: [] as string[],
 
-  // --- kulso szolgaltatasok ---
-  giftCardUrl: 'https://giftcards.sumup.com/order/MEMDT1BM',
-
   // --- kozossegi media ---
   social: {
     facebook: 'https://www.facebook.com/profile.php?id=61579145392339',
@@ -85,4 +82,11 @@ export function bookingPath(locale: Locale): string {
 /** A lokalizalt adatvedelmi tajekoztato utvonala. */
 export function privacyPath(locale: Locale): string {
   return pathFor(locale, 'privacy');
+}
+
+/** A kerdoiv nyelvenkent lokalizalt utvonala. */
+export function questionnairePath(locale: Locale): string {
+  if (locale === 'nl') return '/vragenlijst';
+  if (locale === 'en') return '/en/questionnaire';
+  return '/hu/kerdoiv';
 }

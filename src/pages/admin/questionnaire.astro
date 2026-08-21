@@ -1,0 +1,150 @@
+---
+import AdminHeader from '../../components/AdminHeader.astro';
+import { questionnaireText } from '../../i18n/questionnaire';
+import {
+  homeServiceKeys,
+  priorityKeys,
+  situationKeys,
+  timingKeys,
+} from '../../lib/questionnaire/model';
+import { summarizeQuestionnaire } from '../../lib/questionnaire/summary';
+import { getAdminSession } from '../../lib/server/admin-auth';
+import { listQuestionnaireResponses } from '../../lib/server/questionnaire-repository';
+import '../../styles/global.css';
+
+export const prerender = false;
+
+const session = await getAdminSession(Astro.cookies);
+if (!session) return Astro.redirect('/admin/login');
+
+const responses = await listQuestionnaireResponses();
+const summary = summarizeQuestionnaire(responses);
+const labels = questionnaireText('hu');
+const percent = (count: number) => summary.total ? Math.round((count / summary.total) * 100) : 0;
+const date = (value: Date) => value.toLocaleString('hu-HU', {
+  timeZone: process.env.BOOKING_TIME_ZONE || 'Europe/Amsterdam',
+  year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit',
+});
+
+const sections = [
+  {
+    title: labels.questions.situations,
+    options: situationKeys.map((key) => ({ key, label: labels.situations.find((option) => option.key === key)!.label, count: summary.situations[key] })),
+    other: summary.situationOther,
+  },
+  {
+    title: labels.questions.priorities,
+    options: priorityKeys.map((key) => ({ key, label: labels.priorities.find((option) => option.key === key)!.label, count: summary.priorities[key] })),
+    other: summary.priorityOther,
+  },
+  {
+    title: labels.questions.timing,
+    options: timingKeys.map((key) => {
+      const option = labels.timing.find((item) => item.key === key)!;
+      const group = key.startsWith('weekday_') ? labels.groups.weekday : labels.groups.weekend;
+      return { key, label: `${group} · ${option.label}`, count: summary.timing[key] };
+    }),
+    other: [],
+  },
+  {
+    title: labels.questions.homeService,
+    options: homeServiceKeys.map((key) => ({ key, label: labels.homeService.find((option) => option.key === key)!.label, count: summary.homeService[key] })),
+    other: [],
+  },
+];
+---
+
+<!doctype html>
+<html lang="hu">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Kérdőív eredmények — Relax Bridge</title>
+  </head>
+  <body class="admin-page">
+    <AdminHeader email={session.email} active="questionnaire" />
+    <main class="admin-wrap admin-main">
+      <section class="admin-title">
+        <div>
+          <span class="eyebrow">Névtelen visszajelzések</span>
+          <h1>Kérdőív eredmények</h1>
+          <p>A sávok az összes beérkezett válaszhoz viszonyított arányt mutatják. A többválaszos kérdéseknél az arányok összege meghaladhatja a 100%-ot.</p>
+        </div>
+      </section>
+
+      <section class="summary-grid" aria-label="Kérdőív összefoglaló">
+        <article><span>Összes kitöltés</span><strong>{summary.total}</strong></article>
+        <article><span>Utolsó 30 nap</span><strong>{summary.last30Days}</strong></article>
+        <article><span>Legutóbbi válasz</span><strong class="summary-date">{summary.latest ? date(summary.latest) : 'Még nincs válasz'}</strong></article>
+      </section>
+
+      <section class="language-card">
+        <h2>Kitöltések nyelve</h2>
+        <div class="language-list">
+          <span><b>NL</b> {summary.locales.nl} · {percent(summary.locales.nl)}%</span>
+          <span><b>EN</b> {summary.locales.en} · {percent(summary.locales.en)}%</span>
+          <span><b>HU</b> {summary.locales.hu} · {percent(summary.locales.hu)}%</span>
+        </div>
+      </section>
+
+      <div class="result-grid">
+        {sections.map((section, index) => (
+          <section class="result-card">
+            <span class="result-card__number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+            <h2>{section.title}</h2>
+            <div class="result-list">
+              {section.options.map((option) => (
+                <div class="result-row">
+                  <div class="result-row__label"><span>{option.label}</span><strong>{option.count} · {percent(option.count)}%</strong></div>
+                  <div class="result-bar" aria-hidden="true"><span style={`width:${percent(option.count)}%`}></span></div>
+                </div>
+              ))}
+            </div>
+            {section.other.length > 0 && (
+              <details class="other-results">
+                <summary>Egyéb szöveges válaszok ({section.other.reduce((total, item) => total + item.count, 0)})</summary>
+                <ul>{section.other.map((item) => <li><span>{item.text}</span><strong>{item.count}</strong></li>)}</ul>
+              </details>
+            )}
+          </section>
+        ))}
+      </div>
+    </main>
+  </body>
+</html>
+
+<style>
+  .admin-page { min-height: 100vh; padding: 0; background: #f3eee5; font-size: 0.94rem; }
+  .admin-wrap { width: min(94vw, 76rem); margin-inline: auto; }
+  .admin-main { padding-block: 3rem 6rem; }
+  .admin-title { margin-bottom: 2rem; }
+  .admin-title h1 { max-width: none; font-size: clamp(2.5rem, 5vw, 4.4rem); }
+  .admin-title p { max-width: 52rem; color: var(--ink-soft); line-height: 1.65; }
+  .summary-grid { display: grid; gap: 1rem; }
+  .summary-grid article { display: flex; min-height: 8rem; flex-direction: column; justify-content: space-between; padding: 1.4rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); }
+  .summary-grid span { color: var(--ink-soft); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+  .summary-grid strong { color: var(--pine-dark); font-family: 'Iowan Old Style', Georgia, serif; font-size: 2.8rem; }
+  .summary-grid .summary-date { font-family: inherit; font-size: 1rem; line-height: 1.45; }
+  .language-card { margin-top: 1rem; padding: 1.4rem; border-radius: var(--radius-lg); background: var(--pine-dark); color: white; }
+  .language-card h2 { max-width: none; margin: 0 0 1rem; color: white; font-size: 1.4rem; }
+  .language-list { display: flex; flex-wrap: wrap; gap: 0.65rem; }
+  .language-list span { padding: 0.55rem 0.8rem; border: 1px solid rgb(255 255 255 / 0.18); border-radius: 999px; color: rgb(255 255 255 / 0.76); }
+  .language-list b { margin-right: 0.35rem; color: var(--sand); }
+  .result-grid { display: grid; gap: 1.25rem; margin-top: 1.25rem; }
+  .result-card { position: relative; overflow: hidden; padding: clamp(1.4rem, 4vw, 2.5rem); border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); }
+  .result-card__number { position: absolute; top: 0.75rem; right: 1.25rem; color: var(--clay); font-family: 'Iowan Old Style', Georgia, serif; font-size: 4rem; opacity: 0.14; }
+  .result-card h2 { position: relative; max-width: 45rem; margin: 0 4rem 1.5rem 0; font-size: clamp(1.45rem, 3vw, 2rem); }
+  .result-list { display: grid; gap: 1rem; }
+  .result-row__label { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: 0.4rem; }
+  .result-row__label span { color: var(--ink-soft); line-height: 1.35; }
+  .result-row__label strong { flex: 0 0 auto; color: var(--pine-dark); font-size: 0.78rem; }
+  .result-bar { height: 0.55rem; overflow: hidden; border-radius: 999px; background: var(--pine-soft); }
+  .result-bar span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--pine), var(--clay)); }
+  .other-results { margin-top: 1.5rem; padding-top: 1.2rem; border-top: 1px solid var(--border); }
+  .other-results summary { color: var(--clay-dark); cursor: pointer; font-weight: 700; }
+  .other-results ul { display: grid; gap: 0.55rem; padding: 0; list-style: none; }
+  .other-results li { display: flex; justify-content: space-between; gap: 1rem; padding: 0.65rem 0.75rem; border-radius: 0.55rem; background: var(--cream); color: var(--ink-soft); }
+  @media (min-width: 42rem) { .summary-grid { grid-template-columns: 0.8fr 0.8fr 1.4fr; } }
+  @media (max-width: 36rem) { .result-row__label { display: block; } .result-row__label strong { display: block; margin-top: 0.25rem; } }
+</style>

@@ -1,4 +1,4 @@
-import { readFile } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import postgres from 'postgres';
 
@@ -16,10 +16,15 @@ const sql = postgres(databaseUrl, {
 });
 
 try {
-  const migrationPath = resolve('db/migrations/0001_booking.sql');
-  const migration = await readFile(migrationPath, 'utf8');
+  const migrationDirectory = resolve('db/migrations');
+  const migrationFiles = (await readdir(migrationDirectory))
+    .filter((file) => file.endsWith('.sql'))
+    .sort();
   await sql.begin(async (transaction) => {
-    await transaction.unsafe(migration);
+    for (const file of migrationFiles) {
+      const migration = await readFile(resolve(migrationDirectory, file), 'utf8');
+      await transaction.unsafe(migration);
+    }
     if (process.env.BOOKING_TIME_ZONE) {
       await transaction`
         UPDATE booking_settings
@@ -28,7 +33,7 @@ try {
       `;
     }
   });
-  console.log('Booking database migration completed.');
+  console.log(`Database migration completed (${migrationFiles.length} files).`);
 } finally {
   await sql.end();
 }

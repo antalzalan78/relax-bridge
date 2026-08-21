@@ -14,9 +14,10 @@ interface Props {
   path: string;
   alternates: Partial<Record<Locale, string>>;
   jsonLd?: Record<string, unknown>[];
+  showMobileBooking?: boolean;
 }
 
-const { locale, title, description, path, alternates, jsonLd } = Astro.props;
+const { locale, title, description, path, alternates, jsonLd, showMobileBooking = true } = Astro.props;
 const d = t(locale);
 const bookingHref = bookingPath(locale);
 ---
@@ -37,14 +38,14 @@ const bookingHref = bookingPath(locale);
       jsonLd={jsonLd}
     />
   </head>
-  <body class:list={{ 'has-mobile-booking': path !== bookingHref }}>
+  <body class:list={{ 'has-mobile-booking': showMobileBooking && path !== bookingHref }}>
     <a class="skip-link" href="#main">{d.accessibility.skipToContent}</a>
     <Header locale={locale} alternates={alternates} />
     <BotanicalBackdrop />
     <main id="main">
       <slot />
     </main>
-    {path !== bookingHref && (
+    {showMobileBooking && path !== bookingHref && (
       <nav class="mobile-booking-dock" aria-label={d.service.bookCta}>
         <a class="mobile-booking" href={bookingHref}>
           <span>{d.service.bookCta}</span>
