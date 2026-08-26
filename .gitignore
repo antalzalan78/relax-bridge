@@ -4,6 +4,7 @@ build/
 .cache/
 .astro/
 .vercel/
+.vercel-cli-global/
 .npm-cache/
 .env
 .env.*
