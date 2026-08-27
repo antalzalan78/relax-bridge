@@ -588,16 +588,18 @@ img {
 
 .hero__caption span {
   color: var(--clay-dark);
-  font-size: 0.67rem;
+  font-family: 'Iowan Old Style', Georgia, serif;
+  font-size: 1.35rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  letter-spacing: 0.01em;
 }
 
 .hero__caption strong {
-  margin-top: 0.2rem;
-  font-family: 'Iowan Old Style', Georgia, serif;
-  font-size: 1.2rem;
+  margin-top: 0.15rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  line-height: 1.3;
+  text-transform: uppercase;
 }
 
 /* Kulon helyszinblokkok: kep, kezelesek es arak egyutt. */
