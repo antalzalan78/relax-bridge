@@ -41,6 +41,11 @@ export default {
     secondaryCta: 'Árak megtekintése',
   },
 
+  heroProfile: {
+    name: 'Brigitta',
+    role: 'Masszázsterapeuta',
+  },
+
   images: {
     profile:
       'A Relax Bridge masszőrének portréja, amint egy erdei padon ül.',

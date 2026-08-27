@@ -41,6 +41,11 @@ export default {
     secondaryCta: 'See the prices',
   },
 
+  heroProfile: {
+    name: 'Brigitta',
+    role: 'Massage therapist',
+  },
+
   images: {
     profile:
       'Portrait of the Relax Bridge massage therapist, sitting on a bench in the woods.',

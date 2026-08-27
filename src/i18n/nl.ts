@@ -41,6 +41,11 @@ export default {
     secondaryCta: 'Bekijk de prijzen',
   },
 
+  heroProfile: {
+    name: 'Brigitta',
+    role: 'Massagetherapeut',
+  },
+
   images: {
     profile:
       'Portret van de masseuse van Relax Bridge, zittend op een bankje in het bos.',
