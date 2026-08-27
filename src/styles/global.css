@@ -834,6 +834,10 @@ img {
   pointer-events: none;
 }
 
+.price-panel--textured--orange::after {
+  background: rgb(255 250 244 / 0.6);
+}
+
 .price-panel__texture {
   position: absolute;
   z-index: 0;

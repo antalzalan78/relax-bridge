@@ -9,6 +9,7 @@ import profileImage from '../assets/profile-forest.jpg';
 import studioImage from '../assets/studio-tilburg.jpg';
 import bikeImage from '../assets/home-service-fiets.jpg';
 import purpleTowelTexture from '../assets/towel-purple-card.png';
+import orangeTowelTexture from '../assets/towel-orange-card.png';
 import Base from '../layouts/Base.astro';
 import ServiceCard from './ServiceCard.astro';
 import PriceTable from './PriceTable.astro';
@@ -180,7 +181,15 @@ const jsonLd = [
           </div>
         </div>
 
-        <aside class="price-panel price-panel--dark" aria-label={d.prices.homeHeading}>
+        <aside class="price-panel price-panel--textured price-panel--textured--orange" aria-label={d.prices.homeHeading}>
+          <Image
+            class="price-panel__texture"
+            src={orangeTowelTexture}
+            alt=""
+            width={640}
+            loading="lazy"
+            aria-hidden="true"
+          />
           <span class="price-panel__number" aria-hidden="true">02</span>
           <PriceTable locale={locale} caption={d.prices.homeHeading} services={home} />
           <p class="price-panel__note">{d.prices.intro}</p>
