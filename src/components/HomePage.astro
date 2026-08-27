@@ -8,6 +8,7 @@ import { Image } from 'astro:assets';
 import profileImage from '../assets/profile-forest.jpg';
 import studioImage from '../assets/studio-tilburg.jpg';
 import bikeImage from '../assets/home-service-fiets.jpg';
+import purpleTowelTexture from '../assets/towel-purple-card.png';
 import Base from '../layouts/Base.astro';
 import ServiceCard from './ServiceCard.astro';
 import PriceTable from './PriceTable.astro';
@@ -128,7 +129,15 @@ const jsonLd = [
           </div>
         </div>
 
-        <aside class="price-panel" id={anchors.prices} aria-label={d.prices.studioHeading}>
+        <aside class="price-panel price-panel--textured" id={anchors.prices} aria-label={d.prices.studioHeading}>
+          <Image
+            class="price-panel__texture"
+            src={purpleTowelTexture}
+            alt=""
+            width={640}
+            loading="lazy"
+            aria-hidden="true"
+          />
           <span class="price-panel__number" aria-hidden="true">01</span>
           <PriceTable locale={locale} caption={d.prices.studioHeading} services={studio} />
           <p class="price-panel__note">{d.prices.intro}</p>
