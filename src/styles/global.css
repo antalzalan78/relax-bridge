@@ -345,8 +345,8 @@ img {
 
 .brand__mark {
   position: relative;
-  width: 3.45rem;
-  height: 1.91rem;
+  width: 4rem;
+  height: 2.29rem;
   flex: none;
   overflow: hidden;
 }
@@ -365,12 +365,12 @@ img {
 }
 
 .brand__wordmark {
-  width: 7rem;
+  width: 8.2rem;
   height: auto;
 }
 
 .brand__tagline {
-  width: 9.85rem;
+  width: 12rem;
   height: auto;
   margin-inline: auto;
 }
@@ -1447,16 +1447,16 @@ img {
   }
 
   .brand__mark {
-    width: 3rem;
-    height: 1.66rem;
+    width: 3.25rem;
+    height: 1.86rem;
   }
 
   .brand__wordmark {
-    width: 6.1rem;
+    width: 6.6rem;
   }
 
   .brand__tagline {
-    width: 8.65rem;
+    width: 11rem;
   }
 
   .booking-status {
