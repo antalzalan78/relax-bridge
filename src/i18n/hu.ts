@@ -42,6 +42,8 @@ export default {
   },
 
   images: {
+    profile:
+      'A Relax Bridge masszőrének portréja, amint egy erdei padon ül.',
     studio:
       'A Relax Bridge masszázsszobája Tilburgban: masszázságy, törölközők és masszázsolaj.',
     homeService:

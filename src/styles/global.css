@@ -647,6 +647,10 @@ img {
   box-shadow: var(--shadow-raised);
 }
 
+.hero__media .hero__profile {
+  object-position: 44% 30%;
+}
+
 .location-showcase__image {
   position: absolute;
   inset: 0;

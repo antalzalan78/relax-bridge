@@ -42,6 +42,8 @@ export default {
   },
 
   images: {
+    profile:
+      'Portrait of the Relax Bridge massage therapist, sitting on a bench in the woods.',
     studio:
       'The Relax Bridge massage room in Tilburg, with massage table, towels and massage oil.',
     homeService:

@@ -42,6 +42,8 @@ export default {
   },
 
   images: {
+    profile:
+      'Portret van de masseuse van Relax Bridge, zittend op een bankje in het bos.',
     studio:
       'De massageruimte van Relax Bridge in Tilburg, met massagetafel, handdoeken en massageolie.',
     homeService:
