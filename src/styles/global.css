@@ -829,7 +829,7 @@ img {
   position: absolute;
   z-index: 1;
   inset: 0;
-  background: rgb(255 252 246 / 0.84);
+  background: rgb(255 252 246 / 0.78);
   content: '';
   pointer-events: none;
 }
