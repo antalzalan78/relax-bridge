@@ -1,77 +1,94 @@
-<div class="site-botanical" aria-hidden="true">
+<div class="site-logo-wallpaper" aria-hidden="true">
   <svg
-    class="site-botanical__art"
-    viewBox="0 0 720 520"
+    class="site-logo-wallpaper__art"
+    viewBox="0 0 960 640"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <g class="site-botanical__tree site-botanical__tree--left">
-      <path d="M284 416 190 282" />
-      <path d="M190 282c-76-5-122 52-98 116 61 22 122-28 98-116Z" />
-      <path d="m176 307-66 78" />
-      <circle cx="106" cy="237" r="13" />
-    </g>
+    <g class="site-logo-wallpaper__line">
+      <g class="site-logo-wallpaper__leaves">
+        <path d="M480 326V112" />
+        <path d="M480 112c-52 54-49 130 0 169 49-39 52-115 0-169Z" />
+        <path d="M480 143v122" />
 
-    <g class="site-botanical__tree site-botanical__tree--centre">
-      <path d="M360 420V164" />
-      <path d="M360 164c-54 58-47 139 0 174 47-35 54-116 0-174Z" />
-      <path d="M360 194v128" />
-    </g>
+        <path d="m385 331-91-111" />
+        <path d="M294 220c-72-5-113 47-91 105 58 21 114-24 91-105Z" />
+        <path d="m280 244-62 67" />
+        <circle cx="219" cy="182" r="13" />
 
-    <g class="site-botanical__tree site-botanical__tree--right">
-      <path d="m436 416 94-134" />
-      <path d="M530 282c76-5 122 52 98 116-61 22-122-28-98-116Z" />
-      <path d="m544 307 66 78" />
-      <circle cx="614" cy="237" r="13" />
+        <path d="m575 331 91-111" />
+        <path d="M666 220c72-5 113 47 91 105-58 21-114-24-91-105Z" />
+        <path d="m680 244 62 67" />
+        <circle cx="741" cy="182" r="13" />
+      </g>
+
+      <g class="site-logo-wallpaper__bridge">
+        <path d="M153 487V365h34v122" />
+        <path d="M773 487V365h34v122" />
+        <path d="M187 383Q480 184 773 383" />
+        <path d="M187 417Q480 218 773 417" />
+        <path d="M266 487Q480 245 694 487" />
+        <path d="M187 487q47-72 94 0" />
+        <path d="M679 487q47-72 94 0" />
+      </g>
+
+      <g class="site-logo-wallpaper__waves">
+        <path d="M80 486c90 49 158-43 259 7 101 49 170-42 271 7 101 50 169-42 270 7" />
+        <path d="M94 535c94 52 165-46 270 7 105 52 176-46 281 7 105 52 176-46 221 2" />
+      </g>
     </g>
   </svg>
 </div>
 
 <style>
-  .site-botanical {
+  .site-logo-wallpaper {
     position: absolute;
     z-index: 0;
     top: 4.75rem;
     right: 0;
     left: 0;
-    height: clamp(32rem, 58vw, 48rem);
+    height: clamp(44rem, 74vw, 62rem);
     overflow: hidden;
     pointer-events: none;
     color: var(--pine);
   }
 
-  .site-botanical__art {
+  .site-logo-wallpaper__art {
     position: absolute;
-    top: clamp(2.5rem, 5vw, 5rem);
-    left: max(-7rem, calc((100vw - var(--wrap)) / 2 - 7rem));
-    width: clamp(30rem, 46vw, 43rem);
+    top: clamp(1.5rem, 4vw, 3.75rem);
+    left: 50%;
+    width: clamp(46rem, 78vw, 70rem);
     height: auto;
-    opacity: 0.06;
-    transform: rotate(-1.5deg);
+    opacity: 0.05;
+    transform: translateX(-50%) rotate(-1deg);
   }
 
-  .site-botanical__tree {
+  .site-logo-wallpaper__line {
     stroke: currentColor;
-    stroke-width: 8;
+    stroke-width: 9;
     stroke-linecap: round;
     stroke-linejoin: round;
   }
 
-  .site-botanical__tree circle {
-    fill: currentColor;
-    stroke: none;
+  .site-logo-wallpaper__line circle {
+    fill: none;
+  }
+
+  .site-logo-wallpaper__waves {
+    stroke-width: 10;
   }
 
   @media (max-width: 52rem) {
-    .site-botanical {
-      height: 35rem;
+    .site-logo-wallpaper {
+      top: 4.25rem;
+      height: 37rem;
     }
 
-    .site-botanical__art {
-      top: 5.5rem;
-      left: -2rem;
-      width: 27rem;
-      opacity: 0.045;
+    .site-logo-wallpaper__art {
+      top: 2.25rem;
+      width: 42rem;
+      opacity: 0.038;
+      transform: translateX(-50%);
     }
   }
 </style>

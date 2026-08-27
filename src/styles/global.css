@@ -320,9 +320,10 @@ img {
 
 .brand {
   display: flex;
+  flex-direction: column;
   flex: none;
-  align-items: center;
-  gap: 0.65rem;
+  align-items: flex-start;
+  gap: 0.12rem;
   margin-right: auto;
   color: var(--ink);
   font-family: 'Iowan Old Style', Georgia, serif;
@@ -332,14 +333,20 @@ img {
   text-decoration: none;
 }
 
+.brand__identity {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
 .brand:hover {
   color: var(--pine-dark);
 }
 
 .brand__mark {
   position: relative;
-  width: 3.45rem;
-  height: 1.91rem;
+  width: 4rem;
+  height: 2.29rem;
   flex: none;
   overflow: hidden;
 }
@@ -358,8 +365,14 @@ img {
 }
 
 .brand__wordmark {
-  width: 7rem;
+  width: 8.2rem;
   height: auto;
+}
+
+.brand__tagline {
+  width: 12rem;
+  height: auto;
+  margin-inline: auto;
 }
 
 .nav {
@@ -586,143 +599,127 @@ img {
   font-size: 1.2rem;
 }
 
-/* Ketpartu helyszinvalaszto */
+/* Kulon helyszinblokkok: kep, kezelesek es arak egyutt. */
 
-.place-section {
-  padding-top: clamp(4rem, 8vw, 7rem);
+.location-section {
+  position: relative;
+  scroll-margin-top: 5.5rem;
 }
 
-.place-bridge {
-  position: relative;
+.location-section--studio {
+  padding-top: clamp(4.75rem, 9vw, 8rem);
+}
+
+.location-showcase {
   display: grid;
+  align-items: center;
+  gap: clamp(2.5rem, 6vw, 6rem);
+}
+
+@media (min-width: 52rem) {
+  .location-showcase {
+    grid-template-columns: minmax(0, 1.08fr) minmax(19rem, 0.92fr);
+  }
+
+  .location-showcase--reverse {
+    grid-template-columns: minmax(19rem, 0.92fr) minmax(0, 1.08fr);
+  }
+
+  .location-showcase--reverse .location-showcase__media {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .location-showcase--reverse .location-showcase__intro {
+    grid-column: 1;
+    grid-row: 1;
+  }
+}
+
+.location-showcase__media {
+  position: relative;
   overflow: hidden;
+  min-height: clamp(25rem, 44vw, 34rem);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
+  background: var(--pine-dark);
   box-shadow: var(--shadow-raised);
 }
 
-@media (min-width: 48rem) {
-  .place-bridge {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .place-bridge::after {
-    position: absolute;
-    z-index: 4;
-    top: 50%;
-    left: 50%;
-    width: 3.3rem;
-    height: 3.3rem;
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    content: '\2194';
-    background: var(--paper);
-    color: var(--pine);
-    font-size: 1.2rem;
-    line-height: 3.15rem;
-    text-align: center;
-    transform: translate(-50%, -50%);
-  }
-}
-
-.place-panel {
-  position: relative;
-  display: flex;
-  min-height: clamp(29rem, 49vw, 37rem);
-  align-items: flex-end;
-  overflow: hidden;
-}
-
-.place-panel--studio {
-  background: var(--pine-dark);
-  color: #fff;
-}
-
-.place-panel--home {
-  color: #fff;
-}
-
-.place-panel__image,
-.place-panel__shade {
+.location-showcase__image {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-}
-
-.place-panel__image {
   object-fit: cover;
   transition: transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
-.place-panel__image--studio {
-  object-position: center;
+.location-showcase__image--studio {
+  object-position: center 42%;
 }
 
-.place-panel:hover .place-panel__image {
-  transform: scale(1.025);
+.location-showcase__media:hover .location-showcase__image {
+  transform: scale(1.018);
 }
 
-.place-panel__shade {
-  background: linear-gradient(to top, rgb(16 36 31 / 0.95), rgb(16 36 31 / 0.08) 72%);
-}
-
-.place-panel__number {
+.location-showcase__media::after {
   position: absolute;
-  z-index: 2;
-  top: 1.75rem;
-  right: 2rem;
-  color: currentColor;
+  inset: 0;
+  content: '';
+  background: linear-gradient(135deg, transparent 58%, rgb(16 36 31 / 0.3));
+}
+
+.location-showcase__number {
+  position: absolute;
+  z-index: 1;
+  top: 1.5rem;
+  right: 1.75rem;
+  color: #fff;
   font-family: 'Iowan Old Style', Georgia, serif;
-  font-size: 4.5rem;
-  font-weight: 400;
+  font-size: clamp(3rem, 6vw, 5rem);
   line-height: 1;
-  opacity: 0.2;
+  opacity: 0.58;
 }
 
-.place-panel__content {
-  position: relative;
-  z-index: 3;
+.location-showcase__intro {
   max-width: 31rem;
-  padding: clamp(2rem, 5vw, 4rem);
 }
 
-.place-panel__content .eyebrow,
-.place-panel__content p,
-.place-panel__content a {
-  color: inherit;
+.location-showcase__intro h2 {
+  font-size: clamp(2.8rem, 2rem + 3vw, 5rem);
 }
 
-.place-panel__content .eyebrow {
-  opacity: 0.72;
+.location-showcase__intro h3 {
+  max-width: 15ch;
+  margin-top: 1.5rem;
+  font-size: clamp(1.6rem, 1.3rem + 1vw, 2.35rem);
 }
 
-.place-panel__content p {
-  opacity: 0.78;
+.location-showcase__intro .lead {
+  margin-top: 1.2rem;
 }
 
-.place-panel__content h3 {
-  max-width: 12ch;
+.location-showcase__intro .text-link {
+  margin-top: 0.8rem;
 }
 
-.treatment-block {
+.location-offer {
   display: grid;
-  gap: 2rem;
-  padding-top: clamp(5rem, 9vw, 8rem);
+  align-items: start;
+  gap: clamp(2rem, 5vw, 4rem);
+  padding-top: clamp(3.5rem, 7vw, 6rem);
+  scroll-margin-top: 6rem;
 }
 
-@media (min-width: 52rem) {
-  .treatment-block {
-    grid-template-columns: minmax(10rem, 0.34fr) minmax(0, 1fr);
+@media (min-width: 58rem) {
+  .location-offer {
+    grid-template-columns: minmax(0, 1.25fr) minmax(19rem, 0.75fr);
   }
 }
 
-.treatment-block__heading {
-  align-self: start;
-}
-
-.treatment-block__heading h2 {
-  font-size: clamp(2rem, 1.6rem + 1.6vw, 3.25rem);
+.location-offer__services {
+  min-width: 0;
 }
 
 .service-list {
@@ -801,19 +798,7 @@ img {
   font-size: 1.15rem;
 }
 
-/* Arak */
-
-.price-grid {
-  display: grid;
-  align-items: start;
-  gap: 1.25rem;
-}
-
-@media (min-width: 48rem) {
-  .price-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
+/* Az adott helyszinhez tartozo arak. */
 
 .price-panel {
   position: relative;
@@ -822,6 +807,7 @@ img {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--surface);
+  scroll-margin-top: 6rem;
 }
 
 .price-panel--dark {
@@ -838,6 +824,13 @@ img {
   font-family: 'Iowan Old Style', Georgia, serif;
   font-size: 4rem;
   opacity: 0.2;
+}
+
+.price-panel__note {
+  margin: 1.4rem 0 0;
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+  line-height: 1.55;
 }
 
 .table-scroll {
@@ -906,6 +899,10 @@ img {
 
 .price-panel--dark .prices thead th {
   opacity: 0.7;
+}
+
+.price-panel--dark .price-panel__note {
+  color: rgb(255 255 255 / 0.68);
 }
 
 /* Tudnivalok */
@@ -1334,7 +1331,6 @@ img {
   }
 
   .hero__grid,
-  .place-bridge,
   .knowledge-grid,
   .booking-section__grid,
   .service-hero {
@@ -1350,16 +1346,8 @@ img {
     margin-inline: auto;
   }
 
-  .place-panel {
-    min-height: 29rem;
-  }
-
-  .place-panel--studio {
-    min-height: 25rem;
-  }
-
-  .price-grid {
-    grid-template-columns: 1fr;
+  .location-showcase__media {
+    min-height: clamp(23rem, 112vw, 31rem);
   }
 
   .site-footer__intro {
@@ -1434,12 +1422,16 @@ img {
   }
 
   .brand__mark {
-    width: 3rem;
-    height: 1.66rem;
+    width: 3.25rem;
+    height: 1.86rem;
   }
 
   .brand__wordmark {
-    width: 6.1rem;
+    width: 6.6rem;
+  }
+
+  .brand__tagline {
+    width: 11rem;
   }
 
   .booking-status {
@@ -1489,10 +1481,6 @@ img {
 
   .hero__caption {
     bottom: 1.5rem;
-  }
-
-  .place-panel__content {
-    padding: 1.7rem;
   }
 
   .service-row {
