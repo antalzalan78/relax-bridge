@@ -9,9 +9,10 @@
   --ink: #1f2d28;
   --ink-soft: #625f56;
 
-  --pine: #285247;
-  --pine-dark: #193c34;
-  --pine-soft: #dce6df;
+  --logo-green: #0a8215;
+  --pine: #3c7a57;
+  --pine-dark: #35634f;
+  --pine-soft: #e3f0e3;
   --clay: #a85030;
   --clay-dark: #873d24;
   --clay-soft: #f2dfd4;
@@ -20,8 +21,8 @@
 
   --border: #dcd1c1;
   --border-dark: rgb(255 255 255 / 0.22);
-  --shadow-soft: 0 18px 50px -36px rgb(30 45 39 / 0.4);
-  --shadow-raised: 0 24px 60px -36px rgb(30 45 39 / 0.48);
+  --shadow-soft: 0 18px 50px -36px rgb(42 83 62 / 0.34);
+  --shadow-raised: 0 24px 60px -36px rgb(42 83 62 / 0.42);
 
   --radius-sm: 0.5rem;
   --radius: 1rem;
@@ -35,7 +36,7 @@
   --brand: var(--clay);
   --brand-dark: var(--clay-dark);
   --brand-soft: var(--clay-soft);
-  --accent: var(--pine);
+  --accent: var(--logo-green);
   --accent-soft: var(--pine-soft);
   --warm: var(--sand);
   --bg: var(--paper);
@@ -443,8 +444,8 @@ img {
   height: 0.46rem;
   flex: none;
   border-radius: 50%;
-  background: var(--pine);
-  box-shadow: 0 0 0 0.22rem color-mix(in srgb, var(--pine) 13%, transparent);
+  background: var(--logo-green);
+  box-shadow: 0 0 0 0.22rem color-mix(in srgb, var(--logo-green) 13%, transparent);
 }
 
 .booking-status[data-availability='none'] {
@@ -492,7 +493,7 @@ img {
   align-items: center;
   padding: 0.55rem 1rem;
   border-radius: 999px;
-  background: var(--pine);
+  background: var(--logo-green);
   color: #fff;
   font-size: 0.82rem;
   font-weight: 700;
@@ -667,7 +668,7 @@ img {
   position: absolute;
   inset: 0;
   content: '';
-  background: linear-gradient(135deg, transparent 58%, rgb(16 36 31 / 0.3));
+  background: linear-gradient(135deg, transparent 58%, rgb(53 99 79 / 0.24));
 }
 
 .location-showcase__number {
@@ -794,7 +795,7 @@ img {
 
 .service-row__arrow {
   margin-left: 0.65rem;
-  color: var(--pine);
+  color: var(--logo-green);
   font-size: 1.15rem;
 }
 
@@ -1172,7 +1173,7 @@ img {
 
 .site-footer {
   padding-block: clamp(4rem, 7vw, 6rem) 2rem;
-  background: #142d27;
+  background: var(--pine-dark);
   color: rgb(255 255 255 / 0.7);
   font-size: 0.9rem;
 }

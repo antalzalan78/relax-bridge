@@ -353,9 +353,9 @@ const weekendTiming = copy.timing.filter((option) => option.key.startsWith('week
     cursor: pointer;
     transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
   }
-  .option-card:hover { border-color: var(--pine); transform: translateY(-1px); }
-  .option-card:has(input:checked) { border-color: var(--pine); background: var(--pine-soft); }
-  .option-card input { flex: 0 0 auto; width: 1.05rem; height: 1.05rem; margin: 0.15rem 0 0; accent-color: var(--pine); }
+  .option-card:hover { border-color: var(--logo-green); transform: translateY(-1px); }
+  .option-card:has(input:checked) { border-color: var(--logo-green); background: var(--pine-soft); }
+  .option-card input { flex: 0 0 auto; width: 1.05rem; height: 1.05rem; margin: 0.15rem 0 0; accent-color: var(--logo-green); }
   .option-card span { line-height: 1.45; }
   .option-list--compact { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .timing-grid { display: grid; gap: 1.5rem; }
@@ -363,7 +363,7 @@ const weekendTiming = copy.timing.filter((option) => option.key.startsWith('week
   .other-answer { margin-top: 1rem; }
   .other-answer label { display: block; margin-bottom: 0.45rem; font-weight: 700; }
   .other-answer input { width: 100%; min-height: 3.2rem; padding: 0.8rem 0.9rem; border: 1px solid var(--border); border-radius: 0.75rem; background: var(--paper); font: inherit; }
-  .other-answer input:focus { border-color: var(--pine); outline: 3px solid rgb(30 91 74 / 0.12); }
+  .other-answer input:focus { border-color: var(--logo-green); outline: 3px solid color-mix(in srgb, var(--logo-green) 14%, transparent); }
   .other-answer small { display: block; margin-top: 0.45rem; color: var(--ink-soft); }
   .question-error, .form-status { color: var(--clay-dark); font-weight: 700; }
   .question-error { margin: 1rem 0 0; }
