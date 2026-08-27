@@ -1,5 +1,6 @@
 ---
-import AnimatedLogo from './AnimatedLogo.astro';
+import { Image } from 'astro:assets';
+import logo from '../assets/logo.png';
 import { site, pathFor, privacyPath, type Locale } from '../data/site';
 import { t } from '../i18n';
 import { getServices, servicePath } from '../lib/services';
@@ -19,7 +20,7 @@ const year = new Date().getFullYear();
   <div class="wrap">
     <div class="site-footer__intro">
       <a href={pathFor(locale)} aria-label={site.name}>
-        <AnimatedLogo class="footer-logo" alt={site.name} width={520} />
+        <Image class="footer-logo" src={logo} alt={site.name} width={520} loading="lazy" />
       </a>
       <p>{d.tagline}</p>
     </div>

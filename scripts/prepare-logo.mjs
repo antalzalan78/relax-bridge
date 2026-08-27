@@ -30,7 +30,10 @@ async function keyOutWhite(src) {
     // Minel tavolabb van a pixel a fehertol, annal atlatszatlanabb.
     const a = 255 - Math.min(r, g, b);
 
-    if (a === 0) {
+    // A kapott PNG hattere nem teljesen homogen feher: 1-2 erteknyi
+    // tomoritesi zajt tartalmaz. Ezt nem szabad szines, felatlatszo pontokka
+    // erositeni az unpremultiply lepesben.
+    if (a <= 10) {
       out[o] = out[o + 1] = out[o + 2] = out[o + 3] = 0;
       continue;
     }
@@ -50,57 +53,100 @@ async function keyOutWhite(src) {
   });
 }
 
+const isOrange = (r, g, b) => r > 135 && r > g * 1.22 && g > b * 1.35;
+const isGreen = (r, g, b) => g > 65 && g > r * 1.3 && g > b * 1.25;
+const isPurple = (r, g, b) => b > 65 && b > g * 1.35 && r > g * 1.15;
+const isMarkColor = (r, g, b) => isGreen(r, g, b) || isPurple(r, g, b);
+
 /**
- * A hid grafika hatarai.
- *
- * Ket menetben: eloszor a zold pixelek (hid es levelek), utana a lila hullam,
- * de csak a zold teteje alatt. Igy a "Massage" felirat lila betuszara nem log
- * bele a kivagasba, a hullam viszont teljes egeszeben benne marad.
+ * Kivalasztja egy szinvilag legnagyobb osszefuggo vizszintes savjat.
+ * Ez valasztja el a felső narancssarga szologot az also jelmondattol, illetve
+ * a hidat a jelmondat zold es lila betuitol.
  */
-async function findMarkBox(src) {
+async function findLargestBandBox(src, matches) {
   const { data, info } = await sharp(src)
     .ensureAlpha()
     .raw()
     .toBuffer({ resolveWithObject: true });
 
-  const px = (x, y) => {
-    const i = (y * info.width + x) * info.channels;
-    return [data[i], data[i + 1], data[i + 2]];
-  };
-
-  let minX = info.width, minY = info.height, maxX = 0, maxY = 0;
+  const rows = [];
 
   for (let y = 0; y < info.height; y++) {
+    let count = 0;
+
     for (let x = 0; x < info.width; x++) {
-      const [r, g, b] = px(x, y);
-      if (g > 90 && g - r > 25 && g - b > 25) {
-        if (x < minX) minX = x;
-        if (y < minY) minY = y;
-        if (x > maxX) maxX = x;
-        if (y > maxY) maxY = y;
-      }
+      const i = (y * info.width + x) * info.channels;
+      if (matches(data[i], data[i + 1], data[i + 2])) count++;
+    }
+
+    if (count >= 3) rows.push({ y, count });
+  }
+
+  const bands = [];
+
+  for (const row of rows) {
+    const current = bands.at(-1);
+
+    if (!current || row.y > current.bottom + 3) {
+      bands.push({ top: row.y, bottom: row.y, pixels: row.count });
+    } else {
+      current.bottom = row.y;
+      current.pixels += row.count;
     }
   }
 
-  const greenTop = minY;
+  const band = bands.sort((a, b) => b.pixels - a.pixels)[0];
+  if (!band) throw new Error('Nem talalhato kivaghato logoelem.');
 
-  for (let y = greenTop; y < info.height; y++) {
+  let minX = info.width;
+  let maxX = 0;
+  let minY = info.height;
+  let maxY = 0;
+
+  for (let y = band.top; y <= band.bottom; y++) {
     for (let x = 0; x < info.width; x++) {
-      const [r, g, b] = px(x, y);
-      if (b > 110 && b - g > 30 && r - g > 15) {
-        if (x < minX) minX = x;
-        if (x > maxX) maxX = x;
-        if (y > maxY) maxY = y;
-      }
+      const i = (y * info.width + x) * info.channels;
+      if (!matches(data[i], data[i + 1], data[i + 2])) continue;
+      minX = Math.min(minX, x);
+      maxX = Math.max(maxX, x);
+      minY = Math.min(minY, y);
+      maxY = Math.max(maxY, y);
     }
   }
 
   return {
     left: minX,
-    top: greenTop,
+    top: minY,
     width: maxX - minX + 1,
-    height: maxY - greenTop + 1,
+    height: maxY - minY + 1,
   };
+}
+
+/** Csak a keresett szinvilagot hagyja meg, a tobbi pixelt atlatszova teszi. */
+async function keepColors(src, selectorSrc, matches) {
+  const { data, info } = await sharp(src)
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  const selector = await sharp(selectorSrc).removeAlpha().raw().toBuffer();
+
+  for (let i = 0; i < data.length; i += info.channels) {
+    const selectorIndex = (i / info.channels) * 3;
+    if (
+      data[i + 3] < 6 ||
+      !matches(
+        selector[selectorIndex],
+        selector[selectorIndex + 1],
+        selector[selectorIndex + 2],
+      )
+    ) {
+      data[i + 3] = 0;
+    }
+  }
+
+  return sharp(data, {
+    raw: { width: info.width, height: info.height, channels: info.channels },
+  });
 }
 
 await mkdir('public/images', { recursive: true });
@@ -115,25 +161,41 @@ await sharp(fullBuf)
   .toFile('src/assets/logo.png');
 
 // --- 2. Csak a hid jel, ikonnak ---
-const box = await findMarkBox(SRC);
+const box = await findLargestBandBox(SRC, isMarkColor);
 const pad = 14;
 console.log('hid grafika:', box);
 
-await sharp(fullBuf)
+const markOnly = await (await keepColors(fullBuf, SRC, isMarkColor)).png().toBuffer();
+
+await sharp(markOnly)
   .extract({
     left: Math.max(0, box.left - pad),
-    // Pontosan a levelcsucsnal kezdunk: egy pixellel feljebb mar a "Massage"
-    // felirat "g" betujenek szara logna bele.
-    top: box.top,
-    width: Math.min(box.width + pad * 2, 1024 - Math.max(0, box.left - pad)),
-    height: box.height + pad,
+    top: Math.max(0, box.top - pad),
+    width: Math.min(box.width + pad * 2, (await sharp(SRC).metadata()).width - Math.max(0, box.left - pad)),
+    // Alul csak a tenyleges, harom pixeles ures savig hagyunk helyet, hogy a
+    // jelmondat zold es lila betui ne keruljenek bele az ikonba.
+    height: box.height + pad + 2,
   })
   .png({ compressionLevel: 9 })
   .toFile('src/assets/logo-mark.png');
 
 const markBuf = await sharp('src/assets/logo-mark.png').toBuffer();
 
-// --- 3. Favicon es keplyukas ikonok ---
+// --- 3. Narancssarga szologo a kompakt fejlechez ---
+const wordmarkBox = await findLargestBandBox(SRC, isOrange);
+const wordmarkOnly = await (await keepColors(fullBuf, SRC, isOrange)).png().toBuffer();
+
+await sharp(wordmarkOnly)
+  .extract({
+    left: Math.max(0, wordmarkBox.left - pad),
+    top: Math.max(0, wordmarkBox.top - pad),
+    width: wordmarkBox.width + pad * 2,
+    height: wordmarkBox.height + pad * 2,
+  })
+  .png({ compressionLevel: 9 })
+  .toFile('src/assets/logo-wordmark.png');
+
+// --- 4. Favicon es keplyukas ikonok ---
 for (const size of [32, 180]) {
   await sharp(markBuf)
     .resize(size, size, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
@@ -141,7 +203,7 @@ for (const size of [32, 180]) {
     .toFile(size === 32 ? 'public/favicon-32.png' : 'public/apple-touch-icon.png');
 }
 
-// --- 4. Megosztaskep (Facebook, WhatsApp): a logo krem hatteren ---
+// --- 5. Megosztaskep (Facebook, WhatsApp): a logo krem hatteren ---
 await sharp({
   create: {
     width: 1200,
@@ -165,6 +227,7 @@ await sharp({
 for (const f of [
   'src/assets/logo.png',
   'src/assets/logo-mark.png',
+  'src/assets/logo-wordmark.png',
   'public/favicon-32.png',
   'public/apple-touch-icon.png',
   'public/images/og-image.png',
