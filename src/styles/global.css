@@ -316,12 +316,14 @@ img {
   min-height: 4.75rem;
   align-items: center;
   gap: clamp(0.8rem, 2vw, 1.6rem);
-  padding-block: 0.4rem;
 }
 
 .brand {
-  display: block;
+  display: flex;
+  flex-direction: column;
   flex: none;
+  align-items: flex-start;
+  gap: 0.12rem;
   margin-right: auto;
   color: var(--ink);
   font-family: 'Iowan Old Style', Georgia, serif;
@@ -329,11 +331,6 @@ img {
   font-weight: 600;
   line-height: 1;
   text-decoration: none;
-}
-
-.brand__full {
-  width: 10.5rem;
-  height: auto;
 }
 
 .brand__identity {
@@ -1447,10 +1444,6 @@ img {
     grid-row: 1;
     margin-right: 0;
     font-size: 1.02rem;
-  }
-
-  .brand__full {
-    width: 10.5rem;
   }
 
   .brand__mark {
