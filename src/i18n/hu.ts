@@ -15,6 +15,7 @@ export default {
 
   nav: {
     home: 'Főoldal',
+    services: 'Services',
     studio: 'Stúdióban',
     homeService: 'Házhoz megyek',
     prices: 'Árak',
@@ -41,7 +42,14 @@ export default {
     secondaryCta: 'Árak megtekintése',
   },
 
+  heroProfile: {
+    name: 'Brigitta',
+    role: 'Masszázsterapeuta',
+  },
+
   images: {
+    profile:
+      'A Relax Bridge masszőrének portréja, amint egy erdei padon ül.',
     studio:
       'A Relax Bridge masszázsszobája Tilburgban: masszázságy, törölközők és masszázsolaj.',
     homeService:

@@ -15,6 +15,7 @@ export default {
 
   nav: {
     home: 'Home',
+    services: 'Services',
     studio: 'Studio visit',
     homeService: 'Home service',
     prices: 'Prices',
@@ -41,7 +42,14 @@ export default {
     secondaryCta: 'See the prices',
   },
 
+  heroProfile: {
+    name: 'Brigitta',
+    role: 'Massage therapist',
+  },
+
   images: {
+    profile:
+      'Portrait of the Relax Bridge massage therapist, sitting on a bench in the woods.',
     studio:
       'The Relax Bridge massage room in Tilburg, with massage table, towels and massage oil.',
     homeService:

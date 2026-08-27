@@ -588,16 +588,18 @@ img {
 
 .hero__caption span {
   color: var(--clay-dark);
-  font-size: 0.67rem;
+  font-family: 'Iowan Old Style', Georgia, serif;
+  font-size: 1.35rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  letter-spacing: 0.01em;
 }
 
 .hero__caption strong {
-  margin-top: 0.2rem;
-  font-family: 'Iowan Old Style', Georgia, serif;
-  font-size: 1.2rem;
+  margin-top: 0.15rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  line-height: 1.3;
+  text-transform: uppercase;
 }
 
 /* Kulon helyszinblokkok: kep, kezelesek es arak egyutt. */
@@ -609,6 +611,10 @@ img {
 
 .location-section--studio {
   padding-top: clamp(4.75rem, 9vw, 8rem);
+}
+
+.services-heading {
+  margin-bottom: clamp(2rem, 4vw, 3.5rem);
 }
 
 .location-showcase {
@@ -645,6 +651,10 @@ img {
   border-radius: var(--radius-lg);
   background: var(--pine-dark);
   box-shadow: var(--shadow-raised);
+}
+
+.hero__media .hero__profile {
+  object-position: 44% 30%;
 }
 
 .location-showcase__image {
@@ -809,6 +819,35 @@ img {
   border-radius: var(--radius-lg);
   background: var(--surface);
   scroll-margin-top: 6rem;
+}
+
+.price-panel--textured {
+  isolation: isolate;
+}
+
+.price-panel--textured::after {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background: rgb(255 252 246 / 0.56);
+  content: '';
+  pointer-events: none;
+}
+
+.price-panel__texture {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  filter: saturate(0.72);
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.price-panel--textured > :not(.price-panel__texture) {
+  position: relative;
+  z-index: 2;
 }
 
 .price-panel--dark {
