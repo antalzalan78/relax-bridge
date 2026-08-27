@@ -57,6 +57,8 @@ const isOrange = (r, g, b) => r > 135 && r > g * 1.22 && g > b * 1.35;
 const isGreen = (r, g, b) => g > 65 && g > r * 1.3 && g > b * 1.25;
 const isPurple = (r, g, b) => b > 65 && b > g * 1.35 && r > g * 1.15;
 const isMarkColor = (r, g, b) => isGreen(r, g, b) || isPurple(r, g, b);
+const isTaglineColor = (r, g, b) =>
+  isOrange(r, g, b) || isGreen(r, g, b) || isPurple(r, g, b) || Math.max(r, g, b) < 130;
 
 /**
  * Kivalasztja egy szinvilag legnagyobb osszefuggo vizszintes savjat.
@@ -101,6 +103,62 @@ async function findLargestBandBox(src, matches) {
   let minX = info.width;
   let maxX = 0;
   let minY = info.height;
+  let maxY = 0;
+
+  for (let y = band.top; y <= band.bottom; y++) {
+    for (let x = 0; x < info.width; x++) {
+      const i = (y * info.width + x) * info.channels;
+      if (!matches(data[i], data[i + 1], data[i + 2])) continue;
+      minX = Math.min(minX, x);
+      maxX = Math.max(maxX, x);
+      minY = Math.min(minY, y);
+      maxY = Math.max(maxY, y);
+    }
+  }
+
+  return {
+    left: minX,
+    top: minY,
+    width: maxX - minX + 1,
+    height: maxY - minY + 1,
+  };
+}
+
+/** Megkeresi egy also sav szines tartalmanak befoglalo teglalapjat. */
+async function findBoxBelow(src, matches, fromY) {
+  const { data, info } = await sharp(src)
+    .removeAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+
+  const rows = [];
+
+  for (let y = fromY; y < info.height; y++) {
+    let count = 0;
+    for (let x = 0; x < info.width; x++) {
+      const i = (y * info.width + x) * info.channels;
+      if (matches(data[i], data[i + 1], data[i + 2])) count++;
+    }
+    if (count >= 3) rows.push({ y, count });
+  }
+
+  const bands = [];
+  for (const row of rows) {
+    const current = bands.at(-1);
+    if (!current || row.y > current.bottom + 3) {
+      bands.push({ top: row.y, bottom: row.y, pixels: row.count });
+    } else {
+      current.bottom = row.y;
+      current.pixels += row.count;
+    }
+  }
+
+  const band = bands.sort((a, b) => b.pixels - a.pixels)[0];
+  if (!band) throw new Error('Nem talalhato also logosav.');
+
+  let minX = info.width;
+  let minY = info.height;
+  let maxX = 0;
   let maxY = 0;
 
   for (let y = band.top; y <= band.bottom; y++) {
@@ -195,7 +253,21 @@ await sharp(wordmarkOnly)
   .png({ compressionLevel: 9 })
   .toFile('src/assets/logo-wordmark.png');
 
-// --- 4. Favicon es keplyukas ikonok ---
+// --- 4. Szines jelmondat a kompakt fejlechez ---
+const taglineBox = await findBoxBelow(SRC, isTaglineColor, box.top + box.height);
+const taglinePadY = 4;
+
+await sharp(fullBuf)
+  .extract({
+    left: Math.max(0, taglineBox.left - pad),
+    top: Math.max(0, taglineBox.top - taglinePadY),
+    width: taglineBox.width + pad * 2,
+    height: taglineBox.height + taglinePadY * 2,
+  })
+  .png({ compressionLevel: 9 })
+  .toFile('src/assets/logo-tagline.png');
+
+// --- 5. Favicon es keplyukas ikonok ---
 for (const size of [32, 180]) {
   await sharp(markBuf)
     .resize(size, size, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
@@ -203,7 +275,7 @@ for (const size of [32, 180]) {
     .toFile(size === 32 ? 'public/favicon-32.png' : 'public/apple-touch-icon.png');
 }
 
-// --- 5. Megosztaskep (Facebook, WhatsApp): a logo krem hatteren ---
+// --- 6. Megosztaskep (Facebook, WhatsApp): a logo krem hatteren ---
 await sharp({
   create: {
     width: 1200,
@@ -228,6 +300,7 @@ for (const f of [
   'src/assets/logo.png',
   'src/assets/logo-mark.png',
   'src/assets/logo-wordmark.png',
+  'src/assets/logo-tagline.png',
   'public/favicon-32.png',
   'public/apple-touch-icon.png',
   'public/images/og-image.png',

@@ -320,9 +320,10 @@ img {
 
 .brand {
   display: flex;
+  flex-direction: column;
   flex: none;
-  align-items: center;
-  gap: 0.65rem;
+  align-items: flex-start;
+  gap: 0.12rem;
   margin-right: auto;
   color: var(--ink);
   font-family: 'Iowan Old Style', Georgia, serif;
@@ -330,6 +331,12 @@ img {
   font-weight: 600;
   line-height: 1;
   text-decoration: none;
+}
+
+.brand__identity {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
 }
 
 .brand:hover {
@@ -360,6 +367,12 @@ img {
 .brand__wordmark {
   width: 7rem;
   height: auto;
+}
+
+.brand__tagline {
+  width: 9.85rem;
+  height: auto;
+  margin-inline: auto;
 }
 
 .nav {
@@ -1440,6 +1453,10 @@ img {
 
   .brand__wordmark {
     width: 6.1rem;
+  }
+
+  .brand__tagline {
+    width: 8.65rem;
   }
 
   .booking-status {
