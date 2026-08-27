@@ -15,6 +15,7 @@ export default {
 
   nav: {
     home: 'Főoldal',
+    services: 'Services',
     studio: 'Stúdióban',
     homeService: 'Házhoz megyek',
     prices: 'Árak',

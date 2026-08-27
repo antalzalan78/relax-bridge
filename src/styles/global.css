@@ -613,6 +613,10 @@ img {
   padding-top: clamp(4.75rem, 9vw, 8rem);
 }
 
+.services-heading {
+  margin-bottom: clamp(2rem, 4vw, 3.5rem);
+}
+
 .location-showcase {
   display: grid;
   align-items: center;
