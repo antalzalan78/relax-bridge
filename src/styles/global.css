@@ -835,7 +835,7 @@ img {
 }
 
 .price-panel--textured--orange::after {
-  background: rgb(255 250 244 / 0.6);
+  background: rgb(255 250 244 / 0.5);
 }
 
 .price-panel__texture {
