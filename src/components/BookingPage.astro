@@ -408,7 +408,7 @@ const dateLocale = locale === 'nl' ? 'nl-NL' : locale === 'hu' ? 'hu-HU' : 'en-G
 
   input:focus,
   select:focus,
-  textarea:focus { outline: 2px solid var(--pine); outline-offset: 2px; }
+  textarea:focus { outline: 2px solid var(--logo-green); outline-offset: 2px; }
   textarea { resize: vertical; }
   .slot-fieldset { min-width: 0; margin: 0; padding: 1.5rem 0 0; border: 0; border-top: 1px solid var(--border); }
   .slot-status { margin: 0; color: var(--ink-soft); }
@@ -417,7 +417,7 @@ const dateLocale = locale === 'nl' ? 'nl-NL' : locale === 'hu' ? 'hu-HU' : 'en-G
 
   :global(.slot-button) {
     min-height: 3rem;
-    border: 1px solid var(--pine);
+    border: 1px solid var(--logo-green);
     border-radius: 999px;
     background: transparent;
     color: var(--pine-dark);
@@ -427,9 +427,9 @@ const dateLocale = locale === 'nl' ? 'nl-NL' : locale === 'hu' ? 'hu-HU' : 'en-G
   }
 
   :global(.slot-button:hover),
-  :global(.slot-button[aria-pressed='true']) { background: var(--pine); color: #fff; }
+  :global(.slot-button[aria-pressed='true']) { background: var(--logo-green); color: #fff; }
   .booking-card--details { scroll-margin-top: 7rem; }
-  .appointment-summary { display: grid; gap: 0.2rem; margin-bottom: 2rem; padding: 1.2rem; border-left: 3px solid var(--pine); background: var(--pine-soft); }
+  .appointment-summary { display: grid; gap: 0.2rem; margin-bottom: 2rem; padding: 1.2rem; border-left: 3px solid var(--logo-green); background: var(--pine-soft); }
   :global(.appointment-summary span) { color: var(--pine-dark); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
   :global(.appointment-summary strong) { font-family: 'Iowan Old Style', Georgia, serif; font-size: 1.35rem; }
   :global(.appointment-summary small) { color: var(--ink-soft); }
@@ -440,7 +440,7 @@ const dateLocale = locale === 'nl' ? 'nl-NL' : locale === 'hu' ? 'hu-HU' : 'en-G
   .privacy-note { margin: 0 0 1rem 1.75rem; color: var(--ink-soft); font-size: 0.8rem; }
   .form-error { margin: 1rem 0 0; color: #8f2f24; font-weight: 700; }
   .booking-confirmation { max-width: 46rem; margin-inline: auto; text-align: center; }
-  .confirmation-mark { display: grid; width: 4rem; height: 4rem; place-items: center; margin: 0 auto 1.5rem; border-radius: 50%; background: var(--pine); color: #fff; font-size: 1.7rem; }
+  .confirmation-mark { display: grid; width: 4rem; height: 4rem; place-items: center; margin: 0 auto 1.5rem; border-radius: 50%; background: var(--logo-green); color: #fff; font-size: 1.7rem; }
   .booking-confirmation h2 { max-width: none; }
   .confirmation-reference { display: grid; gap: 0.25rem; margin: 2rem 0; padding: 1.25rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--paper); }
   .confirmation-reference span { color: var(--ink-soft); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; }
