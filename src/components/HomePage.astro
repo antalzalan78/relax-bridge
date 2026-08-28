@@ -10,6 +10,7 @@ import studioImage from '../assets/studio-tilburg.jpg';
 import bikeImage from '../assets/home-service-fiets.jpg';
 import purpleTowelTexture from '../assets/towel-purple-card.png';
 import orangeTowelTexture from '../assets/towel-orange-card.png';
+import greenTowelTexture from '../assets/towel-green-section.png';
 import Base from '../layouts/Base.astro';
 import ServiceCard from './ServiceCard.astro';
 import PriceTable from './PriceTable.astro';
@@ -219,6 +220,15 @@ const jsonLd = [
   </section>
 
   <section class="booking-section" id={anchors.contact}>
+    <Image
+      class="booking-section__texture"
+      src={greenTowelTexture}
+      alt=""
+      width={1600}
+      loading="lazy"
+      aria-hidden="true"
+    />
+    <div class="booking-section__overlay" aria-hidden="true"></div>
     <div class="wrap booking-section__grid">
       <div>
         <span class="eyebrow">{d.tagline}</span>
