@@ -1237,8 +1237,8 @@ img {
 
 .site-footer {
   padding-block: clamp(4rem, 7vw, 6rem) 2rem;
-  background: var(--pine-dark);
-  color: rgb(255 255 255 / 0.7);
+  background: var(--paper);
+  color: var(--ink-soft);
   font-size: 0.9rem;
 }
 
@@ -1249,7 +1249,7 @@ img {
   gap: 2rem;
   margin-bottom: 3rem;
   padding-bottom: 2rem;
-  border-bottom: 1px solid var(--border-dark);
+  border-bottom: 1px solid var(--border);
 }
 
 .site-footer__intro p {
@@ -1268,7 +1268,7 @@ img {
 
 .site-footer h3 {
   margin-bottom: 0.8rem;
-  color: #fff;
+  color: var(--ink);
   font-family: 'Avenir Next', 'Segoe UI', sans-serif;
   font-size: 0.72rem;
   font-weight: 700;
@@ -1287,12 +1287,12 @@ img {
 }
 
 .site-footer a {
-  color: rgb(255 255 255 / 0.7);
+  color: var(--ink-soft);
   text-decoration: none;
 }
 
 .site-footer a:hover {
-  color: #fff;
+  color: var(--pine-dark);
 }
 
 .site-footer__bottom {
@@ -1302,7 +1302,7 @@ img {
   gap: 0.75rem 1.5rem;
   margin-top: 3rem;
   padding-top: 1.25rem;
-  border-top: 1px solid var(--border-dark);
+  border-top: 1px solid var(--border);
   font-size: 0.78rem;
 }
 
