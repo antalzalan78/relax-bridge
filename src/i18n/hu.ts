@@ -121,6 +121,8 @@ export default {
       'Kérdésed van, vagy foglalnál? WhatsAppon érsz el a leggyorsabban.',
     whatsapp: 'WhatsApp',
     whatsappCta: 'WhatsApp-üzenet küldése',
+    googleReview: 'Google-értékelés',
+    googleReviewCta: 'Google-értékelés írása',
     email: 'E-mail',
     area: 'Ellátott terület',
     areaBody: 'Stúdió Tilburgban. Házhoz Tilburgban és Reeshofban.',

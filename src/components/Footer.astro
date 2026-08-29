@@ -69,6 +69,11 @@ const year = new Date().getFullYear();
               <a href={`mailto:${site.email}`}>{site.email}</a>
             </li>
           )}
+          <li>
+            <a href={site.googleReview} target="_blank" rel="noopener noreferrer">
+              {d.contact.googleReviewCta}
+            </a>
+          </li>
           <li>{d.contact.areaBody}</li>
         </ul>
 

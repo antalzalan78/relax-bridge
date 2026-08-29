@@ -121,6 +121,8 @@ export default {
       'A question, or ready to book? WhatsApp is the quickest way to reach me.',
     whatsapp: 'WhatsApp',
     whatsappCta: 'Send a WhatsApp message',
+    googleReview: 'Google review',
+    googleReviewCta: 'Leave a Google review',
     email: 'Email',
     area: 'Service area',
     areaBody: 'Studio in Tilburg. Home service in Tilburg and Reeshof.',
