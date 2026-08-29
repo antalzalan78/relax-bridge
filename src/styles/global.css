@@ -606,7 +606,34 @@ img {
 
 .location-section {
   position: relative;
+  isolation: isolate;
+  overflow: hidden;
   scroll-margin-top: 5.5rem;
+}
+
+.location-section > .wrap {
+  position: relative;
+  z-index: 1;
+}
+
+.section-watermark {
+  position: absolute;
+  z-index: 0;
+  width: clamp(31rem, 49vw, 46rem);
+  height: auto;
+  mix-blend-mode: multiply;
+  opacity: 0.042;
+  pointer-events: none;
+}
+
+.section-watermark--studio {
+  top: 18%;
+  right: -11rem;
+}
+
+.section-watermark--home {
+  top: 24%;
+  left: -12rem;
 }
 
 .location-section--studio {
@@ -952,8 +979,47 @@ img {
 /* Tudnivalok */
 
 .knowledge-grid {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: grid;
   gap: clamp(2.5rem, 7vw, 6rem);
+}
+
+.knowledge-grid > :not(.section-watermark) {
+  position: relative;
+  z-index: 1;
+}
+
+.section-watermark--knowledge {
+  top: -11rem;
+  right: -10rem;
+  width: clamp(28rem, 44vw, 39rem);
+  opacity: 0.035;
+}
+
+@media (max-width: 48rem) {
+  .section-watermark {
+    width: 34rem;
+    opacity: 0.032;
+  }
+
+  .section-watermark--studio {
+    top: 27%;
+    right: -19rem;
+  }
+
+  .section-watermark--home {
+    top: 30%;
+    left: -19rem;
+  }
+
+  .section-watermark--knowledge {
+    top: -8rem;
+    right: -18rem;
+    width: 32rem;
+    opacity: 0.028;
+  }
 }
 
 @media (min-width: 50rem) {
