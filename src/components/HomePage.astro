@@ -16,6 +16,7 @@ import Base from '../layouts/Base.astro';
 import ServiceCard from './ServiceCard.astro';
 import PriceTable from './PriceTable.astro';
 import WaveDivider from './WaveDivider.astro';
+import GoogleReviews from './GoogleReviews.astro';
 
 interface Props {
   locale: Locale;
@@ -282,6 +283,9 @@ const jsonLd = [
           </a>
         </div>
       </div>
+    </div>
+    <div class="wrap">
+      <GoogleReviews locale={locale} />
     </div>
   </section>
 </Base>
