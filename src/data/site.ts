@@ -14,6 +14,7 @@ export const site = {
   phone: '+31653964923',
   phoneDisplay: '+31 6 53964923',
   whatsapp: 'https://wa.me/31653964923',
+  googleReview: 'https://g.page/r/CXNtFuk0lC9HEAE/review',
 
   email: 'info@relaxbridge.nl' as string | null,
 
