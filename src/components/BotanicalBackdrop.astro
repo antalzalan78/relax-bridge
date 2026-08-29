@@ -1,12 +1,17 @@
 ---
-import logoMark from '../assets/logo-mark.png';
+import { Image } from 'astro:assets';
+import approvedLogoWatermark from '../assets/logo-watermark-approved.png';
 ---
 
 <div class="site-logo-wallpaper" aria-hidden="true">
-  <div
+  <Image
     class="site-logo-wallpaper__art"
-    style={`--site-logo-mark: url("${logoMark.src}")`}
-  ></div>
+    src={approvedLogoWatermark}
+    alt=""
+    width={1254}
+    loading="eager"
+    decoding="async"
+  />
 </div>
 
 <style>
@@ -24,17 +29,12 @@ import logoMark from '../assets/logo-mark.png';
 
   .site-logo-wallpaper__art {
     position: absolute;
-    top: clamp(2.5rem, 5vw, 4.5rem);
+    top: -7.5rem;
     left: 50%;
     width: clamp(47rem, 79vw, 72rem);
-    aspect-ratio: 747 / 423;
-    background: currentColor;
-    clip-path: polygon(0 0, 88% 0, 88% 14%, 100% 14%, 100% 100%, 0 100%);
-    mask-image: var(--site-logo-mark);
-    mask-position: center;
-    mask-repeat: no-repeat;
-    mask-size: contain;
-    opacity: 0.052;
+    height: auto;
+    mix-blend-mode: multiply;
+    opacity: 0.065;
     transform: translateX(-50%);
   }
 
@@ -45,9 +45,9 @@ import logoMark from '../assets/logo-mark.png';
     }
 
     .site-logo-wallpaper__art {
-      top: 3rem;
+      top: -3rem;
       width: 43rem;
-      opacity: 0.04;
+      opacity: 0.05;
     }
   }
 </style>
