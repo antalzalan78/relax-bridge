@@ -59,6 +59,8 @@ html {
 }
 
 body {
+  position: relative;
+  isolation: isolate;
   margin: 0;
   background: var(--paper);
   color: var(--ink);
@@ -152,7 +154,7 @@ img {
 }
 
 .section--tint {
-  background: var(--paper-deep);
+  background: rgb(235 227 214 / 0.94);
   border-block: 1px solid var(--border);
 }
 
@@ -616,41 +618,6 @@ img {
   z-index: 1;
 }
 
-.section-watermark {
-  position: absolute;
-  z-index: 0;
-  width: clamp(31rem, 49vw, 46rem);
-  height: auto;
-  mix-blend-mode: multiply;
-  opacity: 0.042;
-  pointer-events: none;
-}
-
-.section-watermark--studio {
-  top: 18%;
-  right: -11rem;
-}
-
-.section-watermark--home {
-  top: 24%;
-  left: -12rem;
-}
-
-.section-watermark--secondary {
-  width: clamp(27rem, 42vw, 39rem);
-  opacity: 0.03;
-}
-
-.section-watermark--studio-secondary {
-  top: 67%;
-  left: -10rem;
-}
-
-.section-watermark--home-secondary {
-  top: 67%;
-  right: -10rem;
-}
-
 .location-section--studio {
   padding-top: clamp(4.75rem, 9vw, 8rem);
 }
@@ -1001,55 +968,9 @@ img {
   gap: clamp(2.5rem, 7vw, 6rem);
 }
 
-.knowledge-grid > :not(.section-watermark) {
+.knowledge-grid > * {
   position: relative;
   z-index: 1;
-}
-
-.section-watermark--knowledge {
-  top: -11rem;
-  right: -10rem;
-  width: clamp(28rem, 44vw, 39rem);
-  opacity: 0.035;
-}
-
-@media (max-width: 48rem) {
-  .section-watermark {
-    width: 34rem;
-    opacity: 0.032;
-  }
-
-  .section-watermark--studio {
-    top: 27%;
-    right: -19rem;
-  }
-
-  .section-watermark--home {
-    top: 30%;
-    left: -19rem;
-  }
-
-  .section-watermark--secondary {
-    width: 31rem;
-    opacity: 0.024;
-  }
-
-  .section-watermark--studio-secondary {
-    top: 70%;
-    left: -18rem;
-  }
-
-  .section-watermark--home-secondary {
-    top: 69%;
-    right: -18rem;
-  }
-
-  .section-watermark--knowledge {
-    top: -8rem;
-    right: -18rem;
-    width: 32rem;
-    opacity: 0.028;
-  }
 }
 
 @media (min-width: 50rem) {
@@ -1336,7 +1257,7 @@ img {
   isolation: isolate;
   overflow: hidden;
   padding-block: clamp(4rem, 7vw, 6rem) 2rem;
-  background: var(--paper);
+  background: rgb(246 241 232 / 0.94);
   color: var(--ink-soft);
   font-size: 0.9rem;
 }
@@ -1346,17 +1267,6 @@ img {
   z-index: 1;
 }
 
-.footer-watermark {
-  position: absolute;
-  z-index: 0;
-  right: -9rem;
-  bottom: -16rem;
-  width: clamp(36rem, 58vw, 52rem);
-  height: auto;
-  mix-blend-mode: multiply;
-  opacity: 0.028;
-  pointer-events: none;
-}
 
 .site-footer__intro {
   display: flex;
@@ -1540,15 +1450,6 @@ img {
     text-align: left;
   }
 
-  .footer-watermark {
-    right: auto;
-    bottom: -4rem;
-    left: 50%;
-    width: 32rem;
-    max-width: none;
-    transform: translateX(-50%);
-    opacity: 0.034;
-  }
 
   .mobile-booking-dock {
     position: fixed;
