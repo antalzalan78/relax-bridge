@@ -37,7 +37,7 @@ export default {
   hero: {
     title: 'Masszázs Tilburgban',
     intro:
-      'Végre egy kis igazi kikapcsolódás — a tilburgi stúdiómban, vagy egyszerűen nálad otthon. Biciklivel megyek, és mindent viszek, ami kell.',
+      'Kapcsolódj ki teljesen a nyugodt tilburgi stúdiómban. Inkább a saját környezetedben maradnál? Házhoz menő szolgáltatás is elérhető.',
     primaryCta: 'Időpontfoglalás',
     secondaryCta: 'Árak megtekintése',
   },

@@ -37,7 +37,7 @@ export default {
   hero: {
     title: 'Massage in Tilburg',
     intro:
-      'Even helemaal tot rust komen — in mijn studio in Tilburg, of gewoon bij je thuis. Ik kom met de fiets en neem alles mee wat nodig is.',
+      'Even helemaal tot rust komen in mijn rustige studio in Tilburg. Liever in je eigen omgeving? Home service is ook mogelijk.',
     primaryCta: 'Afspraak maken',
     secondaryCta: 'Bekijk de prijzen',
   },

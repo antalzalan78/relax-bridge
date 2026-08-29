@@ -37,7 +37,7 @@ export default {
   hero: {
     title: 'Massage in Tilburg',
     intro:
-      'Time to properly unwind — in my studio in Tilburg, or simply at your home. I come by bicycle and bring everything that is needed.',
+      'Take some time to completely unwind in my peaceful studio in Tilburg. Prefer your own surroundings? Home service is also available.',
     primaryCta: 'Book an appointment',
     secondaryCta: 'See the prices',
   },
