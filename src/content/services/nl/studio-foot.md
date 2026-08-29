@@ -4,7 +4,7 @@ key: foot
 category: studio
 slug: voetmassage
 title: Voetmassage
-summary: Verfrist vermoeide, zwaar belaste voeten — en brengt het hele lichaam in balans.
+summary: Ontspannende aandacht voor vermoeide voeten en onderbenen. Ideaal na lang staan, veel lopen of wanneer je voeten gewoon wat extra rust verdienen.
 order: 4
 prices:
   - minutes: 30
