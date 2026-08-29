@@ -1332,10 +1332,30 @@ img {
 /* Lablec */
 
 .site-footer {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   padding-block: clamp(4rem, 7vw, 6rem) 2rem;
   background: var(--paper);
   color: var(--ink-soft);
   font-size: 0.9rem;
+}
+
+.site-footer > .wrap {
+  position: relative;
+  z-index: 1;
+}
+
+.footer-watermark {
+  position: absolute;
+  z-index: 0;
+  right: -9rem;
+  bottom: -16rem;
+  width: clamp(36rem, 58vw, 52rem);
+  height: auto;
+  mix-blend-mode: multiply;
+  opacity: 0.028;
+  pointer-events: none;
 }
 
 .site-footer__intro {
@@ -1518,6 +1538,13 @@ img {
   .site-footer__intro p {
     margin-top: 1.5rem;
     text-align: left;
+  }
+
+  .footer-watermark {
+    right: -17rem;
+    bottom: -8rem;
+    width: 34rem;
+    opacity: 0.024;
   }
 
   .mobile-booking-dock {
