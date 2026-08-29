@@ -1,0 +1,341 @@
+---
+import { site, type Locale } from '../data/site';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+
+const copy = {
+  nl: {
+    eyebrow: 'Ervaringen',
+    heading: 'Wat klanten zeggen',
+    intro: 'Actuele beoordelingen van Google Maps.',
+    loading: 'Google-beoordelingen laden…',
+    unavailable: 'De beoordelingen kunnen nu niet worden geladen.',
+    reviewCta: 'Bekijk op Google Maps',
+    allCta: 'Alle Google-beoordelingen bekijken',
+    order: 'Beoordelingen worden door Google op relevantie gerangschikt.',
+    policy: 'Beoordelingen worden niet door Google geverifieerd. Google controleert wel op ongepaste en valse inhoud.',
+    translated: 'Vertaald door Google',
+    ratingLabel: 'van 5 sterren',
+  },
+  en: {
+    eyebrow: 'Experiences',
+    heading: 'What clients say',
+    intro: 'Current reviews from Google Maps.',
+    loading: 'Loading Google reviews…',
+    unavailable: 'The reviews cannot be loaded right now.',
+    reviewCta: 'View on Google Maps',
+    allCta: 'View all Google reviews',
+    order: 'Reviews are ordered by Google according to relevance.',
+    policy: 'Reviews are not verified by Google. Google checks for and removes inappropriate and fake content.',
+    translated: 'Translated by Google',
+    ratingLabel: 'out of 5 stars',
+  },
+  hu: {
+    eyebrow: 'Tapasztalatok',
+    heading: 'Amit a vendégek mondanak',
+    intro: 'Aktuális értékelések a Google Térképről.',
+    loading: 'Google-értékelések betöltése…',
+    unavailable: 'Az értékelések most nem tölthetők be.',
+    reviewCta: 'Megtekintés a Google Térképen',
+    allCta: 'Összes Google-értékelés megtekintése',
+    order: 'Az értékeléseket a Google relevancia szerint rendezi.',
+    policy: 'Az értékeléseket a Google nem ellenőrzi, de kiszűri és eltávolítja a kifogásolható és hamis tartalmakat.',
+    translated: 'A Google fordítása',
+    ratingLabel: 'az 5 csillagból',
+  },
+}[locale];
+---
+
+<section
+  class="google-reviews"
+  data-google-reviews
+  data-locale={locale}
+  data-rating-label={copy.ratingLabel}
+  data-review-cta={copy.reviewCta}
+  data-translated={copy.translated}
+  aria-labelledby="google-reviews-heading"
+>
+  <div class="google-reviews__heading">
+    <div>
+      <span class="eyebrow">{copy.eyebrow}</span>
+      <h2 id="google-reviews-heading">{copy.heading}</h2>
+      <p>{copy.intro}</p>
+    </div>
+    <a class="btn btn--ghost" href={site.googleReview} target="_blank" rel="noopener noreferrer">
+      {copy.allCta}<span aria-hidden="true">&rarr;</span>
+    </a>
+  </div>
+
+  <p class="google-reviews__loading" data-review-loading aria-live="polite">{copy.loading}</p>
+  <p class="google-reviews__unavailable" data-review-error hidden>
+    {copy.unavailable}
+    <a href={site.googleReview} target="_blank" rel="noopener noreferrer">{copy.allCta}</a>
+  </p>
+
+  <div data-review-content hidden>
+    <div class="google-reviews__summary">
+      <strong data-place-rating></strong>
+      <span class="google-reviews__stars" data-place-stars aria-hidden="true"></span>
+      <span data-review-count></span>
+      <span class="google-reviews__attribution">Google Maps</span>
+    </div>
+    <div class="google-reviews__grid" data-review-grid></div>
+    <div class="google-reviews__legal">
+      <span class="google-reviews__attribution">Google Maps</span>
+      <p>{copy.order}</p>
+      <p>
+        {copy.policy}
+        <a href="https://support.google.com/contributionpolicy/answer/7400114" target="_blank" rel="noopener noreferrer">
+          Google review policy
+        </a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<script>
+  const safeExternalUrl = (value: unknown) => {
+    if (typeof value !== 'string') return '';
+    try {
+      const url = new URL(value);
+      return url.protocol === 'https:' ? url.href : '';
+    } catch {
+      return '';
+    }
+  };
+
+  document.querySelectorAll<HTMLElement>('[data-google-reviews]').forEach(async (root) => {
+    const loading = root.querySelector<HTMLElement>('[data-review-loading]');
+    const error = root.querySelector<HTMLElement>('[data-review-error]');
+    const content = root.querySelector<HTMLElement>('[data-review-content]');
+    const grid = root.querySelector<HTMLElement>('[data-review-grid]');
+
+    try {
+      const response = await fetch(`/api/google-reviews?locale=${encodeURIComponent(root.dataset.locale || 'nl')}`, {
+        headers: { accept: 'application/json' },
+        cache: 'no-store',
+      });
+      if (!response.ok) throw new Error('Reviews unavailable');
+
+      const data = await response.json();
+      if (!Array.isArray(data.reviews) || !data.reviews.length || !grid) throw new Error('No reviews');
+
+      const rating = Number(data.rating || 0);
+      const ratingLabel = root.dataset.ratingLabel || '';
+      const ratingNode = root.querySelector<HTMLElement>('[data-place-rating]');
+      const starsNode = root.querySelector<HTMLElement>('[data-place-stars]');
+      const countNode = root.querySelector<HTMLElement>('[data-review-count]');
+      if (ratingNode) ratingNode.textContent = rating.toLocaleString(root.dataset.locale || 'nl', { maximumFractionDigits: 1 });
+      if (starsNode) {
+        starsNode.textContent = '★'.repeat(Math.round(rating));
+        starsNode.setAttribute('aria-label', `${rating} ${ratingLabel}`);
+      }
+      if (countNode) countNode.textContent = `(${Number(data.reviewCount || data.reviews.length)})`;
+
+      data.reviews.forEach((review: Record<string, unknown>) => {
+        const article = document.createElement('article');
+        article.className = 'google-review-card';
+
+        const header = document.createElement('header');
+        header.className = 'google-review-card__author';
+        const authorUri = safeExternalUrl(review.authorUri);
+        const author = document.createElement(authorUri ? 'a' : 'div');
+        if (author instanceof HTMLAnchorElement) {
+          author.href = authorUri;
+          author.target = '_blank';
+          author.rel = 'noopener noreferrer';
+        }
+
+        const photoUri = safeExternalUrl(review.authorPhotoUri);
+        if (photoUri) {
+          const image = document.createElement('img');
+          image.src = photoUri;
+          image.alt = '';
+          image.width = 44;
+          image.height = 44;
+          image.loading = 'lazy';
+          image.referrerPolicy = 'no-referrer';
+          author.append(image);
+        } else {
+          const avatar = document.createElement('span');
+          avatar.className = 'google-review-card__avatar';
+          avatar.textContent = String(review.author || '?').slice(0, 1);
+          avatar.setAttribute('aria-hidden', 'true');
+          author.append(avatar);
+        }
+
+        const authorText = document.createElement('span');
+        const authorName = document.createElement('strong');
+        authorName.textContent = String(review.author || 'Google Maps user');
+        const time = document.createElement('small');
+        time.textContent = String(review.relativeTime || '');
+        authorText.append(authorName, time);
+        author.append(authorText);
+        header.append(author);
+
+        const stars = document.createElement('div');
+        stars.className = 'google-review-card__stars';
+        const reviewRating = Number(review.rating || 0);
+        stars.textContent = '★'.repeat(Math.round(reviewRating));
+        stars.setAttribute('aria-label', `${reviewRating} ${ratingLabel}`);
+
+        const text = document.createElement('p');
+        text.textContent = String(review.text || '');
+
+        article.append(header, stars, text);
+
+        if (review.originalLanguage && review.displayedLanguage && review.originalLanguage !== review.displayedLanguage) {
+          const translated = document.createElement('small');
+          translated.className = 'google-review-card__translated';
+          translated.textContent = root.dataset.translated || '';
+          article.append(translated);
+        }
+
+        const reviewUri = safeExternalUrl(review.googleMapsUri);
+        if (reviewUri) {
+          const source = document.createElement('a');
+          source.className = 'google-review-card__source';
+          source.href = reviewUri;
+          source.target = '_blank';
+          source.rel = 'noopener noreferrer';
+          source.textContent = root.dataset.reviewCta || 'Google Maps';
+          article.append(source);
+        }
+        grid.append(article);
+      });
+
+      if (loading) loading.hidden = true;
+      if (content) content.hidden = false;
+    } catch {
+      if (loading) loading.hidden = true;
+      if (error) error.hidden = false;
+    }
+  });
+</script>
+
+<style>
+  .google-reviews {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    margin-top: clamp(3rem, 7vw, 6rem);
+    padding-top: clamp(2.5rem, 5vw, 4rem);
+    border-top: 1px solid rgb(255 255 255 / 0.22);
+    color: #fff;
+  }
+
+  .google-reviews__heading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .google-reviews__heading h2 { max-width: none; margin-bottom: 0.25rem; }
+  .google-reviews__heading p { margin: 0; opacity: 0.76; }
+  .google-reviews__heading .btn { flex: 0 0 auto; border-color: rgb(255 255 255 / 0.55); color: #fff; }
+  .google-reviews__heading .btn:hover { border-color: #fff; color: #fff; }
+
+  .google-reviews__loading,
+  .google-reviews__unavailable {
+    padding: 1rem 1.2rem;
+    border: 1px solid rgb(255 255 255 / 0.2);
+    border-radius: var(--radius-sm);
+    background: rgb(255 255 255 / 0.08);
+  }
+
+  .google-reviews__unavailable a { color: #fff; font-weight: 700; }
+
+  .google-reviews__summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem 0.65rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .google-reviews__summary strong { font-family: 'Iowan Old Style', Georgia, serif; font-size: 2rem; }
+  .google-reviews__stars,
+  .google-review-card__stars { color: #ffd166; letter-spacing: 0.08em; }
+
+  .google-reviews__attribution {
+    padding: 0.18rem 0.45rem;
+    border-radius: 0.3rem;
+    background: #fff;
+    color: #5e5e5e;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 0.82rem;
+    white-space: nowrap;
+  }
+
+  .google-reviews__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  :global(.google-review-card) {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    padding: clamp(1.1rem, 3vw, 1.5rem);
+    border: 1px solid rgb(255 255 255 / 0.18);
+    border-radius: var(--radius);
+    background: rgb(255 255 255 / 0.1);
+    backdrop-filter: blur(8px);
+  }
+
+  :global(.google-review-card__author > a),
+  :global(.google-review-card__author > div) {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #fff;
+    text-decoration: none;
+  }
+
+  :global(.google-review-card__author img),
+  :global(.google-review-card__avatar) {
+    display: grid;
+    width: 2.75rem;
+    height: 2.75rem;
+    flex: 0 0 2.75rem;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--surface);
+    color: var(--pine-dark);
+    object-fit: cover;
+    font-weight: 800;
+  }
+
+  :global(.google-review-card__author strong),
+  :global(.google-review-card__author small) { display: block; }
+  :global(.google-review-card__author small) { margin-top: 0.08rem; opacity: 0.68; }
+  :global(.google-review-card__stars) { margin-top: 0.85rem; }
+  :global(.google-review-card > p) { flex: 1; margin: 0.65rem 0 1rem; line-height: 1.65; }
+  :global(.google-review-card__translated) { margin-bottom: 0.65rem; opacity: 0.65; }
+  :global(.google-review-card__source) { color: #fff; font-size: 0.86rem; font-weight: 700; }
+
+  .google-reviews__legal {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem 0.8rem;
+    margin-top: 1.25rem;
+    font-size: 0.74rem;
+    opacity: 0.78;
+  }
+
+  .google-reviews__legal p { margin: 0; }
+  .google-reviews__legal a { color: #fff; }
+
+  @media (max-width: 48rem) {
+    .google-reviews__heading { align-items: flex-start; flex-direction: column; gap: 1.2rem; }
+    .google-reviews__grid { grid-template-columns: 1fr; }
+  }
+</style>
