@@ -636,6 +636,21 @@ img {
   left: -12rem;
 }
 
+.section-watermark--secondary {
+  width: clamp(27rem, 42vw, 39rem);
+  opacity: 0.03;
+}
+
+.section-watermark--studio-secondary {
+  top: 67%;
+  left: -10rem;
+}
+
+.section-watermark--home-secondary {
+  top: 67%;
+  right: -10rem;
+}
+
 .location-section--studio {
   padding-top: clamp(4.75rem, 9vw, 8rem);
 }
@@ -1012,6 +1027,21 @@ img {
   .section-watermark--home {
     top: 30%;
     left: -19rem;
+  }
+
+  .section-watermark--secondary {
+    width: 31rem;
+    opacity: 0.024;
+  }
+
+  .section-watermark--studio-secondary {
+    top: 70%;
+    left: -18rem;
+  }
+
+  .section-watermark--home-secondary {
+    top: 69%;
+    right: -18rem;
   }
 
   .section-watermark--knowledge {
