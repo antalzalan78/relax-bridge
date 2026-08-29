@@ -1,43 +1,17 @@
+---
+import { Image } from 'astro:assets';
+import approvedLogoWatermark from '../assets/logo-watermark-approved.png';
+---
+
 <div class="site-logo-wallpaper" aria-hidden="true">
-  <svg
+  <Image
     class="site-logo-wallpaper__art"
-    viewBox="0 0 960 640"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <g class="site-logo-wallpaper__line">
-      <g class="site-logo-wallpaper__leaves">
-        <path d="M480 326V112" />
-        <path d="M480 112c-52 54-49 130 0 169 49-39 52-115 0-169Z" />
-        <path d="M480 143v122" />
-
-        <path d="m385 331-91-111" />
-        <path d="M294 220c-72-5-113 47-91 105 58 21 114-24 91-105Z" />
-        <path d="m280 244-62 67" />
-        <circle cx="219" cy="182" r="13" />
-
-        <path d="m575 331 91-111" />
-        <path d="M666 220c72-5 113 47 91 105-58 21-114-24-91-105Z" />
-        <path d="m680 244 62 67" />
-        <circle cx="741" cy="182" r="13" />
-      </g>
-
-      <g class="site-logo-wallpaper__bridge">
-        <path d="M153 487V365h34v122" />
-        <path d="M773 487V365h34v122" />
-        <path d="M187 383Q480 184 773 383" />
-        <path d="M187 417Q480 218 773 417" />
-        <path d="M266 487Q480 245 694 487" />
-        <path d="M187 487q47-72 94 0" />
-        <path d="M679 487q47-72 94 0" />
-      </g>
-
-      <g class="site-logo-wallpaper__waves">
-        <path d="M80 486c90 49 158-43 259 7 101 49 170-42 271 7 101 50 169-42 270 7" />
-        <path d="M94 535c94 52 165-46 270 7 105 52 176-46 281 7 105 52 176-46 221 2" />
-      </g>
-    </g>
-  </svg>
+    src={approvedLogoWatermark}
+    alt=""
+    width={1254}
+    loading="eager"
+    decoding="async"
+  />
 </div>
 
 <style>
@@ -55,27 +29,13 @@
 
   .site-logo-wallpaper__art {
     position: absolute;
-    top: clamp(1.5rem, 4vw, 3.75rem);
+    top: -7.5rem;
     left: 50%;
-    width: clamp(46rem, 78vw, 70rem);
+    width: clamp(47rem, 79vw, 72rem);
     height: auto;
-    opacity: 0.05;
-    transform: translateX(-50%) rotate(-1deg);
-  }
-
-  .site-logo-wallpaper__line {
-    stroke: currentColor;
-    stroke-width: 9;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  .site-logo-wallpaper__line circle {
-    fill: none;
-  }
-
-  .site-logo-wallpaper__waves {
-    stroke-width: 10;
+    mix-blend-mode: multiply;
+    opacity: 0.065;
+    transform: translateX(-50%);
   }
 
   @media (max-width: 52rem) {
@@ -85,10 +45,9 @@
     }
 
     .site-logo-wallpaper__art {
-      top: 2.25rem;
-      width: 42rem;
-      opacity: 0.038;
-      transform: translateX(-50%);
+      top: -3rem;
+      width: 43rem;
+      opacity: 0.05;
     }
   }
 </style>

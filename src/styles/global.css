@@ -606,7 +606,49 @@ img {
 
 .location-section {
   position: relative;
+  isolation: isolate;
+  overflow: hidden;
   scroll-margin-top: 5.5rem;
+}
+
+.location-section > .wrap {
+  position: relative;
+  z-index: 1;
+}
+
+.section-watermark {
+  position: absolute;
+  z-index: 0;
+  width: clamp(31rem, 49vw, 46rem);
+  height: auto;
+  mix-blend-mode: multiply;
+  opacity: 0.042;
+  pointer-events: none;
+}
+
+.section-watermark--studio {
+  top: 18%;
+  right: -11rem;
+}
+
+.section-watermark--home {
+  top: 24%;
+  left: -12rem;
+}
+
+.section-watermark--secondary {
+  width: clamp(27rem, 42vw, 39rem);
+  opacity: 0.03;
+}
+
+.section-watermark--studio-secondary {
+  top: 67%;
+  left: -10rem;
+}
+
+.section-watermark--home-secondary {
+  top: 67%;
+  right: -10rem;
 }
 
 .location-section--studio {
@@ -952,8 +994,62 @@ img {
 /* Tudnivalok */
 
 .knowledge-grid {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: grid;
   gap: clamp(2.5rem, 7vw, 6rem);
+}
+
+.knowledge-grid > :not(.section-watermark) {
+  position: relative;
+  z-index: 1;
+}
+
+.section-watermark--knowledge {
+  top: -11rem;
+  right: -10rem;
+  width: clamp(28rem, 44vw, 39rem);
+  opacity: 0.035;
+}
+
+@media (max-width: 48rem) {
+  .section-watermark {
+    width: 34rem;
+    opacity: 0.032;
+  }
+
+  .section-watermark--studio {
+    top: 27%;
+    right: -19rem;
+  }
+
+  .section-watermark--home {
+    top: 30%;
+    left: -19rem;
+  }
+
+  .section-watermark--secondary {
+    width: 31rem;
+    opacity: 0.024;
+  }
+
+  .section-watermark--studio-secondary {
+    top: 70%;
+    left: -18rem;
+  }
+
+  .section-watermark--home-secondary {
+    top: 69%;
+    right: -18rem;
+  }
+
+  .section-watermark--knowledge {
+    top: -8rem;
+    right: -18rem;
+    width: 32rem;
+    opacity: 0.028;
+  }
 }
 
 @media (min-width: 50rem) {
@@ -1236,10 +1332,30 @@ img {
 /* Lablec */
 
 .site-footer {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   padding-block: clamp(4rem, 7vw, 6rem) 2rem;
   background: var(--paper);
   color: var(--ink-soft);
   font-size: 0.9rem;
+}
+
+.site-footer > .wrap {
+  position: relative;
+  z-index: 1;
+}
+
+.footer-watermark {
+  position: absolute;
+  z-index: 0;
+  right: -9rem;
+  bottom: -16rem;
+  width: clamp(36rem, 58vw, 52rem);
+  height: auto;
+  mix-blend-mode: multiply;
+  opacity: 0.028;
+  pointer-events: none;
 }
 
 .site-footer__intro {
@@ -1422,6 +1538,13 @@ img {
   .site-footer__intro p {
     margin-top: 1.5rem;
     text-align: left;
+  }
+
+  .footer-watermark {
+    right: -17rem;
+    bottom: -8rem;
+    width: 34rem;
+    opacity: 0.024;
   }
 
   .mobile-booking-dock {
