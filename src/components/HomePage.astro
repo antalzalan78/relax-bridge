@@ -238,14 +238,24 @@ const jsonLd = [
         <span class="eyebrow">{d.tagline}</span>
         <h2>{d.contact.heading}</h2>
         <p class="lead">{d.contact.intro}</p>
-        <a
-          class="btn btn--light"
-          href={site.whatsapp}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {d.contact.whatsappCta}<span aria-hidden="true">&rarr;</span>
-        </a>
+        <div class="booking-section__actions">
+          <a
+            class="btn btn--light"
+            href={site.whatsapp}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {d.contact.whatsappCta}<span aria-hidden="true">&rarr;</span>
+          </a>
+          <a
+            class="btn btn--review"
+            href={site.googleReview}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span aria-hidden="true">★</span>{d.contact.googleReviewCta}
+          </a>
+        </div>
       </div>
 
       <div class="booking-section__details">
@@ -264,6 +274,12 @@ const jsonLd = [
             <span aria-hidden="true"> &middot; </span>
             <a href={site.social.facebook} rel="noopener">Facebook</a>
           </p>
+        </div>
+        <div>
+          <span class="detail-label">{d.contact.googleReview}</span>
+          <a href={site.googleReview} target="_blank" rel="noopener noreferrer">
+            {d.contact.googleReviewCta}<span aria-hidden="true"> &rarr;</span>
+          </a>
         </div>
       </div>
     </div>
