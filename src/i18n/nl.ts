@@ -121,6 +121,8 @@ export default {
       'Een vraag, of meteen een afspraak maken? WhatsApp is de snelste manier om me te bereiken.',
     whatsapp: 'WhatsApp',
     whatsappCta: 'Stuur een WhatsApp-bericht',
+    googleReview: 'Google-beoordeling',
+    googleReviewCta: 'Schrijf een Google-beoordeling',
     email: 'E-mail',
     area: 'Werkgebied',
     areaBody: 'Studio in Tilburg. Home service in Tilburg en Reeshof.',
