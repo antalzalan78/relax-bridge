@@ -1,7 +1,6 @@
 ---
 import { Image } from 'astro:assets';
 import logo from '../assets/logo.png';
-import approvedLogoWatermark from '../assets/logo-watermark-approved.png';
 import { site, pathFor, privacyPath, type Locale } from '../data/site';
 import { t } from '../i18n';
 import { getServices, servicePath } from '../lib/services';
@@ -18,14 +17,6 @@ const year = new Date().getFullYear();
 ---
 
 <footer class="site-footer">
-  <Image
-    class="footer-watermark"
-    src={approvedLogoWatermark}
-    alt=""
-    width={900}
-    loading="lazy"
-    aria-hidden="true"
-  />
   <div class="wrap">
     <div class="site-footer__intro">
       <a href={pathFor(locale)} aria-label={site.name}>
