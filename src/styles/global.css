@@ -618,8 +618,40 @@ img {
   z-index: 1;
 }
 
+.location-section--home::before {
+  --motif-size: clamp(9.5rem, 12vw, 11.5rem);
+  --checker-size: clamp(19rem, 24vw, 23rem);
+
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background-image: var(--section-logo-pattern);
+  background-repeat: repeat;
+  background-position: 0 0;
+  background-size: var(--motif-size) auto;
+  content: '';
+  pointer-events: none;
+  -webkit-mask-image: conic-gradient(#000 0 25%, transparent 0 50%, #000 0 75%, transparent 0);
+  mask-image: conic-gradient(#000 0 25%, transparent 0 50%, #000 0 75%, transparent 0);
+  -webkit-mask-position: 0 0;
+  mask-position: 0 0;
+  -webkit-mask-size: var(--checker-size) var(--checker-size);
+  mask-size: var(--checker-size) var(--checker-size);
+  mix-blend-mode: multiply;
+  opacity: 0.065;
+}
+
 .location-section--studio {
   padding-top: clamp(4.75rem, 9vw, 8rem);
+}
+
+@media (max-width: 52rem) {
+  .location-section--home::before {
+    --motif-size: 9.5rem;
+    --checker-size: 19rem;
+
+    opacity: 0.055;
+  }
 }
 
 .services-heading {
