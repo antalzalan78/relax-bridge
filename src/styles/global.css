@@ -1541,10 +1541,13 @@ img {
   }
 
   .footer-watermark {
-    right: -17rem;
-    bottom: -8rem;
-    width: 34rem;
-    opacity: 0.024;
+    right: auto;
+    bottom: -4rem;
+    left: 50%;
+    width: 32rem;
+    max-width: none;
+    transform: translateX(-50%);
+    opacity: 0.034;
   }
 
   .mobile-booking-dock {
