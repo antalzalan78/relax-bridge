@@ -1,53 +1,46 @@
 ---
-import { Image } from 'astro:assets';
 import approvedLogoWatermark from '../assets/logo-watermark-approved.png';
 ---
 
-<div class="site-logo-wallpaper" aria-hidden="true">
-  <Image
-    class="site-logo-wallpaper__art"
-    src={approvedLogoWatermark}
-    alt=""
-    width={1254}
-    loading="eager"
-    decoding="async"
-  />
-</div>
+<div
+  class="site-logo-wallpaper"
+  style={`--site-logo-pattern: url("${approvedLogoWatermark.src}")`}
+  aria-hidden="true"
+></div>
 
 <style>
   .site-logo-wallpaper {
+    --motif-size: clamp(9.5rem, 12vw, 11.5rem);
+    --checker-size: clamp(19rem, 24vw, 23rem);
+
     position: absolute;
     z-index: 0;
     top: 4.75rem;
     right: 0;
+    bottom: 0;
     left: 0;
-    height: clamp(44rem, 74vw, 62rem);
-    overflow: hidden;
     pointer-events: none;
-    color: var(--logo-green);
-  }
-
-  .site-logo-wallpaper__art {
-    position: absolute;
-    top: -7.5rem;
-    left: 50%;
-    width: clamp(47rem, 79vw, 72rem);
-    height: auto;
+    background-image: var(--site-logo-pattern);
+    background-repeat: repeat;
+    background-position: 0 0;
+    background-size: var(--motif-size) auto;
+    -webkit-mask-image: conic-gradient(#000 0 25%, transparent 0 50%, #000 0 75%, transparent 0);
+    mask-image: conic-gradient(#000 0 25%, transparent 0 50%, #000 0 75%, transparent 0);
+    -webkit-mask-position: 0 0;
+    mask-position: 0 0;
+    -webkit-mask-size: var(--checker-size) var(--checker-size);
+    mask-size: var(--checker-size) var(--checker-size);
     mix-blend-mode: multiply;
-    opacity: 0.065;
-    transform: translateX(-50%);
+    opacity: 0.045;
   }
 
   @media (max-width: 52rem) {
     .site-logo-wallpaper {
-      top: 4.25rem;
-      height: 37rem;
-    }
+      --motif-size: 9.5rem;
+      --checker-size: 19rem;
 
-    .site-logo-wallpaper__art {
-      top: -3rem;
-      width: 43rem;
-      opacity: 0.05;
+      top: 7.5rem;
+      opacity: 0.04;
     }
   }
 </style>

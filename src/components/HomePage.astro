@@ -11,7 +11,6 @@ import bikeImage from '../assets/home-service-fiets.jpg';
 import purpleTowelTexture from '../assets/towel-purple-card.png';
 import orangeTowelTexture from '../assets/towel-orange-card.png';
 import greenTowelTexture from '../assets/towel-green-section.png';
-import approvedLogoWatermark from '../assets/logo-watermark-approved.png';
 import Base from '../layouts/Base.astro';
 import ServiceCard from './ServiceCard.astro';
 import PriceTable from './PriceTable.astro';
@@ -95,22 +94,6 @@ const jsonLd = [
   </div>
 
   <section class="section location-section location-section--studio" id={anchors.services}>
-    <Image
-      class="section-watermark section-watermark--studio"
-      src={approvedLogoWatermark}
-      alt=""
-      width={900}
-      loading="lazy"
-      aria-hidden="true"
-    />
-    <Image
-      class="section-watermark section-watermark--secondary section-watermark--studio-secondary"
-      src={approvedLogoWatermark}
-      alt=""
-      width={760}
-      loading="lazy"
-      aria-hidden="true"
-    />
     <div class="wrap">
       <div class="section-heading section-heading--wide services-heading">
         <h2>{d.nav.services}</h2>
@@ -166,22 +149,6 @@ const jsonLd = [
   </section>
 
   <section class="section section--tint location-section location-section--home">
-    <Image
-      class="section-watermark section-watermark--home"
-      src={approvedLogoWatermark}
-      alt=""
-      width={900}
-      loading="lazy"
-      aria-hidden="true"
-    />
-    <Image
-      class="section-watermark section-watermark--secondary section-watermark--home-secondary"
-      src={approvedLogoWatermark}
-      alt=""
-      width={760}
-      loading="lazy"
-      aria-hidden="true"
-    />
     <div class="wrap">
       <div class="location-showcase location-showcase--reverse">
         <div class="location-showcase__media">
@@ -233,14 +200,6 @@ const jsonLd = [
   </section>
 
   <section class="wrap section knowledge-grid">
-    <Image
-      class="section-watermark section-watermark--knowledge"
-      src={approvedLogoWatermark}
-      alt=""
-      width={760}
-      loading="lazy"
-      aria-hidden="true"
-    />
     <div class="knowledge-grid__intro">
       <span class="eyebrow">Relax Bridge</span>
       <h2>{d.goodToKnow.heading}</h2>
