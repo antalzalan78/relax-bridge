@@ -9,6 +9,17 @@
   ],
   "redirects": [
     {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "en.relaxbridge.nl"
+        }
+      ],
+      "destination": "https://relaxbridge.nl/en",
+      "permanent": true
+    },
+    {
       "source": "/relaxmassage",
       "destination": "/massage/relaxmassage",
       "permanent": true
