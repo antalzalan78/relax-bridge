@@ -101,7 +101,7 @@ const jsonLd = [
         <h2>{d.nav.services}</h2>
       </div>
 
-      <div class="location-showcase">
+      <div class="location-showcase location-showcase--studio">
         <div class="location-showcase__media">
           <Image
             class="location-showcase__image location-showcase__image--studio"
@@ -119,11 +119,12 @@ const jsonLd = [
           <h2>{d.options.studio.label}</h2>
           <h3>{d.options.studio.title}</h3>
           <p class="lead">{d.options.studio.body}</p>
-          <p class="location-showcase__subtitle">{d.options.studio.subtitle}</p>
           <a class="btn btn--primary" href={studioBookingHref}>
             {d.options.studio.bookingCta}<span aria-hidden="true">&rarr;</span>
           </a>
         </div>
+
+        <p class="location-showcase__subtitle">{d.options.studio.subtitle}</p>
       </div>
 
       <div class="location-offer" id="studio-services">
