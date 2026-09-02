@@ -124,10 +124,11 @@ const jsonLd = [
           </a>
         </div>
 
-        <p class="location-showcase__subtitle">{d.options.studio.subtitle}</p>
+        <p class="location-showcase__subtitle">{d.options.studio.personalization.intro}</p>
       </div>
 
       <div class="studio-personalization-highlights">
+        <p class="studio-personalization-highlights__intro">{d.options.studio.subtitle}</p>
         {d.options.studio.personalization.items.map((item, index) => (
           <article class="studio-personalization-highlight">
             <span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
@@ -143,7 +144,6 @@ const jsonLd = [
         <div class="massage-creator__intro">
           <span class="eyebrow">Studio Visit</span>
           <h2>{d.options.studio.personalization.title}</h2>
-          <p class="lead">{d.options.studio.personalization.intro}</p>
           <a class="btn btn--ghost" href={bookingHref}>{d.hero.primaryCta}</a>
         </div>
       </div>
