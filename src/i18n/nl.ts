@@ -16,7 +16,7 @@ export default {
   nav: {
     home: 'Home',
     services: 'Services',
-    studio: 'Studio visit',
+    studio: 'Studio Visit',
     homeService: 'Home service',
     prices: 'Prijzen',
     about: 'Over mij',
@@ -58,9 +58,9 @@ export default {
 
   options: {
     studio: {
-      label: 'Studio visit',
+      label: 'Studio Visit',
       title: 'Je bent welkom bij mij thuis.',
-      body: 'Een rustige plek in Tilburg waar je even niets hoeft. Vier behandelingen om uit te kiezen.',
+      body: 'Een rustige plek in Tilburg waar je niets hoeft te doen.',
       cta: 'Bekijk de behandelingen',
     },
     homeService: {
@@ -78,7 +78,7 @@ export default {
     price: 'Prijs',
     minutes: 'minuten',
     from: 'vanaf',
-    studioHeading: 'Studio visit',
+    studioHeading: 'Studio Visit',
     homeHeading: 'Home service',
   },
 
@@ -87,7 +87,7 @@ export default {
     items: [
       {
         title: 'Afspraak maken',
-        body: 'Kies bij Studio visit of Home service het gewenste type massage en selecteer een geschikt tijdstip. Liever persoonlijk contact? Stuur me gerust een WhatsApp-bericht. Past het toch niet? Laat het me weten om je afspraak te wijzigen of te annuleren.',
+        body: 'Kies bij Studio Visit of Home service het gewenste type massage en selecteer een geschikt tijdstip. Liever persoonlijk contact? Stuur me gerust een WhatsApp-bericht. Past het toch niet? Laat het me weten om je afspraak te wijzigen of te annuleren.',
       },
       {
         title: 'Prijzen en betaling',
