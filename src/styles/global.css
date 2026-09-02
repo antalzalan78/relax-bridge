@@ -792,6 +792,46 @@ img {
   margin-top: 1.25rem;
 }
 
+.studio-personalization-highlights {
+  display: grid;
+  gap: 1rem;
+  margin-top: clamp(1.25rem, 2.5vw, 2rem);
+  padding-block: clamp(1.25rem, 2.5vw, 2rem);
+  border-block: 1px solid var(--border);
+}
+
+@media (min-width: 48rem) {
+  .studio-personalization-highlights {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.studio-personalization-highlight {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  gap: 0.2rem 0.75rem;
+}
+
+.studio-personalization-highlight > span {
+  padding-top: 0.3rem;
+  color: var(--clay-dark);
+  font-size: 0.68rem;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+}
+
+.studio-personalization-highlight h3 {
+  color: var(--pine-dark);
+  font-size: clamp(1.15rem, 1.05rem + 0.3vw, 1.35rem);
+}
+
+.studio-personalization-highlight p {
+  margin: 0.45rem 0 0;
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
 .location-offer {
   display: grid;
   align-items: start;
@@ -823,6 +863,37 @@ img {
 
 .massage-creator--studio-intro {
   margin-top: clamp(2rem, 4vw, 3.5rem);
+}
+
+@media (min-width: 58rem) {
+  .massage-creator--studio-intro {
+    grid-template-columns: 1fr;
+  }
+
+  .massage-creator--studio-intro .massage-creator__intro {
+    display: grid;
+    grid-template-columns: minmax(15rem, 0.65fr) minmax(20rem, 1.35fr) auto;
+    align-items: center;
+    gap: 0.75rem 2rem;
+  }
+
+  .massage-creator--studio-intro .eyebrow,
+  .massage-creator--studio-intro h2 {
+    grid-column: 1;
+  }
+
+  .massage-creator--studio-intro .lead {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    margin-top: 0;
+  }
+
+  .massage-creator--studio-intro .btn {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    margin-top: 0;
+    white-space: nowrap;
+  }
 }
 
 @media (min-width: 58rem) {
