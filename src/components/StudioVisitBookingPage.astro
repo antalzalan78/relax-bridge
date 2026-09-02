@@ -53,17 +53,21 @@ const creatorHref = massageCreatorPath(locale);
 
     <div class="studio-choice-grid">
       <div class="studio-treatment-list">
-        {services.map((service, index) => (
+        {services.map((service, index) => {
+          const text = copy.services[service.data.key];
+          return (
             <article class="studio-treatment-card">
               <span class="studio-treatment-card__number" aria-hidden="true">
                 {String(index + 1).padStart(2, '0')}
               </span>
               <div>
                 <h3>{service.data.title}</h3>
-                <p class="studio-treatment-card__headline">{service.data.summary}</p>
+                <p class="studio-treatment-card__headline">{text.headline}</p>
+                <p class="studio-treatment-card__detail">{text.detail}</p>
               </div>
             </article>
-        ))}
+          );
+        })}
       </div>
 
       <aside class="price-panel price-panel--textured studio-choice-price" aria-label={d.prices.studioHeading}>
