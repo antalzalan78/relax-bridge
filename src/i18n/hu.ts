@@ -16,7 +16,7 @@ export default {
   nav: {
     home: 'Főoldal',
     services: 'Services',
-    studio: 'Stúdióban',
+    studio: 'Studio Visit',
     homeService: 'Házhoz megyek',
     prices: 'Árak',
     about: 'Rólam',
@@ -58,9 +58,9 @@ export default {
 
   options: {
     studio: {
-      label: 'Stúdióban',
+      label: 'Studio Visit',
       title: 'Szívesen látlak az otthonomban.',
-      body: 'Egy csendes hely Tilburgban, ahol semmit nem kell csinálnod. Négy kezelés közül választhatsz.',
+      body: 'Egy csendes hely Tilburgban, ahol semmit nem kell csinálnod.',
       cta: 'Kezelések megtekintése',
     },
     homeService: {
@@ -78,7 +78,7 @@ export default {
     price: 'Ár',
     minutes: 'perc',
     from: 'már',
-    studioHeading: 'Stúdióban',
+    studioHeading: 'Studio Visit',
     homeHeading: 'Házhoz megyek',
   },
 
@@ -87,7 +87,7 @@ export default {
     items: [
       {
         title: 'Időpontfoglalás',
-        body: 'A Stúdióban vagy a Házhoz megyek menüpont alatt válaszd ki a kívánt masszázstípust, és válassz egy megfelelő időpontot. Ha inkább személyesen egyeztetnél, nyugodtan írj üzenetet WhatsAppon. Mégsem jó az időpont? Csak szólj, és módosítjuk vagy lemondjuk.',
+        body: 'A Studio Visit vagy a Házhoz megyek menüpont alatt válaszd ki a kívánt masszázstípust, és válassz egy megfelelő időpontot. Ha inkább személyesen egyeztetnél, nyugodtan írj üzenetet WhatsAppon. Mégsem jó az időpont? Csak szólj, és módosítjuk vagy lemondjuk.',
       },
       {
         title: 'Árak és fizetés',
