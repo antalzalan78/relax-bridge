@@ -127,6 +127,24 @@ const jsonLd = [
         <p class="location-showcase__subtitle">{d.options.studio.subtitle}</p>
       </div>
 
+      <div class="massage-creator massage-creator--studio-intro">
+        <div class="massage-creator__intro">
+          <span class="eyebrow">Studio Visit</span>
+          <h2>{d.options.studio.personalization.title}</h2>
+          <p class="lead">{d.options.studio.personalization.intro}</p>
+          <a class="btn btn--ghost" href={bookingHref}>{d.hero.primaryCta}</a>
+        </div>
+        <div class="massage-creator__items">
+          {d.options.studio.personalization.items.map((item, index) => (
+            <article class="massage-creator__item">
+              <span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+              <h3>{item.title}</h3>
+              <p>{item.body}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+
       <div class="location-offer" id="studio-services">
         <div class="location-offer__services">
           <span class="detail-label">{d.options.studio.cta}</span>
@@ -150,23 +168,6 @@ const jsonLd = [
         </aside>
       </div>
 
-      <div class="massage-creator">
-        <div class="massage-creator__intro">
-          <span class="eyebrow">Studio Visit</span>
-          <h2>{d.options.studio.personalization.title}</h2>
-          <p class="lead">{d.options.studio.personalization.intro}</p>
-          <a class="btn btn--ghost" href={bookingHref}>{d.hero.primaryCta}</a>
-        </div>
-        <div class="massage-creator__items">
-          {d.options.studio.personalization.items.map((item, index) => (
-            <article class="massage-creator__item">
-              <span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
-              <h3>{item.title}</h3>
-              <p>{item.body}</p>
-            </article>
-          ))}
-        </div>
-      </div>
     </div>
   </section>
 

@@ -701,7 +701,7 @@ img {
     grid-column: 1;
     grid-row: 2;
     justify-self: center;
-    max-width: 37rem;
+    max-width: 39rem;
     margin: 0;
     padding-inline: clamp(1rem, 3vw, 3rem);
   }
@@ -779,8 +779,9 @@ img {
   max-width: 34rem;
   margin: 1.25rem 0 0;
   color: var(--pine-dark);
-  font-weight: 650;
-  line-height: 1.65;
+  font-size: clamp(1.15rem, 1.02rem + 0.45vw, 1.45rem);
+  font-weight: 750;
+  line-height: 1.5;
 }
 
 .location-showcase__intro .text-link {
@@ -818,6 +819,10 @@ img {
   border-radius: var(--radius-lg);
   background: color-mix(in srgb, var(--surface) 86%, var(--pine-soft));
   box-shadow: var(--shadow-soft);
+}
+
+.massage-creator--studio-intro {
+  margin-top: clamp(2rem, 4vw, 3.5rem);
 }
 
 @media (min-width: 58rem) {
