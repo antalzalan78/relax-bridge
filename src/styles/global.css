@@ -1525,6 +1525,14 @@ img {
   scroll-margin-top: 6rem;
 }
 
+.service-row--static {
+  cursor: default;
+}
+
+.service-row--without-price {
+  grid-template-columns: 3rem minmax(0, 1fr);
+}
+
 .price-panel--textured {
   isolation: isolate;
 }

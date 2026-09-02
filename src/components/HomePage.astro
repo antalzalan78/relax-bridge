@@ -152,7 +152,15 @@ const jsonLd = [
         <div class="location-offer__services">
           <span class="detail-label">{d.options.studio.cta}</span>
           <div class="service-list">
-            {studio.map((s, index) => <ServiceCard locale={locale} service={s} index={index} />)}
+            {studio.map((s, index) => (
+              <ServiceCard
+                locale={locale}
+                service={s}
+                index={index}
+                linked={false}
+                showPrice={false}
+              />
+            ))}
           </div>
         </div>
 
