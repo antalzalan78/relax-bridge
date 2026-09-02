@@ -80,6 +80,11 @@ export function bookingPath(locale: Locale): string {
   return pathFor(locale, 'booking');
 }
 
+/** A Studio Visit kezelési mód választóoldala. */
+export function studioVisitBookingPath(locale: Locale): string {
+  return pathFor(locale, 'studio-visit');
+}
+
 /** A lokalizalt adatvedelmi tajekoztato utvonala. */
 export function privacyPath(locale: Locale): string {
   return pathFor(locale, 'privacy');

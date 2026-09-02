@@ -61,7 +61,29 @@ export default {
       label: 'Studio Visit',
       title: 'Szívesen látlak az otthonomban.',
       body: 'Egy csendes hely Tilburgban, ahol semmit nem kell csinálnod.',
+      subtitle:
+        'Válassz a négy kezelés közül, vagy alkosd meg a sajátodat a Massage Creator segítségével.',
       cta: 'Kezelések megtekintése',
+      bookingCta: 'Studio Visit foglalása',
+      personalization: {
+        title: 'Massage Creator',
+        intro:
+          'A Studio Visit élményét pedig néhány apró részlettel még személyesebbé teheted. Ezeket az időpontfoglalás során választhatod ki.',
+        items: [
+          {
+            title: 'Illat',
+            body: 'Válaszd ki a számodra kellemes illatot, vagy kérd a kezelést illatmentesen.',
+          },
+          {
+            title: 'Zene',
+            body: 'Válassz a hangulatodhoz illő zenei világot, hallgasd a saját zenédet, vagy élvezd a masszázst teljes csendben.',
+          },
+          {
+            title: 'Bio & vegan',
+            body: 'A kezelés bio és vegán masszázsolajjal is kérhető.',
+          },
+        ],
+      },
     },
     homeService: {
       label: 'Házhoz megyek',
@@ -73,7 +95,7 @@ export default {
 
   prices: {
     heading: 'Árak',
-    intro: 'Minden ár egy helyen. A fizetés a kezelés után, bankkártyával történik.',
+    intro: 'A fizetés a kezelés után bankkártyával történik.',
     duration: 'Időtartam',
     price: 'Ár',
     minutes: 'perc',

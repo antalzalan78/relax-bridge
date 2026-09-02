@@ -26,6 +26,9 @@ const bookingSchema = z
     customerEmail: z.email().max(200),
     customerPhone: z.string().trim().min(6).max(40),
     homeAddress: z.string().trim().max(300).optional(),
+    creatorScent: z.string().trim().max(120).optional(),
+    creatorMusic: z.string().trim().max(120).optional(),
+    creatorBioVegan: z.boolean().optional(),
     notes: z.string().trim().max(1000).optional(),
     website: z.string().max(0).optional(),
     consent: z.literal(true),
@@ -39,6 +42,26 @@ const bookingSchema = z
       });
     }
   });
+
+const creatorLabels = {
+  nl: { scent: 'Geur', music: 'Muziek', bioVegan: 'Bio & vegan: ja' },
+  en: { scent: 'Scent', music: 'Music', bioVegan: 'Bio & vegan: yes' },
+  hu: { scent: 'Illat', music: 'Zene', bioVegan: 'Bio & vegan: igen' },
+} as const;
+
+function bookingNotes(input: z.infer<typeof bookingSchema>): string | undefined {
+  if (input.category !== 'studio') return input.notes;
+
+  const labels = creatorLabels[input.locale];
+  const choices = [
+    input.creatorScent ? `${labels.scent}: ${input.creatorScent}` : null,
+    input.creatorMusic ? `${labels.music}: ${input.creatorMusic}` : null,
+    input.creatorBioVegan ? labels.bioVegan : null,
+  ].filter(Boolean);
+
+  const creatorNote = choices.length ? `Massage Creator — ${choices.join(' · ')}` : undefined;
+  return [creatorNote, input.notes].filter(Boolean).join('\n') || undefined;
+}
 
 export const POST: APIRoute = async ({ request }) => {
   try {
@@ -70,7 +93,7 @@ export const POST: APIRoute = async ({ request }) => {
       customerEmail: parsed.data.customerEmail,
       customerPhone: parsed.data.customerPhone,
       homeAddress: parsed.data.homeAddress,
-      notes: parsed.data.notes,
+      notes: bookingNotes(parsed.data),
     });
 
     try {

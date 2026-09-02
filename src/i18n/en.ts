@@ -61,7 +61,29 @@ export default {
       label: 'Studio Visit',
       title: 'You are welcome in my home.',
       body: 'A quiet place in Tilburg where you do not have to do anything.',
+      subtitle:
+        'Choose from four treatments, or create your own treatment with the Massage Creator.',
       cta: 'See the treatments',
+      bookingCta: 'Book a Studio Visit',
+      personalization: {
+        title: 'Massage Creator',
+        intro:
+          'Make your Studio Visit even more personal with a few small details. You can choose these while booking your appointment.',
+        items: [
+          {
+            title: 'Scent',
+            body: 'Choose a scent you enjoy, or request a fragrance-free treatment.',
+          },
+          {
+            title: 'Music',
+            body: 'Choose music that suits your mood, listen to your own music or enjoy the massage in complete silence.',
+          },
+          {
+            title: 'Bio & vegan',
+            body: 'The treatment is also available with organic and vegan massage oil.',
+          },
+        ],
+      },
     },
     homeService: {
       label: 'Home service',
@@ -73,7 +95,7 @@ export default {
 
   prices: {
     heading: 'Prices',
-    intro: 'Every price in one overview. You pay by card, after the treatment.',
+    intro: 'Payment is made by card after the treatment.',
     duration: 'Duration',
     price: 'Price',
     minutes: 'minutes',

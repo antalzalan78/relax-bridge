@@ -1,5 +1,5 @@
 ---
-import { bookingPath, questionnairePath, site, pathFor, type Locale } from '../data/site';
+import { bookingPath, questionnairePath, site, pathFor, studioVisitBookingPath, type Locale } from '../data/site';
 import { anchors } from '../data/routes';
 import { t } from '../i18n';
 import { getServices, homeAlternates, lowestPrice } from '../lib/services';
@@ -28,6 +28,7 @@ const studio = await getServices(locale, 'studio');
 const home = await getServices(locale, 'home');
 const cheapest = lowestPrice([...studio, ...home]);
 const bookingHref = bookingPath(locale);
+const studioBookingHref = studioVisitBookingPath(locale);
 
 const alternates = homeAlternates();
 const path = pathFor(locale);
@@ -118,8 +119,9 @@ const jsonLd = [
           <h2>{d.options.studio.label}</h2>
           <h3>{d.options.studio.title}</h3>
           <p class="lead">{d.options.studio.body}</p>
-          <a class="text-link" href="#studio-services">
-            {d.options.studio.cta}<span aria-hidden="true">&darr;</span>
+          <p class="location-showcase__subtitle">{d.options.studio.subtitle}</p>
+          <a class="btn btn--primary" href={studioBookingHref}>
+            {d.options.studio.bookingCta}<span aria-hidden="true">&rarr;</span>
           </a>
         </div>
       </div>
@@ -145,6 +147,24 @@ const jsonLd = [
           <PriceTable locale={locale} caption={d.prices.studioHeading} services={studio} />
           <p class="price-panel__note">{d.prices.intro}</p>
         </aside>
+      </div>
+
+      <div class="massage-creator">
+        <div class="massage-creator__intro">
+          <span class="eyebrow">Studio Visit</span>
+          <h2>{d.options.studio.personalization.title}</h2>
+          <p class="lead">{d.options.studio.personalization.intro}</p>
+          <a class="btn btn--ghost" href={bookingHref}>{d.hero.primaryCta}</a>
+        </div>
+        <div class="massage-creator__items">
+          {d.options.studio.personalization.items.map((item, index) => (
+            <article class="massage-creator__item">
+              <span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+              <h3>{item.title}</h3>
+              <p>{item.body}</p>
+            </article>
+          ))}
+        </div>
       </div>
     </div>
   </section>
