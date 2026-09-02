@@ -16,7 +16,7 @@ export default {
   nav: {
     home: 'Home',
     services: 'Services',
-    studio: 'Studio visit',
+    studio: 'Studio Visit',
     homeService: 'Home service',
     prices: 'Prices',
     about: 'About me',
@@ -58,9 +58,9 @@ export default {
 
   options: {
     studio: {
-      label: 'Studio visit',
-      title: 'You are welcome at my private studio.',
-      body: 'A quiet place in Tilburg where nothing is asked of you. Four treatments to choose from.',
+      label: 'Studio Visit',
+      title: 'You are welcome in my home.',
+      body: 'A quiet place in Tilburg where you do not have to do anything.',
       cta: 'See the treatments',
     },
     homeService: {
@@ -78,7 +78,7 @@ export default {
     price: 'Price',
     minutes: 'minutes',
     from: 'from',
-    studioHeading: 'Studio visit',
+    studioHeading: 'Studio Visit',
     homeHeading: 'Home service',
   },
 
@@ -87,7 +87,7 @@ export default {
     items: [
       {
         title: 'Booking an appointment',
-        body: 'Choose your preferred type of massage under Studio visit or Home service, and pick a suitable time slot. Prefer personal contact? Feel free to send me a message on WhatsApp. Does the time no longer suit you? Just let me know to reschedule or cancel.',
+        body: 'Choose your preferred type of massage under Studio Visit or Home service, and pick a suitable time slot. Prefer personal contact? Feel free to send me a message on WhatsApp. Does the time no longer suit you? Just let me know to reschedule or cancel.',
       },
       {
         title: 'Prices and payment',
