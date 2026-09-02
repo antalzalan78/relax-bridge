@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import purpleTowelTexture from '../assets/towel-purple-card.png';
-import { bookingPath, studioVisitBookingPath, type Locale } from '../data/site';
+import { bookingPath, massageCreatorPath, studioVisitBookingPath, type Locale } from '../data/site';
 import { t } from '../i18n';
 import { studioBookingText } from '../i18n/studio-booking';
 import { getServices } from '../lib/services';
@@ -23,6 +23,7 @@ const alternates = {
   hu: studioVisitBookingPath('hu'),
 };
 const readyBookingHref = `${bookingPath(locale)}?category=studio`;
+const creatorHref = massageCreatorPath(locale);
 ---
 
 <Base
@@ -96,18 +97,18 @@ const readyBookingHref = `${bookingPath(locale)}?category=studio`;
       <div class="massage-creator__intro">
         <span class="eyebrow">{copy.creatorNumber} · Studio Visit</span>
         <h2>{d.options.studio.personalization.title}</h2>
-        <p class="lead">{d.options.studio.personalization.intro}</p>
+        <h3>{copy.creatorHeading}</h3>
+        <p class="lead">{copy.creatorIntro}</p>
+        <a class="btn btn--primary" href={creatorHref}>
+          {copy.creatorCta}<span aria-hidden="true">&rarr;</span>
+        </a>
       </div>
-      <div class="massage-creator__items">
-        {d.options.studio.personalization.items.map((item, index) => (
-          <article class="massage-creator__item">
-            <span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
-            <h3>{item.title}</h3>
-            <p>{item.body}</p>
-          </article>
-        ))}
+      <div class="massage-creator__explanation">
+        <h3>{copy.creatorHowTitle}</h3>
+        <p>{copy.creatorHowBody}</p>
+        <p>{copy.creatorRules}</p>
+        <p>{copy.creatorReview}</p>
       </div>
     </div>
   </section>
 </Base>
-

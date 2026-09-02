@@ -85,6 +85,11 @@ export function studioVisitBookingPath(locale: Locale): string {
   return pathFor(locale, 'studio-visit');
 }
 
+/** A Studio Visit Massage Creator lépésenkénti összeállítója. */
+export function massageCreatorPath(locale: Locale): string {
+  return pathFor(locale, 'massage-creator');
+}
+
 /** A lokalizalt adatvedelmi tajekoztato utvonala. */
 export function privacyPath(locale: Locale): string {
   return pathFor(locale, 'privacy');

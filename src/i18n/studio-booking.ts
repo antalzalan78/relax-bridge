@@ -9,6 +9,17 @@ const studioBooking = {
     readyHeading: 'Vaste behandelingen',
     readyCta: 'Ik kies een vaste behandeling',
     creatorNumber: '02',
+    creatorHeading: 'Wil je jouw behandeling afstemmen op je eigen wensen?',
+    creatorIntro:
+      'Stel je eigen behandeling samen uit de beschikbare behandelingselementen met de Massage Creator.',
+    creatorHowTitle: 'Hoe werkt het?',
+    creatorHowBody:
+      'Kies eerst hoeveel tijd je aan je behandeling wilt besteden. Daarna leidt de Massage Creator je stap voor stap door de mogelijkheden en laat hij zien uit welke behandelingselementen je jouw massage kunt samenstellen.',
+    creatorRules:
+      'Je ziet alleen combinaties die ik als massagetherapeut vooraf als professioneel verantwoord en goed combineerbaar heb geselecteerd. Zo kun je vrij kiezen zonder zelf te hoeven uitzoeken wat goed bij elkaar past.',
+    creatorReview:
+      'Aan het einde controleer je jouw complete behandeling nog één keer, inclusief de totale duur en prijs.',
+    creatorCta: 'Massage Creator openen',
     services: {
       relax: {
         headline: 'Zachte, vloeiende bewegingen die spanning losmaken en je weer opladen.',
@@ -41,6 +52,17 @@ const studioBooking = {
     readyHeading: 'Ready-made treatments',
     readyCta: 'Choose a ready-made treatment',
     creatorNumber: '02',
+    creatorHeading: 'Would you like to tailor your treatment to your own needs?',
+    creatorIntro:
+      'Create your own treatment from the available treatment elements with the Massage Creator.',
+    creatorHowTitle: 'How does it work?',
+    creatorHowBody:
+      'First choose how much time you would like to spend on your treatment. The Massage Creator then guides you through the possibilities step by step and shows you which treatment elements you can use to build your massage.',
+    creatorRules:
+      'You will only see combinations that I have selected as professionally appropriate and compatible as a massage therapist. This gives you freedom without having to work out what combines well.',
+    creatorReview:
+      'At the end you can review your complete treatment once more, including its total duration and price.',
+    creatorCta: 'Open Massage Creator',
     services: {
       relax: {
         headline: 'Gentle, flowing movements that release tension and help you recharge.',
@@ -73,6 +95,17 @@ const studioBooking = {
     readyHeading: 'Kész kezelések',
     readyCta: 'Kész kezelést választok',
     creatorNumber: '02',
+    creatorHeading: 'A saját igényeid szerint állítanád össze a kezelésedet?',
+    creatorIntro:
+      'Alkosd meg a sajátodat a rendelkezésre álló kezelési elemekből a Massage Creator segítségével.',
+    creatorHowTitle: 'Hogyan működik?',
+    creatorHowBody:
+      'Először válaszd ki, mennyi időt szeretnél a kezelésedre szánni. Ezután a Massage Creator lépésről lépésre végigvezet a lehetőségeken, és megmutatja, milyen kezelési elemekből állíthatod össze a saját masszázsodat.',
+    creatorRules:
+      'Csak olyan kombinációkat fogsz látni, amelyeket masszázsterapeutaként szakmailag megfelelőnek és egymással jól kombinálhatónak tartok. Így szabadon alakíthatod a kezelésedet anélkül, hogy neked kellene azon gondolkodnod, mi mivel működik jól együtt.',
+    creatorReview:
+      'A végén pedig még egyszer átnézheted az összeállított kezelésedet az időtartammal és az árral együtt.',
+    creatorCta: 'Massage Creator megnyitása',
     services: {
       relax: {
         headline: 'Lágy, folyamatos mozdulatok, amelyek oldják a feszültséget és feltöltenek.',

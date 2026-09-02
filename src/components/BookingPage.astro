@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import { bookingPath, pathFor, privacyPath, type Locale } from '../data/site';
 import { bookingText } from '../i18n/booking';
 import { getBookingOptions } from '../lib/booking/catalog';
+import { creatorAddons, creatorBases, creatorMaximumMinutes } from '../lib/booking/massage-creator';
 
 interface Props {
   locale: Locale;
@@ -22,6 +23,7 @@ const alternates = {
   hu: bookingPath('hu'),
 };
 const dateLocale = locale === 'nl' ? 'nl-NL' : locale === 'hu' ? 'hu-HU' : 'en-GB';
+const creatorConfig = { bases: creatorBases, addons: creatorAddons, maximumMinutes: creatorMaximumMinutes };
 ---
 
 <Base
@@ -55,6 +57,7 @@ const dateLocale = locale === 'nl' ? 'nl-NL' : locale === 'hu' ? 'hu-HU' : 'en-G
       data-locale={locale}
       data-date-locale={dateLocale}
       data-copy={JSON.stringify(copy)}
+      data-creator-config={JSON.stringify(creatorConfig)}
     >
       <div class="booking-card booking-card--choice">
         <span class="booking-card__number">01</span>
@@ -181,13 +184,56 @@ const dateLocale = locale === 'nl' ? 'nl-NL' : locale === 'hu' ? 'hu-HU' : 'en-G
     const locale = form.dataset.locale || 'nl';
     const dateLocale = form.dataset.dateLocale || 'nl-NL';
     const copy = JSON.parse(form.dataset.copy || '{}');
+    const creatorConfig = JSON.parse(form.dataset.creatorConfig || '{}');
     const service = form.querySelector<HTMLSelectElement>('#service')!;
     const serviceLabel = form.querySelector<HTMLElement>('#service-label')!;
     const searchParams = new URLSearchParams(window.location.search);
     const requestedCategory = searchParams.get('category');
     const requestedService = searchParams.get('service');
+    let requestedCreator: any = null;
 
-    if (requestedCategory === 'studio' || requestedCategory === 'home') {
+    if (searchParams.get('creator') === '1') {
+      const base = searchParams.get('base');
+      const back = Number(searchParams.get('back') || 0);
+      const face = Number(searchParams.get('face') || 0);
+      const foot = Number(searchParams.get('foot') || 0);
+      const baseConfig = creatorConfig.bases?.[base || ''];
+      const validDurations = [0, 15, 30];
+      const minutes = baseConfig ? baseConfig.minutes + back + face + foot : 0;
+      const valid = baseConfig
+        && [0, 30].includes(back)
+        && validDurations.includes(face)
+        && validDurations.includes(foot)
+        && !(base === 'back' && back)
+        && minutes <= creatorConfig.maximumMinutes;
+
+      if (valid) {
+        const addonPrice = (kind: string, duration: number) => duration ? Number(creatorConfig.addons[kind][duration]) : 0;
+        requestedCreator = {
+          id: `studio:creator:${base}:${back}:${face}:${foot}`,
+          key: baseConfig.serviceKey,
+          category: 'studio',
+          title: copy.creatorTitle,
+          minutes,
+          priceEur: baseConfig.priceEur + addonPrice('back', back) + addonPrice('face', face) + addonPrice('foot', foot),
+          creatorBase: base,
+          creatorBack: back,
+          creatorFace: face,
+          creatorFoot: foot,
+        };
+        options.push(requestedCreator);
+        const creatorOption = document.createElement('option');
+        creatorOption.value = requestedCreator.id;
+        creatorOption.dataset.category = 'studio';
+        creatorOption.textContent = `${copy.creatorTitle} · ${minutes} min · € ${requestedCreator.priceEur}`;
+        service.replaceChildren(creatorOption);
+        service.value = requestedCreator.id;
+        service.disabled = true;
+        serviceLabel.textContent = copy.creatorTitle;
+      }
+    }
+
+    if (!requestedCreator && (requestedCategory === 'studio' || requestedCategory === 'home')) {
       service.querySelectorAll<HTMLOptionElement>('option[data-category]').forEach((option) => {
         if (option.dataset.category !== requestedCategory) option.remove();
       });
@@ -196,11 +242,11 @@ const dateLocale = locale === 'nl' ? 'nl-NL' : locale === 'hu' ? 'hu-HU' : 'en-G
         service.options[0].textContent = copy.chooseDuration;
       }
     }
-    const preselectedOption = requestedService
+    const preselectedOption = requestedCreator || (requestedService
       ? options.find(
           (option: any) => `${option.category}:${option.key}` === requestedService,
         )
-      : undefined;
+      : undefined);
     const date = form.querySelector<HTMLInputElement>('#booking-date')!;
     const slotStatus = form.querySelector<HTMLElement>('#slot-status')!;
     const slotGrid = form.querySelector<HTMLElement>('#slot-grid')!;
@@ -318,6 +364,10 @@ const dateLocale = locale === 'nl' ? 'nl-NL' : locale === 'hu' ? 'hu-HU' : 'en-G
         creatorScent: data.get('creatorScent') || undefined,
         creatorMusic: data.get('creatorMusic') || undefined,
         creatorBioVegan: data.get('creatorBioVegan') === 'on',
+        creatorBase: option.creatorBase || undefined,
+        creatorBack: option.creatorBack ?? undefined,
+        creatorFace: option.creatorFace ?? undefined,
+        creatorFoot: option.creatorFoot ?? undefined,
         notes: data.get('notes') || undefined,
         website: data.get('website') || undefined,
         consent: data.get('consent') === 'on',
