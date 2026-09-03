@@ -853,6 +853,10 @@ img {
   .location-offer {
     grid-template-columns: minmax(0, 1.25fr) minmax(19rem, 0.75fr);
   }
+
+  .location-offer--merged {
+    grid-template-columns: 1fr;
+  }
 }
 
 .location-offer__services {

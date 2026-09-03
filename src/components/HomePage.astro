@@ -17,12 +17,9 @@ import { Image } from 'astro:assets';
 import profileImage from '../assets/profile-forest.jpg';
 import studioImage from '../assets/studio-tilburg.jpg';
 import bikeImage from '../assets/home-service-fiets.jpg';
-import orangeTowelTexture from '../assets/towel-orange-card.png';
 import greenTowelTexture from '../assets/towel-green-section.png';
 import approvedLogoWatermark from '../assets/logo-watermark-approved.png';
 import Base from '../layouts/Base.astro';
-import ServiceCard from './ServiceCard.astro';
-import PriceTable from './PriceTable.astro';
 import WaveDivider from './WaveDivider.astro';
 
 interface Props {
@@ -234,27 +231,41 @@ const jsonLd = [
         </div>
       </div>
 
-      <div class="location-offer" id="home-services">
+      <div class="location-offer location-offer--merged" id="home-services">
         <div class="location-offer__services">
           <span class="detail-label">{d.options.homeService.cta}</span>
-          <div class="service-list">
-            {home.map((s, index) => <ServiceCard locale={locale} service={s} index={index} />)}
+          <div class="studio-treatment-list studio-treatment-list--with-prices">
+            {home.map((service, index) => (
+              <article class="studio-treatment-card">
+                <span class="studio-treatment-card__number" aria-hidden="true">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <div class="studio-treatment-card__body">
+                  <h3>{service.data.title}</h3>
+                  <p class="studio-treatment-card__summary">{service.data.summary}</p>
+                </div>
+                <table class="studio-treatment-card__prices">
+                  <caption class="visually-hidden">{service.data.title}</caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">{d.prices.duration}</th>
+                      <th scope="col">{d.prices.price}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {service.data.prices.map((price) => (
+                      <tr>
+                        <td>{price.minutes} {d.prices.minutes}</td>
+                        <td>&euro; {price.eur}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </article>
+            ))}
           </div>
+          <p class="studio-offer-group__payment-note">{d.prices.intro}</p>
         </div>
-
-        <aside class="price-panel price-panel--textured price-panel--textured--orange" aria-label={d.prices.homeHeading}>
-          <Image
-            class="price-panel__texture"
-            src={orangeTowelTexture}
-            alt=""
-            width={640}
-            loading="lazy"
-            aria-hidden="true"
-          />
-          <span class="price-panel__number" aria-hidden="true">02</span>
-          <PriceTable locale={locale} caption={d.prices.homeHeading} services={home} />
-          <p class="price-panel__note">{d.prices.intro}</p>
-        </aside>
       </div>
     </div>
   </section>
