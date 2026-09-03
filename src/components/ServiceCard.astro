@@ -8,17 +8,27 @@ interface Props {
   service: Service;
   index?: number;
   showLocation?: boolean;
+  linked?: boolean;
+  showPrice?: boolean;
 }
 
-const { locale, service, index = 0, showLocation = false } = Astro.props;
+const {
+  locale,
+  service,
+  index = 0,
+  showLocation = false,
+  linked = true,
+  showPrice = true,
+} = Astro.props;
 const d = t(locale);
 const { title, summary, category, slug, prices } = service.data;
 const cheapest = Math.min(...prices.map((p) => p.eur));
+const Tag = linked ? 'a' : 'article';
 ---
 
-<a
-  class="service-row"
-  href={servicePath(locale, category, slug)}
+<Tag
+  class:list={['service-row', { 'service-row--static': !linked, 'service-row--without-price': !showPrice }]}
+  href={linked ? servicePath(locale, category, slug) : undefined}
 >
   <span class="service-row__index" aria-hidden="true">
     {String(index + 1).padStart(2, '0')}
@@ -32,8 +42,10 @@ const cheapest = Math.min(...prices.map((p) => p.eur));
     <span class="service-row__title">{title}</span>
     <span class="service-row__summary">{summary}</span>
   </span>
-  <span class="service-row__price">
-    <span>{d.prices.from} &euro; {cheapest}</span>
-    <span class="service-row__arrow" aria-hidden="true">&nearr;</span>
-  </span>
-</a>
+  {showPrice && (
+    <span class="service-row__price">
+      <span>{d.prices.from} &euro; {cheapest}</span>
+      <span class="service-row__arrow" aria-hidden="true">&nearr;</span>
+    </span>
+  )}
+</Tag>

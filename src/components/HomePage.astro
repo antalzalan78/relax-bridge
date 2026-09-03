@@ -1,14 +1,22 @@
 ---
-import { bookingPath, questionnairePath, site, pathFor, type Locale } from '../data/site';
+import {
+  bookingPath,
+  massageCreatorPath,
+  questionnairePath,
+  site,
+  pathFor,
+  studioVisitBookingPath,
+  type Locale,
+} from '../data/site';
 import { anchors } from '../data/routes';
 import { t } from '../i18n';
+import { studioBookingText } from '../i18n/studio-booking';
 import { getServices, homeAlternates, lowestPrice } from '../lib/services';
 import { localBusinessSchema, faqSchema } from '../lib/schema';
 import { Image } from 'astro:assets';
 import profileImage from '../assets/profile-forest.jpg';
 import studioImage from '../assets/studio-tilburg.jpg';
 import bikeImage from '../assets/home-service-fiets.jpg';
-import purpleTowelTexture from '../assets/towel-purple-card.png';
 import orangeTowelTexture from '../assets/towel-orange-card.png';
 import greenTowelTexture from '../assets/towel-green-section.png';
 import approvedLogoWatermark from '../assets/logo-watermark-approved.png';
@@ -23,11 +31,14 @@ interface Props {
 
 const { locale } = Astro.props;
 const d = t(locale);
+const studioCopy = studioBookingText(locale);
 
 const studio = await getServices(locale, 'studio');
 const home = await getServices(locale, 'home');
 const cheapest = lowestPrice([...studio, ...home]);
 const bookingHref = bookingPath(locale);
+const studioBookingHref = studioVisitBookingPath(locale);
+const creatorHref = massageCreatorPath(locale);
 
 const alternates = homeAlternates();
 const path = pathFor(locale);
@@ -100,7 +111,7 @@ const jsonLd = [
         <h2>{d.nav.services}</h2>
       </div>
 
-      <div class="location-showcase">
+      <div class="location-showcase location-showcase--studio">
         <div class="location-showcase__media">
           <Image
             class="location-showcase__image location-showcase__image--studio"
@@ -118,34 +129,78 @@ const jsonLd = [
           <h2>{d.options.studio.label}</h2>
           <h3>{d.options.studio.title}</h3>
           <p class="lead">{d.options.studio.body}</p>
-          <a class="text-link" href="#studio-services">
-            {d.options.studio.cta}<span aria-hidden="true">&darr;</span>
+          <a class="btn btn--primary" href={studioBookingHref}>
+            {d.options.studio.bookingCta}<span aria-hidden="true">&rarr;</span>
           </a>
         </div>
+
+        <p class="location-showcase__subtitle">{d.options.studio.personalization.intro}</p>
       </div>
 
-      <div class="location-offer" id="studio-services">
-        <div class="location-offer__services">
-          <span class="detail-label">{d.options.studio.cta}</span>
-          <div class="service-list">
-            {studio.map((s, index) => <ServiceCard locale={locale} service={s} index={index} />)}
-          </div>
+      <div class="studio-personalization-highlights">
+        {d.options.studio.personalization.items.map((item, index) => (
+          <article class="studio-personalization-highlight">
+            <span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+            <div>
+              <h3>{item.title}</h3>
+              <p>{item.body}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <p class="studio-personalization-highlights__intro">{d.options.studio.subtitle}</p>
+
+      <section class="studio-offer-group" id="studio-services">
+        <header class="studio-offer-group__heading">
+          <span class="eyebrow">Studio Visit 1</span>
+          <h2>{studioCopy.readyHeading}</h2>
+        </header>
+
+        <div class="studio-treatment-list studio-treatment-list--with-prices">
+            {studio.map((service, index) => {
+              return (
+                <article class="studio-treatment-card">
+                  <span class="studio-treatment-card__number" aria-hidden="true">
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                  <div class="studio-treatment-card__body">
+                    <h3>{service.data.title}</h3>
+                    <p class="studio-treatment-card__summary">{service.data.summary}</p>
+                  </div>
+                  <table class="studio-treatment-card__prices">
+                    <caption class="visually-hidden">{service.data.title}</caption>
+                    <thead>
+                      <tr>
+                        <th scope="col">{d.prices.duration}</th>
+                        <th scope="col">{d.prices.price}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {service.data.prices.map((price) => (
+                        <tr>
+                          <td>{price.minutes} {d.prices.minutes}</td>
+                          <td>&euro; {price.eur}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </article>
+              );
+            })}
         </div>
+        <p class="studio-offer-group__payment-note" id={anchors.prices}>{d.prices.intro}</p>
+      </section>
 
-        <aside class="price-panel price-panel--textured" id={anchors.prices} aria-label={d.prices.studioHeading}>
-          <Image
-            class="price-panel__texture"
-            src={purpleTowelTexture}
-            alt=""
-            width={640}
-            loading="lazy"
-            aria-hidden="true"
-          />
-          <span class="price-panel__number" aria-hidden="true">01</span>
-          <PriceTable locale={locale} caption={d.prices.studioHeading} services={studio} />
-          <p class="price-panel__note">{d.prices.intro}</p>
-        </aside>
-      </div>
+      <section class="massage-creator massage-creator--studio-intro">
+        <div class="massage-creator__intro">
+          <span class="eyebrow">Studio Visit 2</span>
+          <h2>{d.options.studio.personalization.title}</h2>
+          <p class="lead">{studioCopy.creatorHeading}</p>
+          <a class="btn btn--ghost" href={creatorHref}>{d.hero.primaryCta}</a>
+        </div>
+      </section>
+
     </div>
   </section>
 

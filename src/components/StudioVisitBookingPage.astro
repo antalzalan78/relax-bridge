@@ -1,0 +1,114 @@
+---
+import { Image } from 'astro:assets';
+import purpleTowelTexture from '../assets/towel-purple-card.png';
+import { bookingPath, massageCreatorPath, studioVisitBookingPath, type Locale } from '../data/site';
+import { t } from '../i18n';
+import { studioBookingText } from '../i18n/studio-booking';
+import { getServices } from '../lib/services';
+import Base from '../layouts/Base.astro';
+import PriceTable from './PriceTable.astro';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const d = t(locale);
+const copy = studioBookingText(locale);
+const services = await getServices(locale, 'studio');
+const path = studioVisitBookingPath(locale);
+const alternates = {
+  nl: studioVisitBookingPath('nl'),
+  en: studioVisitBookingPath('en'),
+  hu: studioVisitBookingPath('hu'),
+};
+const readyBookingHref = `${bookingPath(locale)}?category=studio`;
+const creatorHref = massageCreatorPath(locale);
+---
+
+<Base
+  locale={locale}
+  title={`${copy.title} — Relax Bridge`}
+  description={copy.intro}
+  path={path}
+  alternates={alternates}
+  showMobileBooking={false}
+>
+  <section class="studio-choice-hero">
+    <div class="wrap studio-choice-hero__inner">
+      <span class="eyebrow">{copy.eyebrow}</span>
+      <h1>{copy.title}</h1>
+      <p class="lead">{copy.intro}</p>
+    </div>
+  </section>
+
+  <section class="wrap section studio-choice-section" id="ready-treatments">
+    <header class="studio-choice-heading">
+      <span aria-hidden="true">01</span>
+      <div>
+        <span class="eyebrow">Studio Visit</span>
+        <h2>{copy.readyHeading}</h2>
+      </div>
+    </header>
+
+    <div class="studio-choice-grid">
+      <div class="studio-treatment-list">
+        {services.map((service, index) => {
+          const text = copy.services[service.data.key];
+          return (
+            <article class="studio-treatment-card">
+              <span class="studio-treatment-card__number" aria-hidden="true">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              <div>
+                <h3>{service.data.title}</h3>
+                <p class="studio-treatment-card__headline">{text.headline}</p>
+                <p class="studio-treatment-card__detail">{text.detail}</p>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+
+      <aside class="price-panel price-panel--textured studio-choice-price" aria-label={d.prices.studioHeading}>
+        <Image
+          class="price-panel__texture"
+          src={purpleTowelTexture}
+          alt=""
+          width={640}
+          loading="eager"
+          aria-hidden="true"
+        />
+        <span class="price-panel__number" aria-hidden="true">01</span>
+        <PriceTable locale={locale} caption={d.prices.studioHeading} services={services} linked={false} />
+        <p class="price-panel__note">{d.prices.intro}</p>
+      </aside>
+    </div>
+
+    <div class="studio-choice-action">
+      <a class="btn btn--primary" href={readyBookingHref}>
+        {copy.readyCta}<span aria-hidden="true">&rarr;</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="section section--tint studio-creator-section" id="massage-creator">
+    <div class="wrap massage-creator massage-creator--booking">
+      <div class="massage-creator__intro">
+        <span class="eyebrow">{copy.creatorNumber} · Studio Visit</span>
+        <h2>{d.options.studio.personalization.title}</h2>
+        <h3>{copy.creatorHeading}</h3>
+        <p class="lead">{copy.creatorIntro}</p>
+        <a class="btn btn--primary" href={creatorHref}>
+          {copy.creatorCta}<span aria-hidden="true">&rarr;</span>
+        </a>
+      </div>
+      <div class="massage-creator__explanation">
+        <h3>{copy.creatorHowTitle}</h3>
+        <p>{copy.creatorHowBody}</p>
+        <p>{copy.creatorRules}</p>
+        <p>{copy.creatorReview}</p>
+      </div>
+    </div>
+  </section>
+</Base>

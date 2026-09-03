@@ -1,0 +1,13 @@
+---
+import MassageCreatorPage from '../../components/MassageCreatorPage.astro';
+import type { Locale } from '../../data/site';
+
+export function getStaticPaths() {
+  return ['en', 'hu'].map((lang) => ({ params: { lang }, props: { locale: lang } }));
+}
+
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+---
+
+<MassageCreatorPage locale={locale} />

@@ -1,0 +1,269 @@
+---
+import Base from '../layouts/Base.astro';
+import { bookingPath, massageCreatorPath, studioVisitBookingPath, type Locale } from '../data/site';
+import { massageCreatorText } from '../i18n/massage-creator';
+import { creatorAddons, creatorBases, creatorMaximumMinutes } from '../lib/booking/massage-creator';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = massageCreatorText(locale);
+const path = massageCreatorPath(locale);
+const alternates = {
+  nl: massageCreatorPath('nl'),
+  en: massageCreatorPath('en'),
+  hu: massageCreatorPath('hu'),
+};
+const creatorConfig = { bases: creatorBases, addons: creatorAddons, maximumMinutes: creatorMaximumMinutes };
+---
+
+<Base
+  locale={locale}
+  title={`${copy.title} — Relax Bridge`}
+  description={copy.intro}
+  path={path}
+  alternates={alternates}
+  showMobileBooking={false}
+>
+  <section class="creator-hero">
+    <div class="wrap">
+      <a class="back-link" href={studioVisitBookingPath(locale)}><span aria-hidden="true">&larr;</span> Studio Visit</a>
+      <span class="eyebrow">{copy.eyebrow}</span>
+      <h1>{copy.title}</h1>
+      <p class="lead">{copy.intro}</p>
+      <ol class="creator-progress" aria-label={copy.eyebrow}>
+        {copy.steps.map((step, index) => (
+          <li data-progress={index + 1} class:list={{ active: index === 0 }}>
+            <span>{String(index + 1).padStart(2, '0')}</span>{step}
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="wrap creator-shell">
+    <form
+      class="creator-form"
+      id="massage-creator-form"
+      data-config={JSON.stringify(creatorConfig)}
+      data-copy={JSON.stringify(copy)}
+      data-booking-path={bookingPath(locale)}
+    >
+      <section class="creator-step" data-step="1">
+        <span class="eyebrow">01</span>
+        <h2>{copy.baseHeading}</h2>
+        <p class="lead">{copy.baseIntro}</p>
+        <div class="creator-base-grid">
+          <label class="creator-base-card">
+            <input type="radio" name="creatorBase" value="relax" />
+            <span class="creator-base-card__check" aria-hidden="true">✓</span>
+            <strong>{copy.relaxTitle}</strong>
+            <span>{copy.relaxBody}</span>
+            <small>€ {creatorBases.relax.priceEur}</small>
+          </label>
+          <label class="creator-base-card">
+            <input type="radio" name="creatorBase" value="back" />
+            <span class="creator-base-card__check" aria-hidden="true">✓</span>
+            <strong>{copy.backTitle}</strong>
+            <span>{copy.backBody}</span>
+            <small>€ {creatorBases.back.priceEur}</small>
+          </label>
+        </div>
+        <div class="creator-actions creator-actions--end">
+          <button class="btn btn--primary" type="button" data-next="2" disabled>
+            {copy.next}<span aria-hidden="true">&rarr;</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="creator-step" data-step="2" hidden>
+        <span class="eyebrow">02</span>
+        <h2>{copy.addonsHeading}</h2>
+        <p class="lead">{copy.addonsIntro}</p>
+        <p class="creator-maximum">{copy.maximum}</p>
+
+        <div class="creator-builder">
+          <div class="creator-addon-list">
+            <fieldset class="creator-addon" data-addon-group="back">
+              <legend>{copy.backAddon}</legend>
+              <div class="creator-duration-options">
+                <label><input type="radio" name="creatorBack" value="0" checked /><span>{copy.none}</span></label>
+                <label><input type="radio" name="creatorBack" value="30" /><span>30 {copy.minutes} · + € 45</span></label>
+              </div>
+            </fieldset>
+            <fieldset class="creator-addon" data-addon-group="face">
+              <legend>{copy.faceAddon}</legend>
+              <div class="creator-duration-options">
+                <label><input type="radio" name="creatorFace" value="0" checked /><span>{copy.none}</span></label>
+                <label><input type="radio" name="creatorFace" value="15" /><span>15 {copy.minutes} · + € 20</span></label>
+                <label><input type="radio" name="creatorFace" value="30" /><span>30 {copy.minutes} · + € 40</span></label>
+              </div>
+            </fieldset>
+            <fieldset class="creator-addon" data-addon-group="foot">
+              <legend>{copy.footAddon}</legend>
+              <div class="creator-duration-options">
+                <label><input type="radio" name="creatorFoot" value="0" checked /><span>{copy.none}</span></label>
+                <label><input type="radio" name="creatorFoot" value="15" /><span>15 {copy.minutes} · + € 20</span></label>
+                <label><input type="radio" name="creatorFoot" value="30" /><span>30 {copy.minutes} · + € 40</span></label>
+              </div>
+            </fieldset>
+          </div>
+
+          <aside class="creator-live-summary" aria-live="polite">
+            <span>{copy.durationLabel}</span>
+            <strong><span id="creator-live-minutes">60</span> {copy.minutes}</strong>
+            <span>{copy.priceLabel}</span>
+            <strong>€ <span id="creator-live-price">65</span></strong>
+          </aside>
+        </div>
+
+        <div class="creator-actions">
+          <button class="btn btn--ghost" type="button" data-back="1">{copy.previous}</button>
+          <button class="btn btn--primary" type="button" data-next="3">
+            {copy.reviewButton}<span aria-hidden="true">&rarr;</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="creator-step creator-review" data-step="3" hidden>
+        <span class="eyebrow">03</span>
+        <h2>{copy.reviewHeading}</h2>
+        <p class="lead">{copy.reviewIntro}</p>
+        <dl class="creator-review-list">
+          <div><dt>{copy.baseLabel}</dt><dd id="creator-review-base"></dd></div>
+          <div><dt>{copy.addonsLabel}</dt><dd id="creator-review-addons"></dd></div>
+          <div><dt>{copy.durationLabel}</dt><dd><strong id="creator-review-minutes"></strong> {copy.minutes}</dd></div>
+          <div><dt>{copy.priceLabel}</dt><dd>€ <strong id="creator-review-price"></strong></dd></div>
+        </dl>
+        <div class="creator-actions">
+          <button class="btn btn--ghost" type="button" data-back="2">{copy.edit}</button>
+          <a class="btn btn--primary" id="creator-booking-link" href={bookingPath(locale)}>
+            {copy.chooseTime}<span aria-hidden="true">&rarr;</span>
+          </a>
+        </div>
+      </section>
+    </form>
+  </section>
+</Base>
+
+<script>
+  const creatorForm = document.querySelector<HTMLFormElement>('#massage-creator-form');
+
+  if (creatorForm) {
+    const config = JSON.parse(creatorForm.dataset.config || '{}');
+    const copy = JSON.parse(creatorForm.dataset.copy || '{}');
+    const bookingPath = creatorForm.dataset.bookingPath || '/booking';
+    const steps = creatorForm.querySelectorAll<HTMLElement>('[data-step]');
+    const progress = document.querySelectorAll<HTMLElement>('[data-progress]');
+    const baseInputs = creatorForm.querySelectorAll<HTMLInputElement>('input[name="creatorBase"]');
+    const firstNext = creatorForm.querySelector<HTMLButtonElement>('[data-step="1"] [data-next]')!;
+    const backGroup = creatorForm.querySelector<HTMLFieldSetElement>('[data-addon-group="back"]')!;
+    const liveMinutes = creatorForm.querySelector<HTMLElement>('#creator-live-minutes')!;
+    const livePrice = creatorForm.querySelector<HTMLElement>('#creator-live-price')!;
+    const reviewBase = creatorForm.querySelector<HTMLElement>('#creator-review-base')!;
+    const reviewAddons = creatorForm.querySelector<HTMLElement>('#creator-review-addons')!;
+    const reviewMinutes = creatorForm.querySelector<HTMLElement>('#creator-review-minutes')!;
+    const reviewPrice = creatorForm.querySelector<HTMLElement>('#creator-review-price')!;
+    const bookingLink = creatorForm.querySelector<HTMLAnchorElement>('#creator-booking-link')!;
+
+    const selectedBase = () => creatorForm.querySelector<HTMLInputElement>('input[name="creatorBase"]:checked')?.value || '';
+    const selectedMinutes = (name: string) => Number(creatorForm.querySelector<HTMLInputElement>(`input[name="${name}"]:checked`)?.value || 0);
+    const resetAddons = () => {
+      ['creatorBack', 'creatorFace', 'creatorFoot'].forEach((name) => {
+        const none = creatorForm.querySelector<HTMLInputElement>(`input[name="${name}"][value="0"]`);
+        if (none) none.checked = true;
+      });
+    };
+    const selection = () => ({
+      base: selectedBase(),
+      back: selectedMinutes('creatorBack'),
+      face: selectedMinutes('creatorFace'),
+      foot: selectedMinutes('creatorFoot'),
+    });
+    const priceFor = (kind: string, minutes: number) => minutes ? Number(config.addons[kind][minutes]) : 0;
+    const calculate = () => {
+      const value = selection();
+      const base = config.bases[value.base];
+      if (!base) return null;
+      return {
+        ...value,
+        minutes: base.minutes + value.back + value.face + value.foot,
+        price: base.priceEur + priceFor('back', value.back) + priceFor('face', value.face) + priceFor('foot', value.foot),
+      };
+    };
+    const showStep = (number: number) => {
+      steps.forEach((step) => { step.hidden = step.dataset.step !== String(number); });
+      progress.forEach((item) => {
+        const itemNumber = Number(item.dataset.progress);
+        item.classList.toggle('active', itemNumber === number);
+        item.classList.toggle('complete', itemNumber < number);
+      });
+      creatorForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+    const updateAvailability = () => {
+      const value = selection();
+      const base = config.bases[value.base];
+      if (!base) return;
+      const groups = ['creatorBack', 'creatorFace', 'creatorFoot'];
+      for (const name of groups) {
+        const current = selectedMinutes(name);
+        creatorForm.querySelectorAll<HTMLInputElement>(`input[name="${name}"]`).forEach((input) => {
+          const candidate = Number(input.value);
+          input.disabled = base.minutes + value.back + value.face + value.foot - current + candidate > config.maximumMinutes;
+        });
+      }
+    };
+    const updateSummary = () => {
+      updateAvailability();
+      const value = calculate();
+      if (!value) return;
+      liveMinutes.textContent = String(value.minutes);
+      livePrice.textContent = String(value.price);
+    };
+    const addonLabel = (label: string, minutes: number) => `${label} — ${minutes} ${copy.minutes}`;
+    const fillReview = () => {
+      const value = calculate();
+      if (!value) return;
+      reviewBase.textContent = value.base === 'relax' ? copy.relaxTitle : copy.backTitle;
+      const addons = [];
+      if (value.back) addons.push(addonLabel(copy.backAddon, value.back));
+      if (value.face) addons.push(addonLabel(copy.faceAddon, value.face));
+      if (value.foot) addons.push(addonLabel(copy.footAddon, value.foot));
+      reviewAddons.textContent = addons.length ? addons.join(' · ') : copy.noAddons;
+      reviewMinutes.textContent = String(value.minutes);
+      reviewPrice.textContent = String(value.price);
+      const params = new URLSearchParams({
+        category: 'studio',
+        creator: '1',
+        base: value.base,
+        back: String(value.back),
+        face: String(value.face),
+        foot: String(value.foot),
+      });
+      bookingLink.href = `${bookingPath}?${params}`;
+    };
+
+    baseInputs.forEach((input) => input.addEventListener('change', () => {
+      firstNext.disabled = false;
+      resetAddons();
+      backGroup.hidden = input.value === 'back';
+      backGroup.disabled = input.value === 'back';
+      updateSummary();
+    }));
+    creatorForm.querySelectorAll<HTMLInputElement>('input[type="radio"]').forEach((input) => {
+      input.addEventListener('change', updateSummary);
+    });
+    creatorForm.querySelectorAll<HTMLButtonElement>('[data-next]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const next = Number(button.dataset.next);
+        if (next === 3) fillReview();
+        showStep(next);
+      });
+    });
+    creatorForm.querySelectorAll<HTMLButtonElement>('[data-back]').forEach((button) => {
+      button.addEventListener('click', () => showStep(Number(button.dataset.back)));
+    });
+  }
+</script>

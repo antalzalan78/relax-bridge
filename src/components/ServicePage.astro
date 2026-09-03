@@ -27,7 +27,9 @@ const { title, summary, category, slug, key } = service.data;
 const path = servicePath(locale, category, slug);
 const alternates = await serviceAlternates(key, category);
 const { Content } = await render(service);
-const bookingHref = `${bookingPath(locale)}?service=${encodeURIComponent(`${category}:${key}`)}`;
+const bookingHref = category === 'home'
+  ? `${bookingPath(locale)}?category=home`
+  : `${bookingPath(locale)}?service=${encodeURIComponent(`${category}:${key}`)}`;
 
 const siblings = (await getServices(locale)).filter(
   (s) => !(s.data.key === key && s.data.category === category),

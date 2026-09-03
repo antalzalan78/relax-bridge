@@ -61,7 +61,29 @@ export default {
       label: 'Studio Visit',
       title: 'Je bent welkom bij mij thuis.',
       body: 'Een rustige plek in Tilburg waar je niets hoeft te doen.',
+      subtitle:
+        'Kies uit vier behandelingen, of stel je eigen behandeling samen met de Massage Creator.',
       cta: 'Bekijk de behandelingen',
+      bookingCta: 'Studio Visit reserveren',
+      personalization: {
+        title: 'Massage Creator',
+        intro:
+          'Met een paar kleine details maak je jouw Studio Visit nog persoonlijker. Je kunt deze tijdens het reserveren kiezen.',
+        items: [
+          {
+            title: 'Geur',
+            body: 'Kies een geur die je prettig vindt, of vraag om een geurloze behandeling.',
+          },
+          {
+            title: 'Muziek',
+            body: 'Kies muziek die bij je stemming past, luister naar je eigen muziek of geniet van de massage in volledige stilte.',
+          },
+          {
+            title: 'Bio & vegan',
+            body: 'De behandeling is ook mogelijk met biologische en veganistische massageolie.',
+          },
+        ],
+      },
     },
     homeService: {
       label: 'Home service',
@@ -73,7 +95,7 @@ export default {
 
   prices: {
     heading: 'Prijzen',
-    intro: 'Alle prijzen in één overzicht. Betalen kan met pin, na de behandeling.',
+    intro: 'Betalen gebeurt na de behandeling met pin.',
     duration: 'Duur',
     price: 'Prijs',
     minutes: 'minuten',
