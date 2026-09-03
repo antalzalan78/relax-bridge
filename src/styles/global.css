@@ -859,6 +859,25 @@ img {
   min-width: 0;
 }
 
+.studio-offer-group {
+  margin-top: clamp(3.5rem, 7vw, 6rem);
+}
+
+.studio-offer-group__heading {
+  display: grid;
+  gap: 0.4rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.studio-offer-group__heading h2 {
+  font-size: clamp(2rem, 1.55rem + 1.7vw, 3.3rem);
+}
+
+.studio-offer-group .location-offer {
+  padding-top: clamp(2rem, 4vw, 3.25rem);
+}
+
 .massage-creator {
   display: grid;
   gap: clamp(2rem, 5vw, 5rem);
@@ -881,7 +900,7 @@ img {
 
   .massage-creator--studio-intro .massage-creator__intro {
     display: grid;
-    grid-template-columns: minmax(15rem, 1fr) auto;
+    grid-template-columns: minmax(15rem, 0.8fr) minmax(18rem, 1.2fr) auto;
     align-items: center;
     gap: 0.75rem 2rem;
   }
@@ -891,8 +910,14 @@ img {
     grid-column: 1;
   }
 
-  .massage-creator--studio-intro .btn {
+  .massage-creator--studio-intro .lead {
     grid-column: 2;
+    grid-row: 1 / span 2;
+    margin-top: 0;
+  }
+
+  .massage-creator--studio-intro .btn {
+    grid-column: 3;
     grid-row: 1 / span 2;
     margin-top: 0;
     white-space: nowrap;

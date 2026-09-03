@@ -1,7 +1,16 @@
 ---
-import { bookingPath, questionnairePath, site, pathFor, studioVisitBookingPath, type Locale } from '../data/site';
+import {
+  bookingPath,
+  massageCreatorPath,
+  questionnairePath,
+  site,
+  pathFor,
+  studioVisitBookingPath,
+  type Locale,
+} from '../data/site';
 import { anchors } from '../data/routes';
 import { t } from '../i18n';
+import { studioBookingText } from '../i18n/studio-booking';
 import { getServices, homeAlternates, lowestPrice } from '../lib/services';
 import { localBusinessSchema, faqSchema } from '../lib/schema';
 import { Image } from 'astro:assets';
@@ -23,12 +32,14 @@ interface Props {
 
 const { locale } = Astro.props;
 const d = t(locale);
+const studioCopy = studioBookingText(locale);
 
 const studio = await getServices(locale, 'studio');
 const home = await getServices(locale, 'home');
 const cheapest = lowestPrice([...studio, ...home]);
 const bookingHref = bookingPath(locale);
 const studioBookingHref = studioVisitBookingPath(locale);
+const creatorHref = massageCreatorPath(locale);
 
 const alternates = homeAlternates();
 const path = pathFor(locale);
@@ -141,44 +152,55 @@ const jsonLd = [
 
       <p class="studio-personalization-highlights__intro">{d.options.studio.subtitle}</p>
 
-      <div class="massage-creator massage-creator--studio-intro">
-        <div class="massage-creator__intro">
-          <span class="eyebrow">Studio Visit</span>
-          <h2>{d.options.studio.personalization.title}</h2>
-          <a class="btn btn--ghost" href={bookingHref}>{d.hero.primaryCta}</a>
-        </div>
-      </div>
+      <section class="studio-offer-group" id="studio-services">
+        <header class="studio-offer-group__heading">
+          <span class="eyebrow">Studio Visit 1</span>
+          <h2>{studioCopy.readyHeading}</h2>
+        </header>
 
-      <div class="location-offer" id="studio-services">
-        <div class="location-offer__services">
-          <span class="detail-label">{d.options.studio.cta}</span>
-          <div class="service-list">
-            {studio.map((s, index) => (
-              <ServiceCard
-                locale={locale}
-                service={s}
-                index={index}
-                linked={false}
-                showPrice={false}
-              />
-            ))}
+        <div class="location-offer">
+          <div class="location-offer__services studio-treatment-list">
+            {studio.map((service, index) => {
+              const text = studioCopy.services[service.data.key];
+              return (
+                <article class="studio-treatment-card">
+                  <span class="studio-treatment-card__number" aria-hidden="true">
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                  <div>
+                    <h3>{service.data.title}</h3>
+                    <p class="studio-treatment-card__headline">{text.headline}</p>
+                    <p class="studio-treatment-card__detail">{text.detail}</p>
+                  </div>
+                </article>
+              );
+            })}
           </div>
-        </div>
 
-        <aside class="price-panel price-panel--textured" id={anchors.prices} aria-label={d.prices.studioHeading}>
-          <Image
-            class="price-panel__texture"
-            src={purpleTowelTexture}
-            alt=""
-            width={640}
-            loading="lazy"
-            aria-hidden="true"
-          />
-          <span class="price-panel__number" aria-hidden="true">01</span>
-          <PriceTable locale={locale} caption={d.prices.studioHeading} services={studio} />
-          <p class="price-panel__note">{d.prices.intro}</p>
-        </aside>
-      </div>
+          <aside class="price-panel price-panel--textured" id={anchors.prices} aria-label={d.prices.studioHeading}>
+            <Image
+              class="price-panel__texture"
+              src={purpleTowelTexture}
+              alt=""
+              width={640}
+              loading="lazy"
+              aria-hidden="true"
+            />
+            <span class="price-panel__number" aria-hidden="true">01</span>
+            <PriceTable locale={locale} caption={d.prices.studioHeading} services={studio} />
+            <p class="price-panel__note">{d.prices.intro}</p>
+          </aside>
+        </div>
+      </section>
+
+      <section class="massage-creator massage-creator--studio-intro">
+        <div class="massage-creator__intro">
+          <span class="eyebrow">Studio Visit 2</span>
+          <h2>{d.options.studio.personalization.title}</h2>
+          <p class="lead">{studioCopy.creatorHeading}</p>
+          <a class="btn btn--ghost" href={creatorHref}>{d.hero.primaryCta}</a>
+        </div>
+      </section>
 
     </div>
   </section>
