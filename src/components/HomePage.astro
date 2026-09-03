@@ -128,7 +128,6 @@ const jsonLd = [
       </div>
 
       <div class="studio-personalization-highlights">
-        <p class="studio-personalization-highlights__intro">{d.options.studio.subtitle}</p>
         {d.options.studio.personalization.items.map((item, index) => (
           <article class="studio-personalization-highlight">
             <span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
@@ -139,6 +138,8 @@ const jsonLd = [
           </article>
         ))}
       </div>
+
+      <p class="studio-personalization-highlights__intro">{d.options.studio.subtitle}</p>
 
       <div class="massage-creator massage-creator--studio-intro">
         <div class="massage-creator__intro">

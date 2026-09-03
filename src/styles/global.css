@@ -807,18 +807,12 @@ img {
 }
 
 .studio-personalization-highlights__intro {
-  margin: 0 0 0.5rem;
+  max-width: 48rem;
+  margin: clamp(1.25rem, 2.5vw, 2rem) 0 0;
   color: var(--pine-dark);
   font-size: clamp(1.15rem, 1.02rem + 0.45vw, 1.45rem);
   font-weight: 750;
   line-height: 1.5;
-}
-
-@media (min-width: 48rem) {
-  .studio-personalization-highlights__intro {
-    grid-column: 1 / -1;
-    max-width: 48rem;
-  }
 }
 
 .studio-personalization-highlight {
