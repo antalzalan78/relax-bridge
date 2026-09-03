@@ -90,6 +90,7 @@ export default {
       title: 'Házhoz megyek a biciklimmel.',
       body: 'Tilburgban és Reeshofban. Az ár tartalmazza az utazási időt, a felkészülést és a kezelést.',
       cta: 'Kezelések megtekintése',
+      bookingCta: 'Home Service foglalása',
     },
   },
 

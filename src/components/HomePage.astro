@@ -39,6 +39,7 @@ const cheapest = lowestPrice([...studio, ...home]);
 const bookingHref = bookingPath(locale);
 const studioBookingHref = studioVisitBookingPath(locale);
 const creatorHref = massageCreatorPath(locale);
+const homeBookingHref = `${bookingHref}?category=home`;
 
 const alternates = homeAlternates();
 const path = pathFor(locale);
@@ -227,8 +228,8 @@ const jsonLd = [
           <h2>{d.options.homeService.label}</h2>
           <h3>{d.options.homeService.title}</h3>
           <p class="lead">{d.options.homeService.body}</p>
-          <a class="text-link" href="#home-services">
-            {d.options.homeService.cta}<span aria-hidden="true">&darr;</span>
+          <a class="btn btn--primary" href={homeBookingHref}>
+            {d.options.homeService.bookingCta}<span aria-hidden="true">&rarr;</span>
           </a>
         </div>
       </div>
