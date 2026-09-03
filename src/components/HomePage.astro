@@ -17,7 +17,6 @@ import { Image } from 'astro:assets';
 import profileImage from '../assets/profile-forest.jpg';
 import studioImage from '../assets/studio-tilburg.jpg';
 import bikeImage from '../assets/home-service-fiets.jpg';
-import purpleTowelTexture from '../assets/towel-purple-card.png';
 import orangeTowelTexture from '../assets/towel-orange-card.png';
 import greenTowelTexture from '../assets/towel-green-section.png';
 import approvedLogoWatermark from '../assets/logo-watermark-approved.png';
@@ -158,39 +157,39 @@ const jsonLd = [
           <h2>{studioCopy.readyHeading}</h2>
         </header>
 
-        <div class="location-offer">
-          <div class="location-offer__services studio-treatment-list">
+        <div class="studio-treatment-list studio-treatment-list--with-prices">
             {studio.map((service, index) => {
-              const text = studioCopy.services[service.data.key];
               return (
                 <article class="studio-treatment-card">
                   <span class="studio-treatment-card__number" aria-hidden="true">
                     {String(index + 1).padStart(2, '0')}
                   </span>
-                  <div>
+                  <div class="studio-treatment-card__body">
                     <h3>{service.data.title}</h3>
-                    <p class="studio-treatment-card__headline">{text.headline}</p>
-                    <p class="studio-treatment-card__detail">{text.detail}</p>
+                    <p class="studio-treatment-card__summary">{service.data.summary}</p>
                   </div>
+                  <table class="studio-treatment-card__prices">
+                    <caption class="visually-hidden">{service.data.title}</caption>
+                    <thead>
+                      <tr>
+                        <th scope="col">{d.prices.duration}</th>
+                        <th scope="col">{d.prices.price}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {service.data.prices.map((price) => (
+                        <tr>
+                          <td>{price.minutes} {d.prices.minutes}</td>
+                          <td>&euro; {price.eur}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </article>
               );
             })}
-          </div>
-
-          <aside class="price-panel price-panel--textured" id={anchors.prices} aria-label={d.prices.studioHeading}>
-            <Image
-              class="price-panel__texture"
-              src={purpleTowelTexture}
-              alt=""
-              width={640}
-              loading="lazy"
-              aria-hidden="true"
-            />
-            <span class="price-panel__number" aria-hidden="true">01</span>
-            <PriceTable locale={locale} caption={d.prices.studioHeading} services={studio} />
-            <p class="price-panel__note">{d.prices.intro}</p>
-          </aside>
         </div>
+        <p class="studio-offer-group__payment-note" id={anchors.prices}>{d.prices.intro}</p>
       </section>
 
       <section class="massage-creator massage-creator--studio-intro">
