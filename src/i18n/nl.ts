@@ -90,6 +90,7 @@ export default {
       title: 'Ik kom met de fiets bij je thuis.',
       body: 'In Tilburg en Reeshof. De prijs is inclusief reistijd, voorbereiding en de behandeling.',
       cta: 'Bekijk de behandelingen',
+      bookingCta: 'Home service reserveren',
     },
   },
 

@@ -90,6 +90,7 @@ export default {
       title: 'I come to your home by bicycle.',
       body: 'In Tilburg and Reeshof. The price includes travel time, preparation and the treatment.',
       cta: 'See the treatments',
+      bookingCta: 'Book a Home Service',
     },
   },
 
