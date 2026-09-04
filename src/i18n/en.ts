@@ -88,7 +88,7 @@ export default {
     homeService: {
       label: 'Home Service',
       title: 'Enjoy your massage in the comfort of your own home. I come to your home by bicycle, in Tilburg and Reeshof.',
-      body: 'The price includes travel time, preparation and the treatment.',
+      body: 'With Home Service, you can choose a Relax Massage or a Neck, Shoulder & Back Massage. The bookable massage time is at least 60 and at most 180 minutes. One booking can be for up to 3 people. One treatment may be selected per person. A one-time €15 travel fee is charged per address, regardless of how many people receive a massage. For multiple people, I also allow a short preparation time between treatments. During booking, the system helps you put together treatments that fit the available time.',
       cta: 'See the treatments',
       bookingCta: 'Book a Home Service',
     },

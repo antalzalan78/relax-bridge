@@ -88,7 +88,7 @@ export default {
     homeService: {
       label: 'Home Service',
       title: 'Élvezd a masszázst a saját otthonod kényelmében. Házhoz megyek a biciklimmel, Tilburgban és Reeshofban.',
-      body: 'Az ár tartalmazza az utazási időt, a felkészülést és a kezelést.',
+      body: 'A Home Service keretében relaxmasszázs és nyak–váll–hátmasszázs választható. A foglalható masszázsidő minimum 60, maximum 180 perc. Egy foglalás legfeljebb 3 főre szólhat. Személyenként egy kezelés választható. Egy címre egyszeri €15 kiszállási díj kerül felszámításra, függetlenül attól, hányan veszik igénybe a masszázst. Több személy esetén a kezelések között rövid előkészítési idővel is számolok. A foglalás során a rendszer segít összeállítani a rendelkezésre álló időhöz illő kezeléseket.',
       cta: 'Kezelések megtekintése',
       bookingCta: 'Home Service foglalása',
     },
