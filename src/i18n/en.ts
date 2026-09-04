@@ -86,9 +86,9 @@ export default {
       },
     },
     homeService: {
-      label: 'Home service',
-      title: 'I come to your home by bicycle.',
-      body: 'In Tilburg and Reeshof. The price includes travel time, preparation and the treatment.',
+      label: 'Home Service',
+      title: 'Enjoy your massage in the comfort of your own home. I come to your home by bicycle, in Tilburg and Reeshof.',
+      body: 'The price includes travel time, preparation and the treatment.',
       cta: 'See the treatments',
       bookingCta: 'Book a Home Service',
     },
