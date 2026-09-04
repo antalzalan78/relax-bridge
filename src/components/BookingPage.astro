@@ -256,11 +256,21 @@ const creatorConfig = { bases: creatorBases, addons: creatorAddons, maximumMinut
     const addressField = form.querySelector<HTMLElement>('#address-field')!;
     const address = form.querySelector<HTMLInputElement>('#home-address')!;
     const creatorFieldset = form.querySelector<HTMLFieldSetElement>('#creator-fieldset')!;
+    const scentSelect = form.querySelector<HTMLSelectElement>('#creator-scent')!;
+    const musicSelect = form.querySelector<HTMLSelectElement>('#creator-music')!;
     const submit = form.querySelector<HTMLButtonElement>('#submit-booking')!;
     const formError = form.querySelector<HTMLElement>('#form-error')!;
     const confirmation = document.querySelector<HTMLElement>('#booking-confirmation')!;
     const reference = document.querySelector<HTMLElement>('#confirmation-reference')!;
     const another = document.querySelector<HTMLButtonElement>('#another-booking')!;
+
+    const applyRequestedPreference = (select: HTMLSelectElement, value: string | null) => {
+      if (value && Array.from(select.options).some((option) => option.value === value)) {
+        select.value = value;
+      }
+    };
+    applyRequestedPreference(scentSelect, searchParams.get('scent'));
+    applyRequestedPreference(musicSelect, searchParams.get('music'));
 
     const dateInAmsterdam = (value = new Date()) =>
       new Intl.DateTimeFormat('en-CA', {

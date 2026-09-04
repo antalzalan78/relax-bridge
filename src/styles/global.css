@@ -1467,6 +1467,67 @@ img {
   font-size: 1.7rem;
 }
 
+.creator-visit-preferences {
+  margin: 2rem 0 0;
+  padding: clamp(1.25rem, 3vw, 1.75rem);
+  border: 1px solid color-mix(in srgb, var(--logo-green) 35%, var(--border));
+  border-radius: var(--radius);
+  background: var(--pine-soft);
+}
+
+.creator-visit-preferences legend {
+  padding-inline: 0.4rem;
+  color: var(--logo-green);
+  font-size: 0.75rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.creator-visit-preferences > p {
+  max-width: 46rem;
+  margin: 0 0 1.25rem;
+  color: var(--ink-soft);
+  line-height: 1.65;
+}
+
+.creator-preference-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 45rem) {
+  .creator-preference-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.creator-preference-grid label {
+  display: block;
+  margin-bottom: 0.45rem;
+  color: var(--pine-dark);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.creator-preference-grid select {
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+}
+
+.creator-preference-grid select:focus {
+  outline: 2px solid var(--logo-green);
+  outline-offset: 2px;
+}
+
 .creator-review {
   max-width: 52rem;
   margin-inline: auto;

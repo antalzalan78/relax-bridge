@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import { bookingPath, massageCreatorPath, studioVisitBookingPath, type Locale } from '../data/site';
+import { bookingText } from '../i18n/booking';
 import { massageCreatorText } from '../i18n/massage-creator';
 import { creatorAddons, creatorBases, creatorMaximumMinutes } from '../lib/booking/massage-creator';
 
@@ -10,6 +11,7 @@ interface Props {
 
 const { locale } = Astro.props;
 const copy = massageCreatorText(locale);
+const preferencesCopy = bookingText(locale);
 const path = massageCreatorPath(locale);
 const alternates = {
   nl: massageCreatorPath('nl'),
@@ -119,6 +121,31 @@ const creatorConfig = { bases: creatorBases, addons: creatorAddons, maximumMinut
           </aside>
         </div>
 
+        <fieldset class="creator-visit-preferences">
+          <legend>{preferencesCopy.preferencesTitle}</legend>
+          <p>{preferencesCopy.creatorIntro}</p>
+          <div class="creator-preference-grid">
+            <div>
+              <label for="creator-scent">{preferencesCopy.creatorScent}</label>
+              <select id="creator-scent" name="creatorScent">
+                <option value="">{preferencesCopy.creatorScentPlaceholder}</option>
+                {preferencesCopy.creatorScentOptions.map((option) => (
+                  <option value={option.value}>{option.label}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label for="creator-music">{preferencesCopy.creatorMusic}</label>
+              <select id="creator-music" name="creatorMusic">
+                <option value="">{preferencesCopy.creatorMusicPlaceholder}</option>
+                {preferencesCopy.creatorMusicOptions.map((option) => (
+                  <option value={option.value}>{option.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </fieldset>
+
         <div class="creator-actions">
           <button class="btn btn--ghost" type="button" data-back="1">{copy.previous}</button>
           <button class="btn btn--primary" type="button" data-next="3">
@@ -134,6 +161,8 @@ const creatorConfig = { bases: creatorBases, addons: creatorAddons, maximumMinut
         <dl class="creator-review-list">
           <div><dt>{copy.baseLabel}</dt><dd id="creator-review-base"></dd></div>
           <div><dt>{copy.addonsLabel}</dt><dd id="creator-review-addons"></dd></div>
+          <div><dt>{preferencesCopy.creatorScent}</dt><dd id="creator-review-scent"></dd></div>
+          <div><dt>{preferencesCopy.creatorMusic}</dt><dd id="creator-review-music"></dd></div>
           <div><dt>{copy.durationLabel}</dt><dd><strong id="creator-review-minutes"></strong> {copy.minutes}</dd></div>
           <div><dt>{copy.priceLabel}</dt><dd>€ <strong id="creator-review-price"></strong></dd></div>
         </dl>
@@ -164,9 +193,13 @@ const creatorConfig = { bases: creatorBases, addons: creatorAddons, maximumMinut
     const livePrice = creatorForm.querySelector<HTMLElement>('#creator-live-price')!;
     const reviewBase = creatorForm.querySelector<HTMLElement>('#creator-review-base')!;
     const reviewAddons = creatorForm.querySelector<HTMLElement>('#creator-review-addons')!;
+    const reviewScent = creatorForm.querySelector<HTMLElement>('#creator-review-scent')!;
+    const reviewMusic = creatorForm.querySelector<HTMLElement>('#creator-review-music')!;
     const reviewMinutes = creatorForm.querySelector<HTMLElement>('#creator-review-minutes')!;
     const reviewPrice = creatorForm.querySelector<HTMLElement>('#creator-review-price')!;
     const bookingLink = creatorForm.querySelector<HTMLAnchorElement>('#creator-booking-link')!;
+    const scentSelect = creatorForm.querySelector<HTMLSelectElement>('#creator-scent')!;
+    const musicSelect = creatorForm.querySelector<HTMLSelectElement>('#creator-music')!;
 
     const selectedBase = () => creatorForm.querySelector<HTMLInputElement>('input[name="creatorBase"]:checked')?.value || '';
     const selectedMinutes = (name: string) => Number(creatorForm.querySelector<HTMLInputElement>(`input[name="${name}"]:checked`)?.value || 0);
@@ -232,6 +265,8 @@ const creatorConfig = { bases: creatorBases, addons: creatorAddons, maximumMinut
       if (value.face) addons.push(addonLabel(copy.faceAddon, value.face));
       if (value.foot) addons.push(addonLabel(copy.footAddon, value.foot));
       reviewAddons.textContent = addons.length ? addons.join(' · ') : copy.noAddons;
+      reviewScent.textContent = scentSelect.value ? scentSelect.selectedOptions[0]?.textContent || '—' : '—';
+      reviewMusic.textContent = musicSelect.value ? musicSelect.selectedOptions[0]?.textContent || '—' : '—';
       reviewMinutes.textContent = String(value.minutes);
       reviewPrice.textContent = String(value.price);
       const params = new URLSearchParams({
@@ -242,6 +277,8 @@ const creatorConfig = { bases: creatorBases, addons: creatorAddons, maximumMinut
         face: String(value.face),
         foot: String(value.foot),
       });
+      if (scentSelect.value) params.set('scent', scentSelect.value);
+      if (musicSelect.value) params.set('music', musicSelect.value);
       bookingLink.href = `${bookingPath}?${params}`;
     };
 
