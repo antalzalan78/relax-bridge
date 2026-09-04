@@ -11,7 +11,7 @@ import {
 import { anchors } from '../data/routes';
 import { t } from '../i18n';
 import { studioBookingText } from '../i18n/studio-booking';
-import { getServices, homeAlternates, lowestPrice } from '../lib/services';
+import { getServices, homeAlternates } from '../lib/services';
 import { localBusinessSchema, faqSchema } from '../lib/schema';
 import { Image } from 'astro:assets';
 import profileImage from '../assets/profile-forest.jpg';
@@ -32,7 +32,6 @@ const studioCopy = studioBookingText(locale);
 
 const studio = await getServices(locale, 'studio');
 const home = await getServices(locale, 'home');
-const cheapest = lowestPrice([...studio, ...home]);
 const bookingHref = bookingPath(locale);
 const studioBookingHref = studioVisitBookingPath(locale);
 const creatorHref = massageCreatorPath(locale);
@@ -72,10 +71,6 @@ const jsonLd = [
           <a class="btn btn--primary" href={bookingHref}>
             {d.hero.primaryCta}
             <span aria-hidden="true">&rarr;</span>
-          </a>
-          <a class="btn btn--ghost" href={`#${anchors.prices}`}>
-            {d.hero.secondaryCta}
-            {cheapest && <span>&nbsp;&middot; {d.prices.from} &euro; {cheapest}</span>}
           </a>
         </div>
       </div>
