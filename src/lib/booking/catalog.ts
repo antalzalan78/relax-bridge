@@ -25,28 +25,12 @@ export async function getBookingOptions(locale: Locale): Promise<BookingOption[]
     );
 }
 
-/**
- * Home Service uses the matching Studio Visit treatment price, then adds one
- * shared travel fee to the complete booking. The home content prices remain the
- * one-person, travel-included prices shown on the public price cards.
- */
+/** Home Service treatment prices exclude the one shared travel fee. */
 export async function getHomeServiceBookingOptions(
   locale: Locale,
 ): Promise<BookingOption[]> {
   const options = await getBookingOptions(locale);
-  const studioOptions = options.filter((option) => option.category === 'studio');
-
-  return options
-    .filter((option) => option.category === 'home')
-    .flatMap((option) => {
-      const studioPrice = studioOptions.find(
-        (candidate) =>
-          candidate.key === option.key && candidate.minutes === option.minutes,
-      );
-      return studioPrice
-        ? [{ ...option, priceEur: studioPrice.priceEur }]
-        : [];
-    });
+  return options.filter((option) => option.category === 'home');
 }
 
 export async function findBookingOption(input: {
