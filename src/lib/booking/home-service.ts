@@ -47,7 +47,7 @@ export function calculateHomeServiceSelection(
   const valid = treatments.every(
     (treatment) =>
       (treatment.key === 'relax' && [60, 90].includes(treatment.minutes)) ||
-      (treatment.key === 'neck-shoulder-back' && treatment.minutes === 60),
+      (treatment.key === 'neck-shoulder-back' && [30, 60].includes(treatment.minutes)),
   );
   if (!valid) return null;
 

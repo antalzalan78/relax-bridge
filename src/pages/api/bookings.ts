@@ -46,7 +46,7 @@ const bookingSchema = z
       .array(
         z.object({
           key: z.enum(['relax', 'neck-shoulder-back']),
-          minutes: z.union([z.literal(60), z.literal(90)]),
+          minutes: z.union([z.literal(30), z.literal(60), z.literal(90)]),
         }),
       )
       .min(1)

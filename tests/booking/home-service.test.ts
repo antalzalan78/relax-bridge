@@ -50,6 +50,18 @@ test('adds 15 minutes of preparation time between Home Service guests', () => {
       reservedMinutes: 210,
     },
   );
+
+  assert.deepEqual(
+    calculateHomeServiceSelection([
+      { key: 'neck-shoulder-back', minutes: 30 },
+      { key: 'neck-shoulder-back', minutes: 30 },
+    ]),
+    {
+      treatmentMinutes: 60,
+      preparationMinutes: 15,
+      reservedMinutes: 75,
+    },
+  );
 });
 
 test('rejects unsupported treatments and combinations over 180 massage minutes', () => {
@@ -64,6 +76,12 @@ test('rejects unsupported treatments and combinations over 180 massage minutes',
   assert.equal(
     calculateHomeServiceSelection([
       { key: 'neck-shoulder-back', minutes: 90 },
+    ]),
+    null,
+  );
+  assert.equal(
+    calculateHomeServiceSelection([
+      { key: 'neck-shoulder-back', minutes: 30 },
     ]),
     null,
   );

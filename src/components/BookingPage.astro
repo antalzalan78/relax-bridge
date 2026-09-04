@@ -320,6 +320,12 @@ const homeConfig = {
     const homeGuestCards = Array.from(form.querySelectorAll<HTMLElement>('[data-home-guest]'));
     const homeTreatmentSelects = Array.from(form.querySelectorAll<HTMLSelectElement>('.home-treatment-select'));
     const homeSummary = form.querySelector<HTMLElement>('#home-builder-summary')!;
+    const homeMinimumTreatmentMinutes = Math.min(
+      ...homeOptions.map((option: any) => option.minutes),
+    );
+    const homeMaximumTreatmentMinutes = Math.max(
+      ...homeOptions.map((option: any) => option.minutes),
+    );
     const scentSelect = form.querySelector<HTMLSelectElement>('#creator-scent')!;
     const musicSelect = form.querySelector<HTMLSelectElement>('#creator-music')!;
     const submit = form.querySelector<HTMLButtonElement>('#submit-booking')!;
@@ -410,12 +416,20 @@ const homeConfig = {
         Array.from(select.options).forEach((option) => {
           if (!option.value) return;
           const treatment = homeOptions.find((item: any) => item.id === option.value);
+          const minimumPossibleMinutes = treatment
+            ? otherMinutes + treatment.minutes +
+              unselectedOtherGuests * homeMinimumTreatmentMinutes
+            : Number.POSITIVE_INFINITY;
+          const maximumPossibleMinutes = treatment
+            ? otherMinutes + treatment.minutes +
+              unselectedOtherGuests * homeMaximumTreatmentMinutes
+            : Number.NEGATIVE_INFINITY;
           option.disabled =
             !treatment ||
-            otherMinutes + treatment.minutes +
-              unselectedOtherGuests * homeConfig.minimumMinutes >
-              homeConfig.maximumMinutes;
+            minimumPossibleMinutes > homeConfig.maximumMinutes ||
+            maximumPossibleMinutes < homeConfig.minimumMinutes;
         });
+        if (select.selectedOptions[0]?.disabled) select.value = '';
       });
 
       const option = buildHomeOption();
@@ -515,7 +529,7 @@ const homeConfig = {
         return total + (option?.minutes || 0);
       }, 0);
       const minimumPossibleMinutes = () =>
-        selectedMinutes() + active.filter((select) => !select.value).length * homeConfig.minimumMinutes;
+        selectedMinutes() + active.filter((select) => !select.value).length * homeMinimumTreatmentMinutes;
       while (minimumPossibleMinutes() > homeConfig.maximumMinutes) {
         const longest = active
           .map((select) => ({
