@@ -80,11 +80,11 @@ const bookingHref = bookingPath(locale);
               {l}
             </span>
           ) : alternates[l] ? (
-            <a href={alternates[l]} hreflang={l} title={localeNames[l]}>
+            <a href={alternates[l]} hreflang={l} title={localeNames[l]} data-language-link>
               {l}
             </a>
           ) : (
-            <a href={pathFor(l)} hreflang={l} title={localeNames[l]}>
+            <a href={pathFor(l)} hreflang={l} title={localeNames[l]} data-language-link>
               {l}
             </a>
           ),
@@ -105,6 +105,16 @@ const bookingHref = bookingPath(locale);
   }
 
   const status = document.querySelector<HTMLElement>('[data-booking-status]');
+
+  const normalizedPath = window.location.pathname.replace(/\/+$/, '') || '/';
+  const bookingPaths = new Set(['/booking', '/en/booking', '/hu/booking']);
+  if (bookingPaths.has(normalizedPath) && window.location.search) {
+    document.querySelectorAll<HTMLAnchorElement>('[data-language-link]').forEach((link) => {
+      const target = new URL(link.href, window.location.origin);
+      target.search = window.location.search;
+      link.href = target.toString();
+    });
+  }
 
   if (status) {
     const label = status.querySelector<HTMLElement>('.booking-status__label');
