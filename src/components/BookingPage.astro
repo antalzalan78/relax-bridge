@@ -84,31 +84,6 @@ const creatorConfig = { bases: creatorBases, addons: creatorAddons, maximumMinut
           <p class="slot-status" id="slot-status">{copy.chooseFirst}</p>
           <div class="slot-grid" id="slot-grid"></div>
         </fieldset>
-      </div>
-
-      <div class="booking-card booking-card--details" id="details-card" hidden>
-        <span class="booking-card__number">02</span>
-        <div class="appointment-summary" id="appointment-summary" aria-live="polite"></div>
-        <input type="hidden" id="start" name="start" />
-
-        <div class="field-grid">
-          <div>
-            <label for="customer-name">{copy.name}</label>
-            <input id="customer-name" name="customerName" autocomplete="name" required maxlength="100" />
-          </div>
-          <div>
-            <label for="customer-email">{copy.email}</label>
-            <input id="customer-email" name="customerEmail" type="email" autocomplete="email" required maxlength="200" />
-          </div>
-          <div>
-            <label for="customer-phone">{copy.phone}</label>
-            <input id="customer-phone" name="customerPhone" type="tel" autocomplete="tel" required maxlength="40" />
-          </div>
-          <div id="address-field" hidden>
-            <label for="home-address">{copy.address}</label>
-            <input id="home-address" name="homeAddress" autocomplete="street-address" maxlength="300" />
-          </div>
-        </div>
 
         <fieldset class="creator-fieldset" id="creator-fieldset" hidden disabled>
           <legend>{copy.preferencesTitle}</legend>
@@ -138,6 +113,31 @@ const creatorConfig = { bases: creatorBases, addons: creatorAddons, maximumMinut
             <span>{copy.creatorBioVegan}</span>
           </label>
         </fieldset>
+      </div>
+
+      <div class="booking-card booking-card--details" id="details-card" hidden>
+        <span class="booking-card__number">02</span>
+        <div class="appointment-summary" id="appointment-summary" aria-live="polite"></div>
+        <input type="hidden" id="start" name="start" />
+
+        <div class="field-grid">
+          <div>
+            <label for="customer-name">{copy.name}</label>
+            <input id="customer-name" name="customerName" autocomplete="name" required maxlength="100" />
+          </div>
+          <div>
+            <label for="customer-email">{copy.email}</label>
+            <input id="customer-email" name="customerEmail" type="email" autocomplete="email" required maxlength="200" />
+          </div>
+          <div>
+            <label for="customer-phone">{copy.phone}</label>
+            <input id="customer-phone" name="customerPhone" type="tel" autocomplete="tel" required maxlength="40" />
+          </div>
+          <div id="address-field" hidden>
+            <label for="home-address">{copy.address}</label>
+            <input id="home-address" name="homeAddress" autocomplete="street-address" maxlength="300" />
+          </div>
+        </div>
 
         <label for="notes">{copy.notes}</label>
         <textarea id="notes" name="notes" rows="3" maxlength="1000"></textarea>
@@ -287,6 +287,12 @@ const creatorConfig = { bases: creatorBases, addons: creatorAddons, maximumMinut
     date.value = today;
 
     const selectedOption = () => options.find((option: any) => option.id === service.value);
+    const setPreferenceVisibility = (option = selectedOption()) => {
+      const studio = option?.category === 'studio' || (!option && requestedCategory === 'studio');
+      creatorFieldset.hidden = !studio;
+      creatorFieldset.disabled = !studio;
+    };
+    setPreferenceVisibility();
     const readableDate = () =>
       new Intl.DateTimeFormat(dateLocale, {
         weekday: 'long',
@@ -301,6 +307,7 @@ const creatorConfig = { bases: creatorBases, addons: creatorAddons, maximumMinut
       details.hidden = true;
       slotGrid.replaceChildren();
       const option = selectedOption();
+      setPreferenceVisibility(option);
       if (!option || !date.value) {
         slotStatus.textContent = copy.chooseFirst;
         return;
@@ -332,8 +339,6 @@ const creatorConfig = { bases: creatorBases, addons: creatorAddons, maximumMinut
             const home = option.category === 'home';
             addressField.hidden = !home;
             address.required = home;
-            creatorFieldset.hidden = home;
-            creatorFieldset.disabled = home;
             details.hidden = false;
             details.scrollIntoView({ behavior: 'smooth', block: 'start' });
           });
@@ -420,6 +425,7 @@ const creatorConfig = { bases: creatorBases, addons: creatorAddons, maximumMinut
       details.hidden = true;
       slotGrid.replaceChildren();
       slotStatus.textContent = copy.chooseFirst;
+      setPreferenceVisibility();
       confirmation.hidden = true;
       form.hidden = false;
       form.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -548,6 +554,7 @@ const creatorConfig = { bases: creatorBases, addons: creatorAddons, maximumMinut
   .field-grid { display: grid; gap: 1rem; margin-bottom: 1rem; }
   @media (min-width: 45rem) { .field-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   .creator-fieldset {
+    grid-column: 1 / -1;
     margin: 1.4rem 0;
     padding: 1.4rem;
     border: 1px solid color-mix(in srgb, var(--logo-green) 35%, var(--border));
