@@ -82,7 +82,7 @@ const homeConfig = {
             <option value="">{copy.chooseService}</option>
             {options.map((option) => (
               <option value={option.id} data-category={option.category}>
-                {copy.studio} · {option.title} · {option.minutes} min · € {option.priceEur}
+                {option.title} · {option.minutes} min · € {option.priceEur}
               </option>
             ))}
             <option value="home:custom" data-category="home">{copy.home}</option>
