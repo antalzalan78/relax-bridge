@@ -108,11 +108,32 @@ const bookingHref = bookingPath(locale);
 
   const normalizedPath = window.location.pathname.replace(/\/+$/, '') || '/';
   const bookingPaths = new Set(['/booking', '/en/booking', '/hu/booking']);
-  if (bookingPaths.has(normalizedPath) && window.location.search) {
-    document.querySelectorAll<HTMLAnchorElement>('[data-language-link]').forEach((link) => {
+  if (bookingPaths.has(normalizedPath)) {
+    const updateLanguageLink = (link: HTMLAnchorElement) => {
+      const params = new URLSearchParams(window.location.search);
+      const service = document.querySelector<HTMLSelectElement>('#service');
+      const selectedService = service?.selectedOptions[0];
+      const scent = document.querySelector<HTMLSelectElement>('#creator-scent');
+      const music = document.querySelector<HTMLSelectElement>('#creator-music');
+
+      if (service?.value) {
+        params.set('service', service.value);
+        const category = selectedService?.dataset.category;
+        if (category) params.set('category', category);
+      }
+      if (scent?.value) params.set('scent', scent.value);
+      else params.delete('scent');
+      if (music?.value) params.set('music', music.value);
+      else params.delete('music');
+
       const target = new URL(link.href, window.location.origin);
-      target.search = window.location.search;
+      target.search = params.toString();
       link.href = target.toString();
+    };
+
+    document.querySelectorAll<HTMLAnchorElement>('[data-language-link]').forEach((link) => {
+      updateLanguageLink(link);
+      link.addEventListener('click', () => updateLanguageLink(link));
     });
   }
 

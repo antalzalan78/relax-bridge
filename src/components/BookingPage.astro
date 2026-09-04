@@ -301,7 +301,9 @@ const homeConfig = {
     }
     const preselectedOption = requestedCreator || (requestedService
       ? options.find(
-          (option: any) => `${option.category}:${option.key}` === requestedService,
+          (option: any) =>
+            option.id === requestedService ||
+            `${option.category}:${option.key}` === requestedService,
         )
       : undefined);
     const date = form.querySelector<HTMLInputElement>('#booking-date')!;
