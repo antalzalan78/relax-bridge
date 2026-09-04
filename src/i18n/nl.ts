@@ -88,7 +88,7 @@ export default {
     homeService: {
       label: 'Home Service',
       title: 'Geniet van de massage in het comfort van je eigen huis. Ik kom met de fiets bij je thuis, in Tilburg en Reeshof.',
-      body: 'De prijs is inclusief reistijd, voorbereiding en de behandeling.',
+      body: 'Bij Home Service kun je kiezen uit een relaxmassage en een nek-, schouder- en rugmassage. De boekbare massagetijd is minimaal 60 en maximaal 180 minuten. Eén reservering kan voor maximaal 3 personen worden gemaakt. Per persoon kan één behandeling worden gekozen. Per adres wordt eenmalig € 15 aan voorrijkosten berekend, ongeacht hoeveel personen gebruikmaken van de massage. Bij meerdere personen houd ik ook rekening met een korte voorbereidingstijd tussen de behandelingen. Tijdens het reserveren helpt het systeem je behandelingen samen te stellen die binnen de beschikbare tijd passen.',
       cta: 'Bekijk de behandelingen',
       bookingCta: 'Home service reserveren',
     },
