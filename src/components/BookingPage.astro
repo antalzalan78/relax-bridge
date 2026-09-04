@@ -111,26 +111,26 @@ const creatorConfig = { bases: creatorBases, addons: creatorAddons, maximumMinut
         </div>
 
         <fieldset class="creator-fieldset" id="creator-fieldset" hidden disabled>
-          <legend>{copy.creatorTitle}</legend>
+          <legend>{copy.preferencesTitle}</legend>
           <p>{copy.creatorIntro}</p>
           <div class="creator-grid">
             <div>
               <label for="creator-scent">{copy.creatorScent}</label>
-              <input
-                id="creator-scent"
-                name="creatorScent"
-                maxlength="120"
-                placeholder={copy.creatorScentPlaceholder}
-              />
+              <select id="creator-scent" name="creatorScent">
+                <option value="">{copy.creatorScentPlaceholder}</option>
+                {copy.creatorScentOptions.map((option) => (
+                  <option value={option.value}>{option.label}</option>
+                ))}
+              </select>
             </div>
             <div>
               <label for="creator-music">{copy.creatorMusic}</label>
-              <input
-                id="creator-music"
-                name="creatorMusic"
-                maxlength="120"
-                placeholder={copy.creatorMusicPlaceholder}
-              />
+              <select id="creator-music" name="creatorMusic">
+                <option value="">{copy.creatorMusicPlaceholder}</option>
+                {copy.creatorMusicOptions.map((option) => (
+                  <option value={option.value}>{option.label}</option>
+                ))}
+              </select>
             </div>
           </div>
           <label class="creator-check">

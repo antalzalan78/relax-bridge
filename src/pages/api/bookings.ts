@@ -27,8 +27,8 @@ const bookingSchema = z
     customerEmail: z.email().max(200),
     customerPhone: z.string().trim().min(6).max(40),
     homeAddress: z.string().trim().max(300).optional(),
-    creatorScent: z.string().trim().max(120).optional(),
-    creatorMusic: z.string().trim().max(120).optional(),
+    creatorScent: z.enum(['orange', 'rose', 'lavender', 'any', 'none']).optional(),
+    creatorMusic: z.enum(['instrumental', 'nature', 'any', 'none']).optional(),
     creatorBioVegan: z.boolean().optional(),
     creatorBase: z.enum(['relax', 'back']).optional(),
     creatorBack: z.union([z.literal(0), z.literal(30)]).optional(),
@@ -64,9 +64,45 @@ const bookingSchema = z
   });
 
 const creatorLabels = {
-  nl: { scent: 'Geur', music: 'Muziek', bioVegan: 'Bio & vegan: ja', base: 'Basis', addons: 'Aanvullingen', total: 'Totaal', relax: '60 min Relaxmassage', back: '60 min Nek-, schouder- en rugmassage', none: 'geen' },
-  en: { scent: 'Scent', music: 'Music', bioVegan: 'Bio & vegan: yes', base: 'Base', addons: 'Add-ons', total: 'Total', relax: '60 min Relax Massage', back: '60 min Neck, Shoulder & Back Massage', none: 'none' },
-  hu: { scent: 'Illat', music: 'Zene', bioVegan: 'Bio & vegan: igen', base: 'Alapkezelés', addons: 'Kiegészítők', total: 'Összesen', relax: '60 perc Relaxmasszázs', back: '60 perc Nyak–váll–hátmasszázs', none: 'nincs' },
+  nl: {
+    scent: 'Geur voor olie en ruimte',
+    music: 'Muziek',
+    bioVegan: 'Bio & vegan: ja',
+    base: 'Basis',
+    addons: 'Aanvullingen',
+    total: 'Totaal',
+    relax: '60 min Relaxmassage',
+    back: '60 min Nek-, schouder- en rugmassage',
+    none: 'geen',
+    scentOptions: { orange: 'Sinaasappel', rose: 'Roos', lavender: 'Lavendel', any: 'Maakt niet uit', none: 'Geen geur' },
+    musicOptions: { instrumental: 'Instrumentaal', nature: 'Natuurgeluiden', any: 'Maakt niet uit', none: 'Geen muziek' },
+  },
+  en: {
+    scent: 'Scent for oil and room',
+    music: 'Music',
+    bioVegan: 'Bio & vegan: yes',
+    base: 'Base',
+    addons: 'Add-ons',
+    total: 'Total',
+    relax: '60 min Relax Massage',
+    back: '60 min Neck, Shoulder & Back Massage',
+    none: 'none',
+    scentOptions: { orange: 'Orange', rose: 'Rose', lavender: 'Lavender', any: 'No preference', none: 'No scent' },
+    musicOptions: { instrumental: 'Instrumental', nature: 'Sounds of nature', any: 'No preference', none: 'No music' },
+  },
+  hu: {
+    scent: 'Illat az olajhoz és a szobához',
+    music: 'Zene',
+    bioVegan: 'Bio & vegan: igen',
+    base: 'Alapkezelés',
+    addons: 'Kiegészítők',
+    total: 'Összesen',
+    relax: '60 perc Relaxmasszázs',
+    back: '60 perc Nyak–váll–hátmasszázs',
+    none: 'nincs',
+    scentOptions: { orange: 'Narancs', rose: 'Rózsa', lavender: 'Levendula', any: 'Mindegy', none: 'Nem kérek' },
+    musicOptions: { instrumental: 'Instrumentális', nature: 'Természet hangjai', any: 'Mindegy', none: 'Nem kérek' },
+  },
 } as const;
 
 function bookingNotes(input: z.infer<typeof bookingSchema>): string | undefined {
@@ -93,8 +129,8 @@ function bookingNotes(input: z.infer<typeof bookingSchema>): string | undefined 
       })()
     : undefined;
   const choices = [
-    input.creatorScent ? `${labels.scent}: ${input.creatorScent}` : null,
-    input.creatorMusic ? `${labels.music}: ${input.creatorMusic}` : null,
+    input.creatorScent ? `${labels.scent}: ${labels.scentOptions[input.creatorScent]}` : null,
+    input.creatorMusic ? `${labels.music}: ${labels.musicOptions[input.creatorMusic]}` : null,
     input.creatorBioVegan ? labels.bioVegan : null,
   ].filter(Boolean);
 
