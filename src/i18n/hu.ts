@@ -86,9 +86,9 @@ export default {
       },
     },
     homeService: {
-      label: 'Házhoz megyek',
-      title: 'Házhoz megyek a biciklimmel.',
-      body: 'Tilburgban és Reeshofban. Az ár tartalmazza az utazási időt, a felkészülést és a kezelést.',
+      label: 'Home Service',
+      title: 'Élvezd a masszázst a saját otthonod kényelmében. Házhoz megyek a biciklimmel, Tilburgban és Reeshofban.',
+      body: 'Az ár tartalmazza az utazási időt, a felkészülést és a kezelést.',
       cta: 'Kezelések megtekintése',
       bookingCta: 'Home Service foglalása',
     },

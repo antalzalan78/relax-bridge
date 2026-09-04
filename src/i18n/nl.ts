@@ -86,9 +86,9 @@ export default {
       },
     },
     homeService: {
-      label: 'Home service',
-      title: 'Ik kom met de fiets bij je thuis.',
-      body: 'In Tilburg en Reeshof. De prijs is inclusief reistijd, voorbereiding en de behandeling.',
+      label: 'Home Service',
+      title: 'Geniet van de massage in het comfort van je eigen huis. Ik kom met de fiets bij je thuis, in Tilburg en Reeshof.',
+      body: 'De prijs is inclusief reistijd, voorbereiding en de behandeling.',
       cta: 'Bekijk de behandelingen',
       bookingCta: 'Home service reserveren',
     },
