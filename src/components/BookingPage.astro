@@ -76,7 +76,7 @@ const homeConfig = {
     >
       <div class="booking-card booking-card--choice">
         <span class="booking-card__number">01</span>
-        <div>
+        <div id="service-field">
           <label id="service-label" for="service">{copy.service}</label>
           <select id="service" name="service" required>
             <option value="">{copy.chooseService}</option>
@@ -241,6 +241,7 @@ const homeConfig = {
     const copy = JSON.parse(form.dataset.copy || '{}');
     const creatorConfig = JSON.parse(form.dataset.creatorConfig || '{}');
     const service = form.querySelector<HTMLSelectElement>('#service')!;
+    const serviceField = form.querySelector<HTMLElement>('#service-field')!;
     const serviceLabel = form.querySelector<HTMLElement>('#service-label')!;
     const searchParams = new URLSearchParams(window.location.search);
     const requestedCategory = searchParams.get('category');
@@ -295,7 +296,7 @@ const homeConfig = {
       if (requestedCategory === 'home') {
         service.value = 'home:custom';
         service.disabled = true;
-        serviceLabel.textContent = copy.homeBuilderTitle;
+        serviceField.hidden = true;
       }
     }
     const preselectedOption = requestedCreator || (requestedService
