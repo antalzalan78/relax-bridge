@@ -1,6 +1,14 @@
 import type { APIRoute } from 'astro';
 import { z } from 'zod';
-import { findBookingOption } from '../../lib/booking/catalog';
+import {
+  findBookingOption,
+  getHomeServiceBookingOptions,
+} from '../../lib/booking/catalog';
+import {
+  calculateHomeServiceSelection,
+  calculateHomeServicePrice,
+  homeServiceTravelFeeEur,
+} from '../../lib/booking/home-service';
 import { calculateCreatorSelection } from '../../lib/booking/massage-creator';
 import {
   consumeRateLimit,
@@ -34,6 +42,16 @@ const bookingSchema = z
     creatorBack: z.union([z.literal(0), z.literal(30)]).optional(),
     creatorFace: z.union([z.literal(0), z.literal(15), z.literal(30)]).optional(),
     creatorFoot: z.union([z.literal(0), z.literal(15), z.literal(30)]).optional(),
+    homeTreatments: z
+      .array(
+        z.object({
+          key: z.enum(['relax', 'neck-shoulder-back']),
+          minutes: z.union([z.literal(60), z.literal(90)]),
+        }),
+      )
+      .min(1)
+      .max(3)
+      .optional(),
     notes: z.string().trim().max(1000).optional(),
     website: z.string().max(0).optional(),
     consent: z.literal(true),
@@ -44,6 +62,28 @@ const bookingSchema = z
         code: 'custom',
         path: ['homeAddress'],
         message: 'Address is required for home appointments.',
+      });
+    }
+    if (value.category === 'home') {
+      const home = value.homeTreatments
+        ? calculateHomeServiceSelection(value.homeTreatments)
+        : null;
+      if (
+        !home ||
+        value.minutes !== home.treatmentMinutes ||
+        value.key !== value.homeTreatments?.[0]?.key
+      ) {
+        context.addIssue({
+          code: 'custom',
+          path: ['homeTreatments'],
+          message: 'Invalid Home Service configuration.',
+        });
+      }
+    } else if (value.homeTreatments) {
+      context.addIssue({
+        code: 'custom',
+        path: ['homeTreatments'],
+        message: 'Home Service treatments are only valid for home appointments.',
       });
     }
     if (value.creatorBase) {
@@ -105,8 +145,93 @@ const creatorLabels = {
   },
 } as const;
 
-function bookingNotes(input: z.infer<typeof bookingSchema>): string | undefined {
-  if (input.category !== 'studio') return input.notes;
+const homeLabels = {
+  nl: {
+    title: 'Home Service',
+    person: 'Persoon',
+    massageTime: 'Totale massagetijd',
+    preparation: 'Voorbereidingstijd',
+    reserved: 'Gereserveerde tijd',
+    travel: 'Eenmalige voorrijkosten',
+    total: 'Totaalprijs',
+  },
+  en: {
+    title: 'Home Service',
+    person: 'Person',
+    massageTime: 'Total massage time',
+    preparation: 'Preparation time',
+    reserved: 'Reserved time',
+    travel: 'One-time travel fee',
+    total: 'Total price',
+  },
+  hu: {
+    title: 'Home Service',
+    person: 'Személy',
+    massageTime: 'Teljes masszázsidő',
+    preparation: 'Előkészítési idő',
+    reserved: 'Lefoglalt idő',
+    travel: 'Egyszeri kiszállási díj',
+    total: 'Végösszeg',
+  },
+} as const;
+
+async function buildHomeBooking(input: z.infer<typeof bookingSchema>) {
+  if (input.category !== 'home' || !input.homeTreatments) return null;
+  const calculation = calculateHomeServiceSelection(input.homeTreatments);
+  if (!calculation) return null;
+
+  const catalog = await getHomeServiceBookingOptions(input.locale);
+  const treatments = input.homeTreatments.map((selection) =>
+    catalog.find(
+      (option) =>
+        option.category === 'home' &&
+        option.key === selection.key &&
+        option.minutes === selection.minutes,
+    ),
+  );
+  if (treatments.some((treatment) => !treatment)) return null;
+
+  const selected = treatments.filter((treatment) => treatment !== undefined);
+  const priceEur = calculateHomeServicePrice(
+    selected.map((treatment) => treatment.priceEur),
+  );
+  if (priceEur === null) return null;
+  const labels = homeLabels[input.locale];
+  const treatmentSummary = selected
+    .map(
+      (treatment, index) =>
+        `${labels.person} ${index + 1}: ${treatment.title} (${treatment.minutes} min, € ${treatment.priceEur})`,
+    )
+    .join(' · ');
+
+  return {
+    option: {
+      id: `home:custom:${selected.map((treatment) => `${treatment.key}:${treatment.minutes}`).join(':')}`,
+      key: selected[0].key,
+      category: 'home' as const,
+      title: `${labels.title} · ${selected.map((treatment) => `${treatment.title} ${treatment.minutes} min`).join(' + ')}`,
+      minutes: calculation.treatmentMinutes,
+      reservedMinutes: calculation.reservedMinutes,
+      priceEur,
+    },
+    note: [
+      treatmentSummary,
+      `${labels.massageTime}: ${calculation.treatmentMinutes} min`,
+      `${labels.preparation}: ${calculation.preparationMinutes} min`,
+      `${labels.reserved}: ${calculation.reservedMinutes} min`,
+      `${labels.travel}: € ${homeServiceTravelFeeEur}`,
+      `${labels.total}: € ${priceEur}`,
+    ].join('\n'),
+  };
+}
+
+function bookingNotes(
+  input: z.infer<typeof bookingSchema>,
+  homeNote?: string,
+): string | undefined {
+  if (input.category === 'home') {
+    return [homeNote, input.notes].filter(Boolean).join('\n') || undefined;
+  }
 
   const labels = creatorLabels[input.locale];
   const customTreatment = input.creatorBase
@@ -163,6 +288,9 @@ export const POST: APIRoute = async ({ request }) => {
           foot: parsed.data.creatorFoot,
         })
       : null;
+    const homeBooking = parsed.data.category === 'home'
+      ? await buildHomeBooking(parsed.data)
+      : null;
     const option = creator
       ? {
           id: `studio:creator:${creator.base}:${creator.back}:${creator.face}:${creator.foot}`,
@@ -172,7 +300,9 @@ export const POST: APIRoute = async ({ request }) => {
           minutes: creator.minutes,
           priceEur: creator.priceEur,
         }
-      : await findBookingOption(parsed.data);
+      : parsed.data.category === 'home'
+        ? homeBooking?.option
+        : await findBookingOption(parsed.data);
     if (!option) {
       return Response.json({ error: 'invalid_service' }, { status: 400 });
     }
@@ -185,7 +315,7 @@ export const POST: APIRoute = async ({ request }) => {
       customerEmail: parsed.data.customerEmail,
       customerPhone: parsed.data.customerPhone,
       homeAddress: parsed.data.homeAddress,
-      notes: bookingNotes(parsed.data),
+      notes: bookingNotes(parsed.data, homeBooking?.note),
     });
 
     try {
