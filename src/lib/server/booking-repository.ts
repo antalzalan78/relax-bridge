@@ -365,7 +365,7 @@ export async function createConfirmedBooking(
         query: transaction,
         date: localDate,
         category: input.option.category,
-        durationMinutes: input.option.minutes,
+        durationMinutes: input.option.reservedMinutes ?? input.option.minutes,
         settings,
       });
       const selected = slots.find(

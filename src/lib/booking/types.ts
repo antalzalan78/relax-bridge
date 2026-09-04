@@ -36,5 +36,7 @@ export interface BookingOption {
   category: BookingCategory;
   title: string;
   minutes: number;
+  /** Total time blocked in the calendar when it differs from massage time. */
+  reservedMinutes?: number;
   priceEur: number;
 }
