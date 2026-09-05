@@ -113,6 +113,9 @@ const creatorLabels = {
     total: 'Totaal',
     relax: '60 min Relaxmassage',
     back: '60 min Nek-, schouder- en rugmassage',
+    backAddon: 'Gerichte rug-, nek- en schouderbehandeling',
+    faceAddon: 'Gezichts- en hoofdmassage',
+    footAddon: 'Voetmassage',
     none: 'geen',
     scentOptions: { orange: 'Sinaasappel', rose: 'Roos', lavender: 'Lavendel', any: 'Maakt niet uit', none: 'Geen geur' },
     musicOptions: { instrumental: 'Instrumentaal', nature: 'Natuurgeluiden', any: 'Maakt niet uit', none: 'Geen muziek' },
@@ -126,6 +129,9 @@ const creatorLabels = {
     total: 'Total',
     relax: '60 min Relax Massage',
     back: '60 min Neck, Shoulder & Back Massage',
+    backAddon: 'Back, Neck & Shoulder focus',
+    faceAddon: 'Face & Head Massage',
+    footAddon: 'Foot Massage',
     none: 'none',
     scentOptions: { orange: 'Orange', rose: 'Rose', lavender: 'Lavender', any: 'No preference', none: 'No scent' },
     musicOptions: { instrumental: 'Instrumental', nature: 'Sounds of nature', any: 'No preference', none: 'No music' },
@@ -139,6 +145,9 @@ const creatorLabels = {
     total: 'Összesen',
     relax: '60 perc Relaxmasszázs',
     back: '60 perc Nyak–váll–hátmasszázs',
+    backAddon: 'Célzott hát-, nyak- és vállkezelés',
+    faceAddon: 'Arc- és fejmasszázs',
+    footAddon: 'Talpmasszázs',
     none: 'nincs',
     scentOptions: { orange: 'Narancs', rose: 'Rózsa', lavender: 'Levendula', any: 'Mindegy', none: 'Nem kérek' },
     musicOptions: { instrumental: 'Instrumentális', nature: 'Természet hangjai', any: 'Mindegy', none: 'Nem kérek' },
@@ -245,9 +254,9 @@ function bookingNotes(
   const treatmentNote = customTreatment
     ? (() => {
         const addons = [
-          customTreatment.back ? `Back, Neck & Shoulder focus (${customTreatment.back} min)` : null,
-          customTreatment.face ? `Face & Head Massage (${customTreatment.face} min)` : null,
-          customTreatment.foot ? `Foot Massage (${customTreatment.foot} min)` : null,
+          customTreatment.back ? `${labels.backAddon} (${customTreatment.back} min)` : null,
+          customTreatment.face ? `${labels.faceAddon} (${customTreatment.face} min)` : null,
+          customTreatment.foot ? `${labels.footAddon} (${customTreatment.foot} min)` : null,
         ].filter(Boolean);
         const base = customTreatment.base === 'relax' ? labels.relax : labels.back;
         return `Massage Creator — ${labels.base}: ${base} · ${labels.addons}: ${addons.length ? addons.join(', ') : labels.none} · ${labels.total}: ${customTreatment.minutes} min, € ${customTreatment.priceEur}`;
