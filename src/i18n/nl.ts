@@ -15,7 +15,7 @@ export default {
 
   nav: {
     home: 'Home',
-    services: 'Services',
+    services: 'Behandelingen',
     studio: 'Studio Visit',
     homeService: 'Home service',
     prices: 'Prijzen',
