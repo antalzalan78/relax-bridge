@@ -117,8 +117,8 @@ const creatorLabels = {
     faceAddon: 'Gezichts- en hoofdmassage',
     footAddon: 'Voetmassage',
     none: 'geen',
-    scentOptions: { orange: 'Sinaasappel', rose: 'Roos', lavender: 'Lavendel', any: 'Maakt niet uit', none: 'Geen geur' },
-    musicOptions: { instrumental: 'Instrumentaal', nature: 'Natuurgeluiden', any: 'Maakt niet uit', none: 'Geen muziek' },
+    scentOptions: { orange: 'Sinaasappel', rose: 'Roos', lavender: 'Lavendel', any: 'Ik laat het aan jou over', none: 'Geen geur' },
+    musicOptions: { instrumental: 'Instrumentaal', nature: 'Natuurgeluiden', any: 'Ik laat het aan jou over', none: 'Geen muziek' },
   },
   en: {
     scent: 'Scent for oil and room',
@@ -133,8 +133,8 @@ const creatorLabels = {
     faceAddon: 'Face & Head Massage',
     footAddon: 'Foot Massage',
     none: 'none',
-    scentOptions: { orange: 'Orange', rose: 'Rose', lavender: 'Lavender', any: 'No preference', none: 'No scent' },
-    musicOptions: { instrumental: 'Instrumental', nature: 'Sounds of nature', any: 'No preference', none: 'No music' },
+    scentOptions: { orange: 'Orange', rose: 'Rose', lavender: 'Lavender', any: 'I’ll leave it to you', none: 'No scent' },
+    musicOptions: { instrumental: 'Instrumental', nature: 'Sounds of nature', any: 'I’ll leave it to you', none: 'No music' },
   },
   hu: {
     scent: 'Illat az olajhoz és a szobához',
@@ -149,8 +149,8 @@ const creatorLabels = {
     faceAddon: 'Arc- és fejmasszázs',
     footAddon: 'Talpmasszázs',
     none: 'nincs',
-    scentOptions: { orange: 'Narancs', rose: 'Rózsa', lavender: 'Levendula', any: 'Mindegy', none: 'Nem kérek' },
-    musicOptions: { instrumental: 'Instrumentális', nature: 'Természet hangjai', any: 'Mindegy', none: 'Nem kérek' },
+    scentOptions: { orange: 'Narancs', rose: 'Rózsa', lavender: 'Levendula', any: 'Rád bízom', none: 'Nem kérek' },
+    musicOptions: { instrumental: 'Instrumentális', nature: 'Természet hangjai', any: 'Rád bízom', none: 'Nem kérek' },
   },
 } as const;
 
