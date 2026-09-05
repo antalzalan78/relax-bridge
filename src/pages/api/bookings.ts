@@ -279,6 +279,9 @@ export const POST: APIRoute = async ({ request }) => {
     if (!parsed.success) {
       return Response.json({ error: 'invalid_request' }, { status: 400 });
     }
+    const bookingInput = parsed.data.creatorBioVegan
+      ? { ...parsed.data, creatorScent: 'none' as const }
+      : parsed.data;
 
     const allowed = await consumeRateLimit({
       key: requestFingerprint(request, 'public-booking'),
@@ -324,7 +327,7 @@ export const POST: APIRoute = async ({ request }) => {
       customerEmail: parsed.data.customerEmail,
       customerPhone: parsed.data.customerPhone,
       homeAddress: parsed.data.homeAddress,
-      notes: bookingNotes(parsed.data, homeBooking?.note),
+      notes: bookingNotes(bookingInput, homeBooking?.note),
     });
 
     try {
