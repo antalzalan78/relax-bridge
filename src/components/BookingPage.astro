@@ -377,6 +377,7 @@ const homeConfig = {
     );
     const scentSelect = form.querySelector<HTMLSelectElement>('#creator-scent')!;
     const musicSelect = form.querySelector<HTMLSelectElement>('#creator-music')!;
+    const bioVeganCheckbox = form.querySelector<HTMLInputElement>('input[name="creatorBioVegan"]')!;
     const submit = form.querySelector<HTMLButtonElement>('#submit-booking')!;
     const formError = form.querySelector<HTMLElement>('#form-error')!;
     const confirmation = document.querySelector<HTMLElement>('#booking-confirmation')!;
@@ -390,6 +391,13 @@ const homeConfig = {
     };
     applyRequestedPreference(scentSelect, searchParams.get('scent'));
     applyRequestedPreference(musicSelect, searchParams.get('music'));
+
+    const syncBioVeganScent = () => {
+      if (bioVeganCheckbox.checked) scentSelect.value = 'none';
+      scentSelect.disabled = bioVeganCheckbox.checked;
+    };
+    bioVeganCheckbox.addEventListener('change', syncBioVeganScent);
+    syncBioVeganScent();
 
     const dateInAmsterdam = (value = new Date()) =>
       new Intl.DateTimeFormat('en-CA', {
@@ -616,6 +624,7 @@ const homeConfig = {
       formError.hidden = true;
 
       const data = new FormData(form);
+      const creatorBioVegan = data.get('creatorBioVegan') === 'on';
       const payload = {
         locale,
         key: option.key,
@@ -626,9 +635,9 @@ const homeConfig = {
         customerEmail: data.get('customerEmail'),
         customerPhone: data.get('customerPhone'),
         homeAddress: data.get('homeAddress') || undefined,
-        creatorScent: data.get('creatorScent') || undefined,
+        creatorScent: creatorBioVegan ? 'none' : data.get('creatorScent') || undefined,
         creatorMusic: data.get('creatorMusic') || undefined,
-        creatorBioVegan: data.get('creatorBioVegan') === 'on',
+        creatorBioVegan,
         creatorBase: option.creatorBase || undefined,
         creatorBack: option.creatorBack ?? undefined,
         creatorFace: option.creatorFace ?? undefined,
@@ -671,6 +680,7 @@ const homeConfig = {
 
     another.addEventListener('click', () => {
       form.reset();
+      syncBioVeganScent();
       if (requestedCategory === 'home') service.value = 'home:custom';
       date.value = today;
       start.value = '';
@@ -854,6 +864,7 @@ const homeConfig = {
   input:focus,
   select:focus,
   textarea:focus { outline: 2px solid var(--logo-green); outline-offset: 2px; }
+  select:disabled { cursor: not-allowed; opacity: 0.62; }
   textarea { resize: vertical; }
   .slot-fieldset { min-width: 0; margin: 0; padding: 1.5rem 0 0; border: 0; border-top: 1px solid var(--border); }
   .slot-status { margin: 0; color: var(--ink-soft); }
