@@ -22,6 +22,8 @@ const allOptions = await getBookingOptions(locale);
 const options = allOptions.filter((option) => option.category === 'studio');
 const homeOptions = await getHomeServiceBookingOptions(locale);
 const path = bookingPath(locale);
+const studioBookingHref = `${path}?category=studio`;
+const homeBookingHref = `${path}?category=home`;
 const privacyHref = privacyPath(locale);
 const alternates = {
   nl: bookingPath('nl'),
@@ -46,6 +48,40 @@ const homeConfig = {
   path={path}
   alternates={alternates}
 >
+  <section class="booking-choice" id="booking-choice">
+    <div class="wrap booking-choice__inner">
+      <a class="back-link" href={pathFor(locale)}>
+        <span aria-hidden="true">&larr;</span> Relax Bridge
+      </a>
+      <span class="eyebrow">{copy.choiceEyebrow}</span>
+      <h1>{copy.choiceTitle}</h1>
+      <p class="lead">{copy.choiceIntro}</p>
+
+      <div class="booking-choice__grid">
+        <a class="booking-choice-card booking-choice-card--studio" href={studioBookingHref}>
+          <span class="booking-choice-card__number" aria-hidden="true">01</span>
+          <span class="eyebrow">Relax Bridge</span>
+          <h2>Studio Visit</h2>
+          <p>{copy.choiceStudioBody}</p>
+          <span class="booking-choice-card__cta">
+            {copy.choiceStudioCta}<span aria-hidden="true">&rarr;</span>
+          </span>
+        </a>
+
+        <a class="booking-choice-card booking-choice-card--home" href={homeBookingHref}>
+          <span class="booking-choice-card__number" aria-hidden="true">02</span>
+          <span class="eyebrow">Relax Bridge</span>
+          <h2>Home Service</h2>
+          <p>{copy.choiceHomeBody}</p>
+          <span class="booking-choice-card__cta">
+            {copy.choiceHomeCta}<span aria-hidden="true">&rarr;</span>
+          </span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <div id="booking-flow" hidden>
   <section class="booking-hero">
     <div class="wrap booking-hero__inner">
       <a class="back-link" href={pathFor(locale)}>
@@ -227,9 +263,22 @@ const homeConfig = {
       <button class="btn btn--ghost" id="another-booking" type="button">{copy.another}</button>
     </div>
   </section>
+  </div>
 </Base>
 
 <script>
+  const bookingChoice = document.querySelector<HTMLElement>('#booking-choice');
+  const bookingFlow = document.querySelector<HTMLElement>('#booking-flow');
+  const bookingParams = new URLSearchParams(window.location.search);
+  const opensBookingFlow =
+    bookingParams.has('category') ||
+    bookingParams.has('service') ||
+    bookingParams.get('creator') === '1';
+  if (bookingChoice && bookingFlow && opensBookingFlow) {
+    bookingChoice.hidden = true;
+    bookingFlow.hidden = false;
+  }
+
   const form = document.querySelector<HTMLFormElement>('#booking-form');
 
   if (form) {
@@ -637,6 +686,81 @@ const homeConfig = {
 </script>
 
 <style>
+  .booking-choice {
+    padding-block: clamp(3rem, 7vw, 6rem);
+  }
+
+  .booking-choice__inner > .back-link { margin-bottom: clamp(2rem, 4vw, 3rem); }
+  .booking-choice__inner > h1 { max-width: 54rem; }
+  .booking-choice__inner > .lead { max-width: 46rem; }
+
+  .booking-choice__grid {
+    display: grid;
+    gap: clamp(1rem, 3vw, 1.6rem);
+    margin-top: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  @media (min-width: 48rem) {
+    .booking-choice__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  .booking-choice-card {
+    position: relative;
+    display: flex;
+    min-height: clamp(20rem, 36vw, 27rem);
+    flex-direction: column;
+    align-items: flex-start;
+    overflow: hidden;
+    padding: clamp(1.6rem, 4vw, 3rem);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--shadow-soft);
+    color: var(--ink);
+    text-decoration: none;
+    transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+  }
+
+  .booking-choice-card::before {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 0.55rem;
+    background: var(--clay);
+    content: '';
+  }
+
+  .booking-choice-card--studio::before { background: #9d86a8; }
+  .booking-choice-card--home::before { background: #d99163; }
+  .booking-choice-card:hover,
+  .booking-choice-card:focus-visible {
+    border-color: color-mix(in srgb, var(--clay) 55%, var(--border));
+    box-shadow: 0 1.4rem 3.5rem rgb(56 43 31 / 0.13);
+    transform: translateY(-0.35rem);
+  }
+  .booking-choice-card:focus-visible { outline: 2px solid var(--logo-green); outline-offset: 3px; }
+  .booking-choice-card h2 { margin-top: 1rem; font-size: clamp(2.6rem, 6vw, 4.7rem); }
+  .booking-choice-card p { max-width: 35rem; color: var(--ink-soft); font-size: clamp(1rem, 1.8vw, 1.15rem); }
+  .booking-choice-card__number {
+    position: absolute;
+    top: 1.2rem;
+    right: 1.5rem;
+    color: var(--clay);
+    font-family: 'Iowan Old Style', Georgia, serif;
+    font-size: clamp(3.6rem, 8vw, 6rem);
+    opacity: 0.15;
+  }
+  .booking-choice-card__cta {
+    display: inline-flex;
+    gap: 0.75rem;
+    align-items: center;
+    margin-top: auto;
+    padding: 0.85rem 1.15rem;
+    border-radius: 999px;
+    background: var(--clay);
+    color: #fff;
+    font-weight: 700;
+  }
+
   .booking-hero {
     position: relative;
     overflow: hidden;
