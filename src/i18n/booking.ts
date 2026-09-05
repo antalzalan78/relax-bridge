@@ -3,7 +3,7 @@ import type { Locale } from '../data/site';
 const booking = {
   nl: {
     choiceEyebrow: 'Online reserveren',
-    choiceTitle: 'Waar wil je genieten van je massage?',
+    choiceTitle: 'Waar wil je je massage ontvangen?',
     choiceIntro: 'Kies de omgeving die het beste bij je past. Daarna ga je direct verder naar de juiste reservering.',
     choiceStudioBody: 'Kom helemaal tot rust in mijn rustige studio in Tilburg. Kies een vaste behandeling of stel je eigen massage samen met de Massage Creator.',
     choiceStudioCta: 'Kies Studio Visit',
@@ -83,7 +83,7 @@ const booking = {
   },
   en: {
     choiceEyebrow: 'Book online',
-    choiceTitle: 'Where would you like to enjoy your massage?',
+    choiceTitle: 'Where would you like your massage?',
     choiceIntro: 'Choose the setting that suits you best. You will then continue directly to the right booking flow.',
     choiceStudioBody: 'Unwind completely in my quiet studio in Tilburg. Choose a ready-made treatment or create your own massage with the Massage Creator.',
     choiceStudioCta: 'Choose Studio Visit',
@@ -163,7 +163,7 @@ const booking = {
   },
   hu: {
     choiceEyebrow: 'Online foglalás',
-    choiceTitle: 'Hol szeretnéd élvezni a masszázst?',
+    choiceTitle: 'Hol szeretnéd a masszázst?',
     choiceIntro: 'Válaszd ki a számodra megfelelő helyszínt, és innen közvetlenül a hozzá tartozó foglaláshoz jutsz.',
     choiceStudioBody: 'Kapcsolódj ki teljesen a nyugodt tilburgi stúdiómban. Válassz kész kezelést, vagy állítsd össze a sajátodat a Massage Creator segítségével.',
     choiceStudioCta: 'Studio Visit kiválasztása',
