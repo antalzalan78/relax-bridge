@@ -37,7 +37,6 @@ const bookingSchema = z
     homeAddress: z.string().trim().max(300).optional(),
     creatorScent: z.enum(['orange', 'rose', 'lavender', 'any', 'none']).optional(),
     creatorMusic: z.enum(['instrumental', 'nature', 'lofi', 'own', 'any', 'none']).optional(),
-    creatorBioVegan: z.boolean().optional(),
     creatorBase: z.enum(['relax', 'back']).optional(),
     creatorBack: z.union([z.literal(0), z.literal(30)]).optional(),
     creatorFace: z.union([z.literal(0), z.literal(15), z.literal(30)]).optional(),
@@ -107,7 +106,6 @@ const creatorLabels = {
   nl: {
     scent: 'Geur voor olie en ruimte',
     music: 'Muziek',
-    bioVegan: 'Bio & vegan: ja',
     base: 'Basis',
     addons: 'Aanvullingen',
     total: 'Totaal',
@@ -123,7 +121,6 @@ const creatorLabels = {
   en: {
     scent: 'Scent for oil and room',
     music: 'Music',
-    bioVegan: 'Bio & vegan: yes',
     base: 'Base',
     addons: 'Add-ons',
     total: 'Total',
@@ -139,7 +136,6 @@ const creatorLabels = {
   hu: {
     scent: 'Illat az olajhoz és a szobához',
     music: 'Zene',
-    bioVegan: 'Bio & vegan: igen',
     base: 'Alapkezelés',
     addons: 'Kiegészítők',
     total: 'Összesen',
@@ -265,7 +261,6 @@ function bookingNotes(
   const choices = [
     input.creatorScent ? `${labels.scent}: ${labels.scentOptions[input.creatorScent]}` : null,
     input.creatorMusic ? `${labels.music}: ${labels.musicOptions[input.creatorMusic]}` : null,
-    input.creatorBioVegan ? labels.bioVegan : null,
   ].filter(Boolean);
 
   const preferencesNote = choices.length ? `Studio Visit — ${choices.join(' · ')}` : undefined;
@@ -279,9 +274,6 @@ export const POST: APIRoute = async ({ request }) => {
     if (!parsed.success) {
       return Response.json({ error: 'invalid_request' }, { status: 400 });
     }
-    const bookingInput = parsed.data.creatorBioVegan
-      ? { ...parsed.data, creatorScent: 'none' as const }
-      : parsed.data;
 
     const allowed = await consumeRateLimit({
       key: requestFingerprint(request, 'public-booking'),
@@ -327,7 +319,7 @@ export const POST: APIRoute = async ({ request }) => {
       customerEmail: parsed.data.customerEmail,
       customerPhone: parsed.data.customerPhone,
       homeAddress: parsed.data.homeAddress,
-      notes: bookingNotes(bookingInput, homeBooking?.note),
+      notes: bookingNotes(parsed.data, homeBooking?.note),
     });
 
     try {

@@ -197,10 +197,6 @@ const homeConfig = {
               </select>
             </div>
           </div>
-          <label class="creator-check">
-            <input name="creatorBioVegan" type="checkbox" />
-            <span>{copy.creatorBioVegan}</span>
-          </label>
         </fieldset>
       </div>
 
@@ -377,7 +373,6 @@ const homeConfig = {
     );
     const scentSelect = form.querySelector<HTMLSelectElement>('#creator-scent')!;
     const musicSelect = form.querySelector<HTMLSelectElement>('#creator-music')!;
-    const bioVeganCheckbox = form.querySelector<HTMLInputElement>('input[name="creatorBioVegan"]')!;
     const submit = form.querySelector<HTMLButtonElement>('#submit-booking')!;
     const formError = form.querySelector<HTMLElement>('#form-error')!;
     const confirmation = document.querySelector<HTMLElement>('#booking-confirmation')!;
@@ -391,13 +386,6 @@ const homeConfig = {
     };
     applyRequestedPreference(scentSelect, searchParams.get('scent'));
     applyRequestedPreference(musicSelect, searchParams.get('music'));
-
-    const syncBioVeganScent = () => {
-      if (bioVeganCheckbox.checked) scentSelect.value = 'none';
-      scentSelect.disabled = bioVeganCheckbox.checked;
-    };
-    bioVeganCheckbox.addEventListener('change', syncBioVeganScent);
-    syncBioVeganScent();
 
     const dateInAmsterdam = (value = new Date()) =>
       new Intl.DateTimeFormat('en-CA', {
@@ -654,7 +642,6 @@ const homeConfig = {
       formError.hidden = true;
 
       const data = new FormData(form);
-      const creatorBioVegan = data.get('creatorBioVegan') === 'on';
       const payload = {
         locale,
         key: option.key,
@@ -665,9 +652,8 @@ const homeConfig = {
         customerEmail: data.get('customerEmail'),
         customerPhone: data.get('customerPhone'),
         homeAddress: data.get('homeAddress') || undefined,
-        creatorScent: creatorBioVegan ? 'none' : data.get('creatorScent') || undefined,
+        creatorScent: data.get('creatorScent') || undefined,
         creatorMusic: data.get('creatorMusic') || undefined,
-        creatorBioVegan,
         creatorBase: option.creatorBase || undefined,
         creatorBack: option.creatorBack ?? undefined,
         creatorFace: option.creatorFace ?? undefined,
@@ -710,7 +696,6 @@ const homeConfig = {
 
     another.addEventListener('click', () => {
       form.reset();
-      syncBioVeganScent();
       if (requestedCategory === 'home') service.value = 'home:custom';
       date.value = today;
       start.value = '';
@@ -933,8 +918,6 @@ const homeConfig = {
   .creator-fieldset > p { margin: 0 0 1rem; color: var(--ink-soft); }
   .creator-grid { display: grid; gap: 1rem; }
   @media (min-width: 45rem) { .creator-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  .creator-check { display: flex; gap: 0.65rem; align-items: center; margin: 1rem 0 0; color: var(--ink); font-size: 0.9rem; font-weight: 600; letter-spacing: 0; text-transform: none; }
-  .creator-check input { width: 1.1rem; min-height: 1.1rem; }
   .home-builder-fieldset {
     grid-column: 1 / -1;
     margin: 0;
