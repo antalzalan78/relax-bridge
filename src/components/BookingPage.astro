@@ -496,15 +496,37 @@ const homeConfig = {
       }
 
       const preparation = option.preparationMinutes
-        ? `<span><small>${copy.homePreparationTime}</small><strong>${option.preparationMinutes} min</strong></span>`
+        ? `<div><dt>${copy.homePreparationTime}</dt><dd>${option.preparationMinutes} min</dd></div>`
         : '';
+      const treatmentRows = active
+        .map((select, index) => {
+          const treatment = homeOptions.find((item: any) => item.id === select.value);
+          return `
+            <li>
+              <span>
+                <small>${copy.homeGuest.replace('{number}', String(index + 1))}</small>
+                <strong>${treatment.title}</strong>
+              </span>
+              <span class="home-summary-treatment-meta">
+                <span>${treatment.minutes} min</span>
+                <strong>€ ${treatment.priceEur}</strong>
+              </span>
+            </li>
+          `;
+        })
+        .join('');
       homeSummary.innerHTML = `
-        <span><small>${copy.homeMassageTime}</small><strong>${option.minutes} min</strong></span>
-        ${preparation}
-        <span><small>${copy.homeReservedTime}</small><strong>${option.reservedMinutes} min</strong></span>
-        <span><small>${copy.homeTreatmentSubtotal}</small><strong>€ ${option.treatmentPriceEur}</strong></span>
-        <span><small>${copy.homeTravelFee}</small><strong>€ ${homeConfig.travelFeeEur}</strong></span>
-        <span><small>${copy.homeTotalPrice}</small><strong>€ ${option.priceEur}</strong></span>
+        <h3>${copy.homeSummaryTitle}</h3>
+        <ol class="home-summary-treatments">${treatmentRows}</ol>
+        <dl class="home-summary-totals">
+          <div><dt>${copy.homeMassageTime}</dt><dd>${option.minutes} min</dd></div>
+          ${preparation}
+          <div><dt>${copy.homeReservedTime}</dt><dd>${option.reservedMinutes} min</dd></div>
+          <div><dt>${copy.homeTreatmentSubtotal}</dt><dd>€ ${option.treatmentPriceEur}</dd></div>
+          <div><dt>${copy.homeTravelFee}</dt><dd>€ ${homeConfig.travelFeeEur}</dd></div>
+          <div class="home-summary-total"><dt>${copy.homeTotalPrice}</dt><dd>€ ${option.priceEur}</dd></div>
+        </dl>
+        ${option.preparationMinutes ? `<p class="home-summary-note">${copy.homePreparationNote}</p>` : ''}
       `;
     };
 
@@ -560,8 +582,16 @@ const homeConfig = {
             button.setAttribute('aria-pressed', 'true');
             start.value = slot.start;
             const optionName = option.category === 'home' ? copy.home : option.title;
+            const homeTreatments = option.category === 'home'
+              ? option.homeTreatments.map((selection: any, index: number) => {
+                  const treatment = homeOptions.find(
+                    (item: any) => item.key === selection.key && item.minutes === selection.minutes,
+                  );
+                  return `${copy.homeGuest.replace('{number}', String(index + 1))}: ${treatment.title} · ${treatment.minutes} min · € ${treatment.priceEur}`;
+                }).join(' · ')
+              : '';
             const homeDetails = option.category === 'home'
-              ? `${copy.homeMassageTime}: ${option.minutes} min · ${copy.homeReservedTime}: ${option.reservedMinutes} min · ${copy.homeTotalPrice}: € ${option.priceEur}`
+              ? `${homeTreatments} · ${copy.homeMassageTime}: ${option.minutes} min · ${copy.homeReservedTime}: ${option.reservedMinutes} min · ${copy.homeTotalPrice}: € ${option.priceEur}`
               : `${optionName} · ${option.minutes} min · € ${option.priceEur}`;
             summary.innerHTML = `<span>${copy.selected}</span><strong>${readableDate()} · ${slot.label}</strong><small>${homeDetails}</small>`;
             const home = option.category === 'home';
@@ -932,18 +962,64 @@ const homeConfig = {
     font-size: 1.15rem;
   }
   .home-builder-summary {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.8rem 1.4rem;
     margin-top: 1.25rem;
-    padding: 1rem;
+    padding: clamp(1rem, 3vw, 1.5rem);
     border-radius: var(--radius-sm);
     background: var(--pine-soft);
     color: var(--ink-soft);
   }
-  :global(.home-builder-summary span) { display: grid; gap: 0.15rem; }
-  :global(.home-builder-summary small) { color: var(--ink-soft); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
-  :global(.home-builder-summary strong) { color: var(--pine-dark); font-size: 1rem; }
+  :global(.home-builder-summary h3) {
+    margin: 0 0 1rem;
+    color: var(--pine-dark);
+    font-size: clamp(1.45rem, 3vw, 2rem);
+  }
+  :global(.home-summary-treatments) { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+  :global(.home-summary-treatments li) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1rem;
+    align-items: center;
+    padding: 0.85rem 0;
+    border-top: 1px solid color-mix(in srgb, var(--logo-green) 18%, var(--border));
+  }
+  :global(.home-summary-treatments li > span:first-child) { display: grid; gap: 0.2rem; }
+  :global(.home-summary-treatments small) {
+    color: var(--ink-soft);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  :global(.home-summary-treatments strong) { color: var(--pine-dark); }
+  :global(.home-summary-treatment-meta) {
+    display: flex;
+    gap: 1rem;
+    align-items: baseline;
+    white-space: nowrap;
+  }
+  :global(.home-summary-totals) {
+    display: grid;
+    gap: 0.6rem;
+    margin: 1rem 0 0;
+    padding: 1rem 0 0;
+    border-top: 1px solid color-mix(in srgb, var(--logo-green) 30%, var(--border));
+  }
+  :global(.home-summary-totals > div) { display: flex; gap: 1rem; justify-content: space-between; }
+  :global(.home-summary-totals dt) { color: var(--ink-soft); }
+  :global(.home-summary-totals dd) { margin: 0; color: var(--pine-dark); font-weight: 700; white-space: nowrap; }
+  :global(.home-summary-total) {
+    margin-top: 0.3rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid color-mix(in srgb, var(--logo-green) 30%, var(--border));
+    font-size: 1.08rem;
+  }
+  :global(.home-summary-total dt),
+  :global(.home-summary-total dd) { color: var(--pine-dark); font-weight: 800; }
+  :global(.home-summary-note) { margin: 1rem 0 0; font-size: 0.82rem; line-height: 1.55; }
+  @media (max-width: 32rem) {
+    :global(.home-summary-treatments li) { align-items: start; }
+    :global(.home-summary-treatment-meta) { display: grid; gap: 0.15rem; text-align: right; }
+  }
   .consent { display: flex; gap: 0.65rem; align-items: flex-start; margin-top: 1.25rem; color: var(--ink); font-size: 0.9rem; font-weight: 500; letter-spacing: 0; text-transform: none; }
   .consent input { width: 1.1rem; min-height: 1.1rem; margin-top: 0.25rem; }
   .privacy-note { margin: 0 0 1rem 1.75rem; color: var(--ink-soft); font-size: 0.8rem; }
