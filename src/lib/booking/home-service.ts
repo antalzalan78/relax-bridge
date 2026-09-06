@@ -5,6 +5,8 @@ export const homeServiceMinimumMinutes = 60;
 export const homeServiceMaximumMinutes = 180;
 export const homeServicePreparationMinutes = 15;
 export const homeServiceTravelFeeEur = 15;
+/** Minimum calendar buffer both before and after a Home Service booking. */
+export const homeServiceTravelBufferMinutes = 60;
 
 export type HomeServiceTreatment = Pick<
   BookingOption,

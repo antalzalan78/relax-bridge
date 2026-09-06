@@ -5,6 +5,7 @@ import {
   localDayInstantRange,
   localTimeWindowInstantRange,
 } from '../booking/availability';
+import { homeServiceTravelBufferMinutes } from '../booking/home-service';
 import type {
   AvailableSlot,
   BookingCategory,
@@ -70,8 +71,14 @@ export async function getBookingSettings(
     bookingHorizonDays: numberValue(row.booking_horizon_days),
     studioBufferBeforeMinutes: numberValue(row.studio_buffer_before_minutes),
     studioBufferAfterMinutes: numberValue(row.studio_buffer_after_minutes),
-    homeBufferBeforeMinutes: numberValue(row.home_buffer_before_minutes),
-    homeBufferAfterMinutes: numberValue(row.home_buffer_after_minutes),
+    homeBufferBeforeMinutes: Math.max(
+      numberValue(row.home_buffer_before_minutes),
+      homeServiceTravelBufferMinutes,
+    ),
+    homeBufferAfterMinutes: Math.max(
+      numberValue(row.home_buffer_after_minutes),
+      homeServiceTravelBufferMinutes,
+    ),
   };
 }
 
