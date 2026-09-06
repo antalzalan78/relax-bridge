@@ -78,10 +78,6 @@ export default {
             title: 'Music',
             body: 'Choose music that suits your mood, listen to your own music or enjoy the massage in complete silence.',
           },
-          {
-            title: 'Bio & vegan',
-            body: 'The treatment is also available with organic and vegan massage oil.',
-          },
         ],
       },
     },

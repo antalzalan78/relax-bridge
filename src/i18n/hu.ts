@@ -78,10 +78,6 @@ export default {
             title: 'Zene',
             body: 'Válassz a hangulatodhoz illő zenei világot, hallgasd a saját zenédet, vagy élvezd a masszázst teljes csendben.',
           },
-          {
-            title: 'Bio & vegan',
-            body: 'A kezelés bio és vegán masszázsolajjal is kérhető.',
-          },
         ],
       },
     },

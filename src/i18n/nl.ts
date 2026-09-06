@@ -78,10 +78,6 @@ export default {
             title: 'Muziek',
             body: 'Kies muziek die bij je stemming past, luister naar je eigen muziek of geniet van de massage in volledige stilte.',
           },
-          {
-            title: 'Bio & vegan',
-            body: 'De behandeling is ook mogelijk met biologische en veganistische massageolie.',
-          },
         ],
       },
     },
