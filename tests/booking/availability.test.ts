@@ -4,6 +4,7 @@ import {
   buildAvailableSlots,
   localDayInstantRange,
 } from '../../src/lib/booking/availability.ts';
+import { homeServiceTravelBufferMinutes } from '../../src/lib/booking/home-service.ts';
 
 const base = {
   date: '2026-08-10',
@@ -41,14 +42,26 @@ test('does not offer slots whose service or buffer overlaps an existing booking'
 test('reserves travel time before and after home appointments', () => {
   const slots = buildAvailableSlots({
     ...base,
-    openWindows: [{ start: '09:00', end: '13:00' }],
-    bufferBeforeMinutes: 30,
-    bufferAfterMinutes: 30,
+    openWindows: [{ start: '09:00', end: '14:00' }],
+    bufferBeforeMinutes: homeServiceTravelBufferMinutes,
+    bufferAfterMinutes: homeServiceTravelBufferMinutes,
   });
-  assert.equal(slots[0].label, '09:30');
+  assert.equal(slots[0].label, '10:00');
   assert.equal(slots[0].busyStart, '2026-08-10T07:00:00Z');
-  assert.equal(slots.at(-1)?.label, '11:30');
-  assert.equal(slots.at(-1)?.busyEnd, '2026-08-10T11:00:00Z');
+  assert.equal(slots.at(-1)?.label, '12:00');
+  assert.equal(slots.at(-1)?.busyEnd, '2026-08-10T12:00:00Z');
+});
+
+test('keeps two hours between separate Home Service treatments', () => {
+  const slots = buildAvailableSlots({
+    ...base,
+    openWindows: [{ start: '09:00', end: '17:00' }],
+    busyWindows: [{ start: '2026-08-10T08:00:00Z', end: '2026-08-10T11:00:00Z' }],
+    bufferBeforeMinutes: homeServiceTravelBufferMinutes,
+    bufferAfterMinutes: homeServiceTravelBufferMinutes,
+  });
+
+  assert.equal(slots[0].label, '14:00');
 });
 
 test('honours partial blocked periods and the minimum notice instant', () => {

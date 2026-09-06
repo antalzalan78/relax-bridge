@@ -6,8 +6,8 @@ CREATE TABLE IF NOT EXISTS booking_settings (
   booking_horizon_days smallint NOT NULL DEFAULT 60 CHECK (booking_horizon_days BETWEEN 1 AND 365),
   studio_buffer_before_minutes smallint NOT NULL DEFAULT 0 CHECK (studio_buffer_before_minutes BETWEEN 0 AND 180),
   studio_buffer_after_minutes smallint NOT NULL DEFAULT 15 CHECK (studio_buffer_after_minutes BETWEEN 0 AND 180),
-  home_buffer_before_minutes smallint NOT NULL DEFAULT 30 CHECK (home_buffer_before_minutes BETWEEN 0 AND 180),
-  home_buffer_after_minutes smallint NOT NULL DEFAULT 30 CHECK (home_buffer_after_minutes BETWEEN 0 AND 180),
+  home_buffer_before_minutes smallint NOT NULL DEFAULT 60 CHECK (home_buffer_before_minutes BETWEEN 0 AND 180),
+  home_buffer_after_minutes smallint NOT NULL DEFAULT 60 CHECK (home_buffer_after_minutes BETWEEN 0 AND 180),
   updated_at timestamptz NOT NULL DEFAULT now()
 );
 
