@@ -47,6 +47,15 @@ export default {
     role: 'Masszázsterapeuta',
   },
 
+  introduction: {
+    title: 'Rólam',
+    paragraphs: [
+      'A masszázs közel húsz éve része az életemnek. Magyarországon tanultam és kezdtem el masszőrként dolgozni, azóta pedig Hollandiában is sok tapasztalattal és új tudással gazdagodtam.',
+      'Ezekből született meg a Relax Bridge, ahol fontos számomra, hogy ne csak egy kezelést kapj, hanem azt a saját igényeidhez is tudd alakítani.',
+      'Ha pedig arra is kíváncsi vagy, ki áll a Relax Bridge mögött, készítettem egy videót, amelyben egy kicsit többet mesélek magamról, a masszázsról és arról, hogyan dolgozom.',
+    ],
+  },
+
   images: {
     profile:
       'A Relax Bridge masszőrének portréja, amint egy erdei padon ül.',

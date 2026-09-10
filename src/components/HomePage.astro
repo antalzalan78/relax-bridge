@@ -54,7 +54,7 @@ const jsonLd = [
   alternates={alternates}
   jsonLd={jsonLd}
 >
-  <section class="wrap hero">
+  <section class="wrap hero hero--text-only">
     <div class="hero__grid">
       <div class="hero__copy">
         <span class="eyebrow">{d.tagline}</span>
@@ -75,20 +75,33 @@ const jsonLd = [
         </div>
       </div>
 
-      <div class="hero__media">
-        <div class="hero__arch" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <section class="wrap homepage-introduction" id="about" aria-labelledby="homepage-introduction-title">
+    <div class="homepage-introduction__card">
+      <div class="homepage-introduction__media">
         <Image
-          class="hero__profile"
+          class="homepage-introduction__image"
           src={profileImage}
           alt={d.images.profile}
-          widths={[480, 800, 1200]}
-          sizes="(min-width: 54rem) 42vw, 100vw"
+          widths={[480, 800]}
+          sizes="(min-width: 48rem) 34vw, 100vw"
           loading="eager"
           fetchpriority="high"
         />
         <div class="hero__caption">
           <span>{d.heroProfile.name}</span>
           <strong>{d.heroProfile.role}</strong>
+        </div>
+      </div>
+      <div class="homepage-introduction__content">
+        <header class="homepage-introduction__heading">
+          <span class="eyebrow">Relax Bridge</span>
+          <h2 id="homepage-introduction-title">{d.introduction.title}</h2>
+        </header>
+        <div class="homepage-introduction__copy">
+          {d.introduction.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
         </div>
       </div>
     </div>
