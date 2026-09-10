@@ -531,14 +531,6 @@ img {
   z-index: 1;
 }
 
-.hero--text-only {
-  padding-bottom: clamp(2rem, 4vw, 3.5rem);
-}
-
-.hero--text-only .hero__grid {
-  grid-template-columns: minmax(0, 50rem);
-}
-
 .hero__copy .lead {
   margin-top: 1.6rem;
 }
@@ -613,14 +605,14 @@ img {
 }
 
 .homepage-introduction {
-  padding-block: clamp(1rem, 3vw, 2rem) clamp(2rem, 4vw, 3.5rem);
+  min-width: 0;
   scroll-margin-top: 5.5rem;
 }
 
 .homepage-introduction__card {
   display: grid;
-  gap: clamp(2rem, 4vw, 4rem);
-  padding: clamp(2rem, 5vw, 4.5rem);
+  gap: clamp(1.25rem, 2vw, 2rem);
+  padding: clamp(1.25rem, 2.4vw, 2rem);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: rgb(255 253 249 / 0.9);
@@ -630,13 +622,13 @@ img {
 .homepage-introduction__media {
   position: relative;
   align-self: stretch;
-  min-height: 22rem;
+  min-height: 18rem;
 }
 
 .homepage-introduction__image {
   width: 100%;
   height: 100%;
-  min-height: 22rem;
+  min-height: 18rem;
   border-radius: var(--radius-lg);
   object-fit: cover;
   object-position: center;
@@ -654,16 +646,16 @@ img {
 
 .homepage-introduction__heading h2 {
   max-width: 12ch;
-  font-size: clamp(2.7rem, 5vw, 4.5rem);
+  font-size: clamp(2.35rem, 4vw, 3.6rem);
   line-height: 0.96;
 }
 
 .homepage-introduction__copy {
   max-width: 48rem;
-  margin-top: clamp(1.5rem, 3vw, 2.5rem);
+  margin-top: clamp(1.25rem, 2vw, 1.75rem);
   color: var(--ink-soft);
-  font-size: clamp(1.02rem, 0.98rem + 0.25vw, 1.18rem);
-  line-height: 1.75;
+  font-size: clamp(0.88rem, 0.82rem + 0.18vw, 0.98rem);
+  line-height: 1.62;
 }
 
 .homepage-introduction__copy > * + * {
@@ -677,8 +669,14 @@ img {
 
 @media (min-width: 48rem) {
   .homepage-introduction__card {
-    grid-template-columns: minmax(17rem, 0.78fr) minmax(0, 1.22fr);
+    grid-template-columns: minmax(9rem, 0.68fr) minmax(0, 1.32fr);
     align-items: stretch;
+  }
+}
+
+@media (min-width: 52rem) {
+  .hero--with-introduction .hero__grid {
+    grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
   }
 }
 
