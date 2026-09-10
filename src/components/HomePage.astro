@@ -98,6 +98,18 @@ const jsonLd = [
     <WaveDivider />
   </div>
 
+  <section class="wrap homepage-introduction" id="about" aria-labelledby="homepage-introduction-title">
+    <div class="homepage-introduction__card">
+      <header class="homepage-introduction__heading">
+        <span class="eyebrow">Relax Bridge</span>
+        <h2 id="homepage-introduction-title">{d.introduction.title}</h2>
+      </header>
+      <div class="homepage-introduction__copy">
+        {d.introduction.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+      </div>
+    </div>
+  </section>
+
   <section class="section location-section location-section--studio" id={anchors.services}>
     <div class="wrap">
       <div class="section-heading section-heading--wide services-heading">

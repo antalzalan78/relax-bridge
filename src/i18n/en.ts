@@ -47,6 +47,15 @@ export default {
     role: 'Massage therapist',
   },
 
+  introduction: {
+    title: 'About me',
+    paragraphs: [
+      'Massage has been part of my life for nearly twenty years. I trained and began working as a massage therapist in Hungary, and since then I have gained a great deal of experience and new knowledge in the Netherlands as well.',
+      'Relax Bridge grew out of all of that. It matters to me that you not only receive a treatment, but can also tailor it to your own needs.',
+      'If you would also like to know who is behind Relax Bridge, I have made a video in which I share a little more about myself, massage and the way I work.',
+    ],
+  },
+
   images: {
     profile:
       'Portrait of the Relax Bridge massage therapist, sitting on a bench in the woods.',
