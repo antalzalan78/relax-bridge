@@ -667,6 +667,10 @@ img {
   font-weight: 600;
 }
 
+.homepage-introduction__video {
+  margin-top: 1.5rem;
+}
+
 @media (min-width: 48rem) {
   .homepage-introduction__card {
     grid-template-columns: minmax(9rem, 0.68fr) minmax(0, 1.32fr);
