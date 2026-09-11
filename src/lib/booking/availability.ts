@@ -23,6 +23,13 @@ interface EpochWindow {
   end: number;
 }
 
+interface ResolveOpenWindowsInput {
+  baseWindows: LocalTimeWindow[];
+  additionalOpenWindows?: LocalTimeWindow[];
+  blockedWindows?: LocalTimeWindow[];
+  blockAllDay?: boolean;
+}
+
 function localWindowToEpoch(
   date: Temporal.PlainDate,
   timeZone: string,
@@ -70,6 +77,54 @@ function mergeWindows(windows: EpochWindow[]): EpochWindow[] {
   }
 
   return merged;
+}
+
+function localTimeToMinutes(value: string): number {
+  const [hour, minute] = value.slice(0, 5).split(':').map(Number);
+  return hour * 60 + minute;
+}
+
+function minutesToLocalTime(value: number): string {
+  return `${String(Math.floor(value / 60)).padStart(2, '0')}:${String(value % 60).padStart(2, '0')}`;
+}
+
+/** Resolves the effective opening windows shown in the admin calendar. */
+export function resolveOpenWindows(input: ResolveOpenWindowsInput): LocalTimeWindow[] {
+  if (input.blockAllDay) return [];
+
+  let open = mergeWindows(
+    [...input.baseWindows, ...(input.additionalOpenWindows ?? [])].map((window) => ({
+      start: localTimeToMinutes(window.start),
+      end: localTimeToMinutes(window.end),
+    })),
+  );
+
+  const blocked = mergeWindows(
+    (input.blockedWindows ?? []).map((window) => ({
+      start: localTimeToMinutes(window.start),
+      end: localTimeToMinutes(window.end),
+    })),
+  );
+
+  for (const blockedWindow of blocked) {
+    open = open.flatMap((window) => {
+      if (!overlaps(window, blockedWindow)) return [window];
+
+      const remaining: EpochWindow[] = [];
+      if (window.start < blockedWindow.start) {
+        remaining.push({ start: window.start, end: blockedWindow.start });
+      }
+      if (blockedWindow.end < window.end) {
+        remaining.push({ start: blockedWindow.end, end: window.end });
+      }
+      return remaining;
+    });
+  }
+
+  return open.map((window) => ({
+    start: minutesToLocalTime(window.start),
+    end: minutesToLocalTime(window.end),
+  }));
 }
 
 function toIso(epochMilliseconds: number): string {

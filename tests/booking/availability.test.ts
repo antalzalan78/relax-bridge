@@ -3,6 +3,7 @@ import test from 'node:test';
 import {
   buildAvailableSlots,
   localDayInstantRange,
+  resolveOpenWindows,
 } from '../../src/lib/booking/availability.ts';
 import { homeServiceTravelBufferMinutes } from '../../src/lib/booking/home-service.ts';
 
@@ -83,5 +84,34 @@ test('uses real local-day duration across daylight-saving changes', () => {
   assert.equal(
     new Date(autumn.end).getTime() - new Date(autumn.start).getTime(),
     25 * 60 * 60 * 1000,
+  );
+});
+
+test('resolves visible admin opening windows with additions and partial closures', () => {
+  assert.deepEqual(
+    resolveOpenWindows({
+      baseWindows: [{ start: '09:00', end: '12:00' }],
+      additionalOpenWindows: [{ start: '13:00', end: '17:00' }],
+      blockedWindows: [
+        { start: '10:00', end: '10:30' },
+        { start: '15:00', end: '16:00' },
+      ],
+    }),
+    [
+      { start: '09:00', end: '10:00' },
+      { start: '10:30', end: '12:00' },
+      { start: '13:00', end: '15:00' },
+      { start: '16:00', end: '17:00' },
+    ],
+  );
+});
+
+test('hides opening windows on a fully blocked day', () => {
+  assert.deepEqual(
+    resolveOpenWindows({
+      baseWindows: [{ start: '09:00', end: '17:00' }],
+      blockAllDay: true,
+    }),
+    [],
   );
 });

@@ -15,6 +15,7 @@ import {
 } from '../../lib/server/booking-repository';
 import { assertSameOrigin } from '../../lib/server/security';
 import { retryBookingEmails } from '../../lib/server/booking-email';
+import { resolveOpenWindows } from '../../lib/booking/availability';
 import AdminHeader from '../../components/AdminHeader.astro';
 import '../../styles/global.css';
 
@@ -119,6 +120,29 @@ for (const booking of bookings) {
 const exceptionsByDay = new Map(days.map((day) => [day.toString(), [] as any[]]));
 for (const exception of exceptions) exceptionsByDay.get(localDate(exception.day))?.push(exception);
 const shortTime = (value: unknown) => String(value).slice(0, 5);
+const openWindowsByDay = new Map(days.map((day) => {
+  const date = day.toString();
+  const dayExceptions = exceptionsByDay.get(date) || [];
+  const baseWindows = rules
+    .filter((rule) =>
+      rule.active !== false &&
+      Number(rule.weekday) === day.dayOfWeek &&
+      (!rule.valid_from || localDate(rule.valid_from) <= date) &&
+      (!rule.valid_until || localDate(rule.valid_until) >= date)
+    )
+    .map((rule) => ({ start: shortTime(rule.start_time), end: shortTime(rule.end_time) }));
+  const additionalOpenWindows = dayExceptions
+    .filter((exception) => exception.kind === 'open' && exception.start_time && exception.end_time)
+    .map((exception) => ({ start: shortTime(exception.start_time), end: shortTime(exception.end_time) }));
+  const blockedWindows = dayExceptions
+    .filter((exception) => exception.kind === 'blocked' && exception.start_time && exception.end_time)
+    .map((exception) => ({ start: shortTime(exception.start_time), end: shortTime(exception.end_time) }));
+  const blockAllDay = dayExceptions.some((exception) =>
+    exception.kind === 'blocked' && !exception.start_time && !exception.end_time
+  );
+
+  return [date, resolveOpenWindows({ baseWindows, additionalOpenWindows, blockedWindows, blockAllDay })] as const;
+}));
 const emailStatusLabel = (value: unknown) => ({
   pending: 'függőben',
   sending: 'küldés alatt',
@@ -144,6 +168,7 @@ const emailStatusLabel = (value: unknown) => ({
           <span class="eyebrow">Egy közös naptár</span>
           <h1>Foglalások és szabad idők</h1>
           <div class="booking-legend" aria-label="Foglalástípusok jelmagyarázata">
+            <span><i class="booking-legend__swatch booking-legend__swatch--open"></i>Foglalható idősáv</span>
             <span><i class="booking-legend__swatch booking-legend__swatch--studio"></i>Stúdió</span>
             <span><i class="booking-legend__swatch booking-legend__swatch--home"></i>Home service</span>
           </div>
@@ -159,12 +184,23 @@ const emailStatusLabel = (value: unknown) => ({
         {days.map((day, index) => {
           const dayBookings = bookingsByDay.get(day.toString()) || [];
           const dayExceptions = exceptionsByDay.get(day.toString()) || [];
+          const openWindows = openWindowsByDay.get(day.toString()) || [];
           return (
             <article class:list={['calendar-day', { 'calendar-day--today': day.equals(today) }]}>
               <header>
                 <span>{weekdays[index]}</span>
                 <strong>{day.day}</strong>
               </header>
+              {openWindows.length > 0 && (
+                <div class="open-window-list" aria-label="Foglalható idősávok">
+                  {openWindows.map((window) => (
+                    <div class="open-window">
+                      <span>Foglalható</span>
+                      <strong>{window.start}–{window.end}</strong>
+                    </div>
+                  ))}
+                </div>
+              )}
               {dayExceptions.map((exception) => (
                 <div class:list={['exception-chip', `exception-chip--${exception.kind}`]}>
                   <span>{exception.kind === 'blocked' ? 'Zárva' : 'Extra nyitva'}</span>
@@ -309,6 +345,7 @@ const emailStatusLabel = (value: unknown) => ({
   .booking-legend { display: flex; flex-wrap: wrap; gap: 0.55rem 1rem; margin-top: 0.8rem; color: var(--ink-soft); font-size: 0.72rem; font-weight: 700; }
   .booking-legend span { display: inline-flex; align-items: center; gap: 0.4rem; }
   .booking-legend__swatch { width: 0.65rem; height: 0.65rem; border-radius: 50%; }
+  .booking-legend__swatch--open { width: 1rem; border: 1px solid var(--pine); border-radius: 0.18rem; background: var(--pine-soft); }
   .booking-legend__swatch--studio { background: var(--pine); }
   .booking-legend__swatch--home { background: var(--clay); }
   .calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(9rem, 1fr)); overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow-soft); }
@@ -318,6 +355,10 @@ const emailStatusLabel = (value: unknown) => ({
   .calendar-day > header span { color: var(--ink-soft); font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
   .calendar-day > header strong { display: grid; width: 2rem; height: 2rem; place-items: center; border-radius: 50%; font-family: 'Iowan Old Style', Georgia, serif; }
   .calendar-day--today > header strong { background: var(--clay); color: #fff; }
+  .open-window-list { display: grid; gap: 0.4rem; margin-bottom: 0.6rem; }
+  .open-window { display: grid; gap: 0.12rem; padding: 0.55rem 0.6rem; border: 1px solid rgb(40 82 71 / 0.22); border-left: 3px solid var(--pine); border-radius: 0.45rem; background: var(--pine-soft); color: var(--pine-dark); }
+  .open-window span { font-size: 0.62rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+  .open-window strong { font-size: 0.78rem; }
   .exception-chip { display: grid; margin-bottom: 0.5rem; padding: 0.5rem; border-radius: 0.45rem; background: var(--clay-soft); color: var(--clay-dark); font-size: 0.72rem; }
   .exception-chip--open { background: var(--pine-soft); color: var(--pine-dark); }
   .exception-chip small { opacity: 0.78; }
