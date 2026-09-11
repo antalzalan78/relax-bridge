@@ -11,8 +11,9 @@ export default defineConfig({
     locales: ['nl', 'en', 'hu'],
     defaultLocale: 'nl',
     routing: {
-      // A holland a fooldal (/), az angol es a magyar /en es /hu ala kerul.
+      // A nyelv nelkuli URL mindig holland; csak az angol es a magyar kap elotagot.
       prefixDefaultLocale: false,
+      redirectToDefaultLocale: false,
     },
   },
   integrations: [sitemap({ i18n: { defaultLocale: 'nl', locales: { nl: 'nl-NL', en: 'en', hu: 'hu-HU' } } })],
