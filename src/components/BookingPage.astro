@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import { bookingPath, pathFor, privacyPath, type Locale } from '../data/site';
+import { bookingPath, massageCreatorPath, pathFor, privacyPath, type Locale } from '../data/site';
 import { bookingText } from '../i18n/booking';
 import { getBookingOptions, getHomeServiceBookingOptions } from '../lib/booking/catalog';
 import {
@@ -23,6 +23,7 @@ const options = allOptions.filter((option) => option.category === 'studio');
 const homeOptions = await getHomeServiceBookingOptions(locale);
 const path = bookingPath(locale);
 const studioBookingHref = `${path}?category=studio`;
+const creatorBookingHref = massageCreatorPath(locale);
 const homeBookingHref = `${path}?category=home`;
 const privacyHref = privacyPath(locale);
 const alternates = {
@@ -68,8 +69,18 @@ const homeConfig = {
           </span>
         </a>
 
-        <a class="booking-choice-card booking-choice-card--home" href={homeBookingHref}>
+        <a class="booking-choice-card booking-choice-card--creator" href={creatorBookingHref}>
           <span class="booking-choice-card__number" aria-hidden="true">02</span>
+          <span class="eyebrow">Relax Bridge</span>
+          <h2>Massage Creator <small>(Studio Visit)</small></h2>
+          <p>{copy.choiceCreatorBody}</p>
+          <span class="booking-choice-card__cta">
+            {copy.choiceCreatorCta}<span aria-hidden="true">&rarr;</span>
+          </span>
+        </a>
+
+        <a class="booking-choice-card booking-choice-card--home" href={homeBookingHref}>
+          <span class="booking-choice-card__number" aria-hidden="true">03</span>
           <span class="eyebrow">Relax Bridge</span>
           <h2>Home Service</h2>
           <p>{copy.choiceHomeBody}</p>
@@ -729,6 +740,10 @@ const homeConfig = {
     .booking-choice__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
 
+  @media (min-width: 70rem) {
+    .booking-choice__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+
   .booking-choice-card {
     position: relative;
     display: flex;
@@ -755,6 +770,7 @@ const homeConfig = {
   }
 
   .booking-choice-card--studio::before { background: #9d86a8; }
+  .booking-choice-card--creator::before { background: var(--logo-green); }
   .booking-choice-card--home::before { background: #d99163; }
   .booking-choice-card:hover,
   .booking-choice-card:focus-visible {
@@ -764,6 +780,14 @@ const homeConfig = {
   }
   .booking-choice-card:focus-visible { outline: 2px solid var(--logo-green); outline-offset: 3px; }
   .booking-choice-card h2 { margin-top: 1rem; font-size: clamp(2.6rem, 6vw, 4.7rem); }
+  .booking-choice-card h2 small {
+    display: block;
+    margin-top: 0.45rem;
+    font-family: inherit;
+    font-size: 0.32em;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
   .booking-choice-card p { max-width: 35rem; color: var(--ink-soft); font-size: clamp(1rem, 1.8vw, 1.15rem); }
   .booking-choice-card__number {
     position: absolute;
