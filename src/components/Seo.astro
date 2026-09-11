@@ -1,5 +1,11 @@
 ---
-import { site, localeTags, defaultLocale, type Locale } from '../data/site';
+import {
+  site,
+  localeTags,
+  defaultLocale,
+  isSearchIndexableLocale,
+  type Locale,
+} from '../data/site';
 
 interface Props {
   locale: Locale;
@@ -19,31 +25,34 @@ const { locale, title, description, path, alternates, jsonLd = [], image } =
 
 const canonical = new URL(path, site.url).href;
 const ogImage = new URL(image ?? '/images/og-image.png', site.url).href;
+const isSearchIndexable = isSearchIndexableLocale(locale);
+const dutchAlternate = alternates[defaultLocale];
 ---
 
 <title>{title}</title>
 <meta name="description" content={description} />
+{!isSearchIndexable && <meta name="robots" content="noindex, follow" />}
 <link rel="canonical" href={canonical} />
 
 {/*
-  hreflang: ez hianyzott a regi oldalrol. Enelkul a Google duplikacionak latja
-  a harom nyelvi valtozatot, es nem tudja, kinek melyiket adja.
+  Only the Dutch version is advertised to search engines. English and Hungarian
+  remain available to visitors but are not published as search alternatives.
 */}
 {
-  Object.entries(alternates).map(([lang, href]) => (
+  dutchAlternate && (
     <link
       rel="alternate"
-      hreflang={localeTags[lang as Locale]}
-      href={new URL(href, site.url).href}
+      hreflang={localeTags[defaultLocale]}
+      href={new URL(dutchAlternate, site.url).href}
     />
-  ))
+  )
 }
 {
-  alternates[defaultLocale] && (
+  dutchAlternate && (
     <link
       rel="alternate"
       hreflang="x-default"
-      href={new URL(alternates[defaultLocale]!, site.url).href}
+      href={new URL(dutchAlternate, site.url).href}
     />
   )
 }

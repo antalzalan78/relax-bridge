@@ -50,6 +50,11 @@ export type Locale = 'nl' | 'en' | 'hu';
 export const locales: Locale[] = ['nl', 'en', 'hu'];
 export const defaultLocale: Locale = 'nl';
 
+/** Only the default Dutch locale may appear in search results. */
+export function isSearchIndexableLocale(locale: Locale): boolean {
+  return locale === defaultLocale;
+}
+
 export const localeNames: Record<Locale, string> = {
   nl: 'Nederlands',
   en: 'English',

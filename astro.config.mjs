@@ -16,5 +16,11 @@ export default defineConfig({
       redirectToDefaultLocale: false,
     },
   },
-  integrations: [sitemap({ i18n: { defaultLocale: 'nl', locales: { nl: 'nl-NL', en: 'en', hu: 'hu-HU' } } })],
+  integrations: [
+    sitemap({
+      // Only Dutch pages are advertised to search engines. English and
+      // Hungarian remain available through direct URLs and the language switcher.
+      filter: (page) => !/^\/(?:en|hu)(?:\/|$)/.test(new URL(page).pathname),
+    }),
+  ],
 });
