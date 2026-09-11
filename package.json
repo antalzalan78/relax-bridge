@@ -10,7 +10,8 @@
     "test:booking": "node --experimental-strip-types --test tests/booking/*.test.ts",
     "test:questionnaire": "node --experimental-strip-types --test tests/questionnaire/*.test.ts",
     "test:analytics": "node --experimental-strip-types --test tests/analytics/*.test.ts",
-    "test": "npm run test:booking && npm run test:questionnaire && npm run test:analytics",
+    "test:routing": "node --experimental-strip-types --test tests/routing/*.test.ts",
+    "test": "npm run test:booking && npm run test:questionnaire && npm run test:analytics && npm run test:routing",
     "db:migrate": "node --env-file-if-exists=.env scripts/migrate-db.mjs",
     "admin:hash": "node scripts/hash-admin-password.mjs"
   },
