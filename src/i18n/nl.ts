@@ -54,6 +54,7 @@ export default {
       'Uit al die ervaring is Relax Bridge ontstaan. Ik vind het belangrijk dat je niet alleen een behandeling krijgt, maar die ook kunt afstemmen op jouw eigen behoeften.',
       'Ben je ook benieuwd naar de persoon achter Relax Bridge? Ik heb een video gemaakt waarin ik iets meer vertel over mezelf, massage en mijn manier van werken.',
     ],
+    videoCta: 'Bekijk mijn introductievideo',
   },
 
   images: {

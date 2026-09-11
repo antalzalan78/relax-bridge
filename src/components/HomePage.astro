@@ -100,6 +100,15 @@ const jsonLd = [
             <div class="homepage-introduction__copy">
               {d.introduction.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
             </div>
+            <a
+              class="btn btn--primary homepage-introduction__video"
+              href={site.introductionVideo}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {d.introduction.videoCta}
+              <span aria-hidden="true">&rarr;</span>
+            </a>
           </div>
         </div>
       </section>

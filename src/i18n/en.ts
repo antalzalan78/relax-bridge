@@ -54,6 +54,7 @@ export default {
       'Relax Bridge grew out of all of that. It matters to me that you not only receive a treatment, but can also tailor it to your own needs.',
       'If you would also like to know who is behind Relax Bridge, I have made a video in which I share a little more about myself, massage and the way I work.',
     ],
+    videoCta: 'Watch my introduction video',
   },
 
   images: {

@@ -54,6 +54,7 @@ export default {
       'Ezekből született meg a Relax Bridge, ahol fontos számomra, hogy ne csak egy kezelést kapj, hanem azt a saját igényeidhez is tudd alakítani.',
       'Ha pedig arra is kíváncsi vagy, ki áll a Relax Bridge mögött, készítettem egy videót, amelyben egy kicsit többet mesélek magamról, a masszázsról és arról, hogyan dolgozom.',
     ],
+    videoCta: 'Bemutatkozó videó megtekintése',
   },
 
   images: {
