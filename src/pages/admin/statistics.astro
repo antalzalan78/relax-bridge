@@ -1,0 +1,237 @@
+---
+import AdminHeader from '../../components/AdminHeader.astro';
+import { getAdminSession } from '../../lib/server/admin-auth';
+import { getWebsiteTrafficSummary } from '../../lib/server/website-analytics-repository';
+import '../../styles/global.css';
+
+export const prerender = false;
+
+const session = await getAdminSession(Astro.cookies);
+if (!session) return Astro.redirect('/admin/login');
+
+const summary = await getWebsiteTrafficSummary();
+const maxDaily = Math.max(1, ...summary.daily.map((item) => item.count));
+const percentage = (count: number) => summary.last30Days
+  ? Math.round((count / summary.last30Days) * 100)
+  : 0;
+const shortDay = (day: string) => new Date(`${day}T12:00:00Z`).toLocaleDateString('hu-HU', {
+  month: 'short',
+  day: 'numeric',
+  timeZone: 'UTC',
+});
+const sourceNames: Record<string, string> = {
+  direct: 'Közvetlen / QR / ismeretlen',
+  internal: 'Belső oldalról',
+  google: 'Google',
+  bing: 'Bing',
+  duckduckgo: 'DuckDuckGo',
+  yahoo: 'Yahoo',
+  instagram: 'Instagram',
+  facebook: 'Facebook',
+  whatsapp: 'WhatsApp',
+  x: 'X / Twitter',
+  linkedin: 'LinkedIn',
+};
+const sourceLabel = (source: string) => source.startsWith('utm:')
+  ? `Kampány: ${source.slice(4)}`
+  : sourceNames[source] || source;
+const regionNames = new Intl.DisplayNames(['hu'], { type: 'region' });
+const countryLabel = (country: string) => country === '??'
+  ? 'Ismeretlen ország'
+  : regionNames.of(country) || country;
+const entryPathLabel = (path: string) => ({
+  '/': 'Holland főoldal',
+  '/en': 'Angol főoldal',
+  '/hu': 'Magyar főoldal',
+}[path] || path);
+const topSource = summary.sources[0];
+const visibleSources = summary.sources.slice(0, 8);
+const visibleCountries = summary.countries.slice(0, 8);
+const visiblePaths = summary.entryPaths.slice(0, 8);
+---
+
+<!doctype html>
+<html lang="hu">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Weboldal-statisztika — Relax Bridge</title>
+  </head>
+  <body class="admin-page">
+    <AdminHeader email={session.email} active="statistics" />
+    <main class="admin-wrap admin-main">
+      <section class="admin-title">
+        <span class="eyebrow">Utolsó 30 nap</span>
+        <h1>Honnan érkeznek a látogatók?</h1>
+        <p>A számok anonim látogatásokat mutatnak. Egy böngészőfül megnyitása egy látogatás; nincs egyedi látogatóazonosítás.</p>
+      </section>
+
+      <section class="summary-grid" aria-label="Látogatási összefoglaló">
+        <article>
+          <span>Ma</span>
+          <strong>{summary.today}</strong>
+          <small>látogatás</small>
+        </article>
+        <article>
+          <span>Utolsó 7 nap</span>
+          <strong>{summary.last7Days}</strong>
+          <small>látogatás</small>
+        </article>
+        <article>
+          <span>Utolsó 30 nap</span>
+          <strong>{summary.last30Days}</strong>
+          <small>látogatás</small>
+        </article>
+        <article class="summary-grid__source">
+          <span>Leggyakoribb forrás</span>
+          <strong>{topSource ? sourceLabel(topSource.key) : 'Még nincs adat'}</strong>
+          <small>{topSource ? `${topSource.count} látogatás · ${percentage(topSource.count)}%` : 'Az élesítés után kezd gyűlni'}</small>
+        </article>
+      </section>
+
+      <section class="trend-card">
+        <header>
+          <div>
+            <span class="section-kicker">Napi alakulás</span>
+            <h2>Látogatások az elmúlt 30 napban</h2>
+          </div>
+          <div class="language-summary" aria-label="Látogatások nyelv szerint">
+            <span><b>NL</b> {summary.locales.nl}</span>
+            <span><b>EN</b> {summary.locales.en}</span>
+            <span><b>HU</b> {summary.locales.hu}</span>
+          </div>
+        </header>
+        <div class="trend-scroll">
+          <div class="trend-chart" role="img" aria-label="Napi látogatások oszlopdiagramja">
+            {summary.daily.map((item, index) => (
+              <div class="trend-day" title={`${shortDay(item.day)}: ${item.count} látogatás`}>
+                <span class="trend-value">{item.count}</span>
+                <span
+                  class:list={['trend-bar', { 'trend-bar--empty': item.count === 0 }]}
+                  style={`height: ${item.count ? Math.max(8, (item.count / maxDaily) * 100) : 2}%`}
+                ></span>
+                <time datetime={item.day}>{index % 5 === 0 || index === 29 ? shortDay(item.day) : ''}</time>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {summary.last30Days === 0 && (
+        <p class="empty-state">Még nincs látogatási adat. A számlálás az éles oldalon, a közzététel után indul el.</p>
+      )}
+
+      <section class="breakdown-grid">
+        <article class="breakdown-card">
+          <span class="section-kicker">Forgalmi források</span>
+          <h2>Honnan találtak az oldalra?</h2>
+          <p class="card-note">A „Közvetlen / QR / ismeretlen” csoportba kerül a beírt cím, a könyvjelző, a QR-kód és az olyan megnyitás, amely nem ad át forrást.</p>
+          <div class="rank-list">
+            {visibleSources.map((item) => (
+              <div class="rank-row">
+                <div><span>{sourceLabel(item.key)}</span><strong>{item.count} · {percentage(item.count)}%</strong></div>
+                <span class="rank-bar"><i style={`width:${percentage(item.count)}%`}></i></span>
+              </div>
+            ))}
+            {visibleSources.length === 0 && <p>Nincs még adat.</p>}
+          </div>
+        </article>
+
+        <article class="breakdown-card">
+          <span class="section-kicker">Országok</span>
+          <h2>Melyik országból érkeztek?</h2>
+          <p class="card-note">Az országot a tárhely hozzávetőleges országkódja alapján, IP-cím tárolása nélkül összesítjük.</p>
+          <div class="rank-list">
+            {visibleCountries.map((item) => (
+              <div class="rank-row">
+                <div><span>{countryLabel(item.key)}</span><strong>{item.count} · {percentage(item.count)}%</strong></div>
+                <span class="rank-bar"><i style={`width:${percentage(item.count)}%`}></i></span>
+              </div>
+            ))}
+            {visibleCountries.length === 0 && <p>Nincs még adat.</p>}
+          </div>
+        </article>
+
+        <article class="breakdown-card breakdown-card--wide">
+          <span class="section-kicker">Belépő oldalak</span>
+          <h2>Melyik oldalon kezdték a látogatást?</h2>
+          <div class="path-list">
+            {visiblePaths.map((item, index) => (
+              <div>
+                <span class="path-number">{String(index + 1).padStart(2, '0')}</span>
+                <span class="path-name">{entryPathLabel(item.key)}</span>
+                <code>{item.key}</code>
+                <strong>{item.count} · {percentage(item.count)}%</strong>
+              </div>
+            ))}
+            {visiblePaths.length === 0 && <p>Nincs még adat.</p>}
+          </div>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>
+
+<style>
+  .admin-page { min-height: 100vh; padding: 0; background: #f3eee5; font-size: 0.94rem; }
+  .admin-wrap { width: min(94vw, 76rem); margin-inline: auto; }
+  .admin-main { padding-block: 3rem 6rem; }
+  .admin-title { margin-bottom: 2rem; }
+  .admin-title h1 { max-width: 16ch; font-size: clamp(2.5rem, 5vw, 4.4rem); }
+  .admin-title p { max-width: 50rem; color: var(--ink-soft); line-height: 1.65; }
+  .summary-grid { display: grid; gap: 1rem; }
+  .summary-grid article { display: flex; min-height: 9rem; flex-direction: column; justify-content: space-between; padding: 1.35rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); }
+  .summary-grid article > span, .section-kicker { color: var(--clay-dark); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+  .summary-grid strong { color: var(--pine-dark); font-family: 'Iowan Old Style', Georgia, serif; font-size: clamp(2.5rem, 5vw, 3.5rem); line-height: 1; }
+  .summary-grid small { color: var(--ink-soft); }
+  .summary-grid .summary-grid__source { border: 0; background: var(--pine-dark); color: white; }
+  .summary-grid__source > span { color: var(--sand) !important; }
+  .summary-grid__source strong { color: white; font-family: inherit; font-size: clamp(1.15rem, 2.2vw, 1.55rem); line-height: 1.25; }
+  .summary-grid__source small { color: rgb(255 255 255 / 0.68); }
+  .trend-card, .breakdown-card { margin-top: 1rem; padding: clamp(1.25rem, 3vw, 2rem); border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); }
+  .trend-card header { display: flex; align-items: end; justify-content: space-between; gap: 1rem; }
+  .trend-card h2, .breakdown-card h2 { max-width: none; margin: 0.35rem 0 0; font-size: clamp(1.4rem, 3vw, 2rem); }
+  .language-summary { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+  .language-summary span { padding: 0.4rem 0.6rem; border-radius: 999px; background: var(--pine-soft); color: var(--pine-dark); font-size: 0.72rem; }
+  .language-summary b { margin-right: 0.2rem; }
+  .trend-scroll { overflow-x: auto; padding-top: 1.8rem; }
+  .trend-chart { display: grid; height: 14rem; min-width: 44rem; grid-template-columns: repeat(30, minmax(0.7rem, 1fr)); align-items: end; gap: 0.32rem; border-bottom: 1px solid var(--border); }
+  .trend-day { display: grid; height: 100%; grid-template-rows: 1.3rem 1fr 1.5rem; align-items: end; text-align: center; }
+  .trend-value { align-self: start; color: var(--ink-soft); font-size: 0.62rem; opacity: 0; transition: opacity 150ms ease; }
+  .trend-day:hover .trend-value { opacity: 1; }
+  .trend-bar { display: block; min-height: 0.22rem; border-radius: 0.35rem 0.35rem 0 0; background: linear-gradient(180deg, var(--clay), var(--pine)); }
+  .trend-bar--empty { background: var(--border); }
+  .trend-day time { padding-top: 0.4rem; color: var(--ink-soft); font-size: 0.58rem; white-space: nowrap; }
+  .empty-state { margin: 1rem 0 0; padding: 1rem 1.2rem; border-left: 3px solid var(--clay); background: var(--clay-soft); color: var(--ink-soft); }
+  .breakdown-grid { display: grid; gap: 1rem; }
+  .breakdown-card { margin-top: 0; }
+  .breakdown-card:first-child, .breakdown-card:nth-child(2) { margin-top: 1rem; }
+  .card-note { min-height: 3.7rem; color: var(--ink-soft); font-size: 0.8rem; line-height: 1.55; }
+  .rank-list { display: grid; gap: 1rem; margin-top: 1.5rem; }
+  .rank-list > p, .path-list > p { color: var(--ink-soft); }
+  .rank-row > div { display: flex; justify-content: space-between; gap: 1rem; margin-bottom: 0.35rem; }
+  .rank-row span { overflow-wrap: anywhere; }
+  .rank-row strong { flex: 0 0 auto; color: var(--pine-dark); font-size: 0.75rem; }
+  .rank-bar { display: block; height: 0.48rem; overflow: hidden; border-radius: 999px; background: var(--pine-soft); }
+  .rank-bar i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--pine), var(--clay)); }
+  .path-list { margin-top: 1.25rem; border-top: 1px solid var(--border); }
+  .path-list > div { display: grid; grid-template-columns: 2rem minmax(9rem, 1fr) minmax(8rem, 1.2fr) auto; align-items: center; gap: 0.75rem; padding-block: 0.9rem; border-bottom: 1px solid var(--border); }
+  .path-number { color: var(--clay-dark); font-size: 0.65rem; font-weight: 800; }
+  .path-name { font-weight: 700; }
+  .path-list code { overflow: hidden; color: var(--ink-soft); font-size: 0.74rem; text-overflow: ellipsis; white-space: nowrap; }
+  .path-list strong { color: var(--pine-dark); font-size: 0.76rem; }
+  @media (min-width: 42rem) { .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 68rem) {
+    .summary-grid { grid-template-columns: 0.7fr 0.7fr 0.8fr 1.45fr; }
+    .breakdown-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .breakdown-card--wide { grid-column: 1 / -1; }
+  }
+  @media (max-width: 42rem) {
+    .admin-main { padding-top: 2rem; }
+    .trend-card header { display: block; }
+    .language-summary { margin-top: 1rem; }
+    .path-list > div { grid-template-columns: 1.7rem 1fr auto; }
+    .path-list code { grid-column: 2 / -1; grid-row: 2; }
+  }
+</style>

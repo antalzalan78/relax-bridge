@@ -108,6 +108,17 @@ Az alapbeállítás 15 perces időrács, 12 órás minimum előfoglalás és 60 
 foglalási horizont. A stúdióidőpont után 15 perc, az otthoni kezelés előtt és
 után 30–30 perc automatikus puffer foglalódik a közös naptárban.
 
+### Weboldal-statisztika
+
+Az adminfelület **Statisztika** lapja az utolsó 30 nap anonim látogatásait
+mutatja napi trend, forrás, ország, belépő oldal és nyelv szerint. A mérés nem
+használ analitikai sütit vagy egyedi látogatóazonosítót, és nem tárol IP-címet.
+Az adatbázis kizárólag napi összesítéseket őriz, legfeljebb 13 hónapig.
+
+A statisztikai tábla az első éles látogatáskor automatikusan létrejön; a
+`npm.cmd run db:migrate` parancs is létrehozza a `0003_website_analytics.sql`
+migrációból.
+
 ## A logó
 
 A forrás a `src/assets/logo-source.png` — fehér hátterű, átlátszóság nélkül.

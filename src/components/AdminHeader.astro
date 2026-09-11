@@ -1,7 +1,7 @@
 ---
 interface Props {
   email: string;
-  active: 'bookings' | 'questionnaire';
+  active: 'bookings' | 'questionnaire' | 'statistics';
 }
 
 const { email, active } = Astro.props;
@@ -13,6 +13,7 @@ const { email, active } = Astro.props;
     <nav aria-label="Admin menü">
       <a href="/admin" aria-current={active === 'bookings' ? 'page' : undefined}>Foglalások</a>
       <a href="/admin/questionnaire" aria-current={active === 'questionnaire' ? 'page' : undefined}>Kérdőív</a>
+      <a href="/admin/statistics" aria-current={active === 'statistics' ? 'page' : undefined}>Statisztika</a>
     </nav>
     <span class="admin-email">{email}</span>
     <form method="post" action="/admin/logout">
