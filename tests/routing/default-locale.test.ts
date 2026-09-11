@@ -3,7 +3,11 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 import config from '../../astro.config.mjs';
-import { defaultLocale, pathFor } from '../../src/data/site.ts';
+import {
+  defaultLocale,
+  isSearchIndexableLocale,
+  pathFor,
+} from '../../src/data/site.ts';
 
 test('the unprefixed site always uses Dutch as its default language', async () => {
   const routing = config.i18n?.routing;
@@ -18,6 +22,9 @@ test('the unprefixed site always uses Dutch as its default language', async () =
   assert.equal(pathFor('nl'), '/');
   assert.equal(pathFor('en'), '/en');
   assert.equal(pathFor('hu'), '/hu');
+  assert.equal(isSearchIndexableLocale('nl'), true);
+  assert.equal(isSearchIndexableLocale('en'), false);
+  assert.equal(isSearchIndexableLocale('hu'), false);
 
   const rootPage = await readFile(new URL('../../src/pages/index.astro', import.meta.url), 'utf8');
   assert.match(rootPage, /<HomePage locale="nl"\s*\/>/);
