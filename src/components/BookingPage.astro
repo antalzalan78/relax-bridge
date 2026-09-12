@@ -223,6 +223,11 @@ const homeConfig = {
               </select>
             </div>
           </div>
+          <div class="creator-fieldset__actions">
+            <button class="btn btn--primary" id="preferences-continue" type="button" hidden>
+              {copy.preferencesContinue}<span aria-hidden="true">&rarr;</span>
+            </button>
+          </div>
         </fieldset>
       </div>
 
@@ -405,6 +410,7 @@ const homeConfig = {
     );
     const scentSelect = form.querySelector<HTMLSelectElement>('#creator-scent')!;
     const musicSelect = form.querySelector<HTMLSelectElement>('#creator-music')!;
+    const preferencesContinue = form.querySelector<HTMLButtonElement>('#preferences-continue')!;
     const submit = form.querySelector<HTMLButtonElement>('#submit-booking')!;
     const formError = form.querySelector<HTMLElement>('#form-error')!;
     const confirmation = document.querySelector<HTMLElement>('#booking-confirmation')!;
@@ -600,6 +606,7 @@ const homeConfig = {
         date.value = '';
         start.value = '';
         details.hidden = true;
+        preferencesContinue.hidden = true;
         slotGrid.replaceChildren();
         slotStatus.textContent = service.value === 'home:custom' ? copy.homeChooseAll : copy.chooseFirst;
       }
@@ -632,6 +639,7 @@ const homeConfig = {
           date.value = '';
           start.value = '';
           details.hidden = true;
+          preferencesContinue.hidden = true;
           slotGrid.replaceChildren();
         }
         calendarStatus.textContent = availableDates.size ? '' : copy.calendarNoAvailability;
@@ -744,6 +752,7 @@ const homeConfig = {
     async function loadSlots() {
       start.value = '';
       details.hidden = true;
+      preferencesContinue.hidden = true;
       slotGrid.replaceChildren();
       const option = selectedOption();
       setChoiceVisibility(option);
@@ -790,7 +799,9 @@ const homeConfig = {
             addressField.hidden = !home;
             address.required = home;
             details.hidden = false;
-            details.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            preferencesContinue.hidden = home;
+            const nextSection = home ? details : creatorFieldset;
+            nextSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
           });
           slotGrid.append(button);
         }
@@ -816,6 +827,12 @@ const homeConfig = {
         12,
       ));
       void loadAvailabilityCalendar(true);
+    });
+    preferencesContinue.addEventListener('click', () => {
+      details.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      window.setTimeout(() => {
+        form.querySelector<HTMLInputElement>('#customer-name')?.focus({ preventScroll: true });
+      }, 450);
     });
     service.addEventListener('change', () => {
       setChoiceVisibility();
@@ -936,6 +953,7 @@ const homeConfig = {
       date.value = '';
       start.value = '';
       details.hidden = true;
+      preferencesContinue.hidden = true;
       slotGrid.replaceChildren();
       slotStatus.textContent = copy.chooseFirst;
       setChoiceVisibility();
@@ -1243,6 +1261,7 @@ const homeConfig = {
     grid-column: 1 / -1;
     margin: 1.4rem 0;
     padding: 1.4rem;
+    scroll-margin-top: 7rem;
     border: 1px solid color-mix(in srgb, var(--logo-green) 35%, var(--border));
     border-radius: var(--radius);
     background: var(--pine-soft);
@@ -1251,6 +1270,7 @@ const homeConfig = {
   .creator-fieldset > p { margin: 0 0 1rem; color: var(--ink-soft); }
   .creator-grid { display: grid; gap: 1rem; }
   @media (min-width: 45rem) { .creator-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .creator-fieldset__actions { display: flex; justify-content: flex-end; margin-top: 1.2rem; }
   .home-builder-fieldset {
     grid-column: 1 / -1;
     margin: 0;
