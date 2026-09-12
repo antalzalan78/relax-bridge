@@ -17,6 +17,7 @@ import type {
 } from '../booking/types';
 import { ensureBookingEmailDeliverySchema } from './booking-email-schema';
 import { getDatabase } from './db';
+import { ensureGoogleCalendarSchema } from './google-calendar-schema';
 
 type Queryable = any;
 
@@ -139,6 +140,7 @@ async function getBusyWindows(
   date: string,
   settings: BookingSettings,
 ): Promise<InstantWindow[]> {
+  await ensureGoogleCalendarSchema();
   const range = localDayInstantRange(date, settings.timeZone);
   const rows = await query`
     SELECT busy_starts_at, busy_ends_at
@@ -146,6 +148,11 @@ async function getBusyWindows(
     WHERE status = 'confirmed'
       AND busy_starts_at < ${range.end}::timestamptz
       AND busy_ends_at > ${range.start}::timestamptz
+    UNION ALL
+    SELECT starts_at AS busy_starts_at, ends_at AS busy_ends_at
+    FROM google_calendar_busy
+    WHERE starts_at < ${range.end}::timestamptz
+      AND ends_at > ${range.start}::timestamptz
   `;
 
   return rows.map((row: any) => ({
@@ -218,6 +225,7 @@ export async function getAvailableDates(input: {
   lastDay: string;
   timeZone: string;
 }> {
+  await ensureGoogleCalendarSchema();
   const query = getDatabase();
   const settings = await getBookingSettings(query);
   const now = Temporal.Instant.from(
@@ -270,6 +278,11 @@ export async function getAvailableDates(input: {
       WHERE status = 'confirmed'
         AND busy_starts_at < ${rangeEnd}::timestamptz
         AND busy_ends_at > ${rangeStart}::timestamptz
+      UNION ALL
+      SELECT starts_at AS busy_starts_at, ends_at AS busy_ends_at
+      FROM google_calendar_busy
+      WHERE starts_at < ${rangeEnd}::timestamptz
+        AND ends_at > ${rangeStart}::timestamptz
     `,
   ]);
 
@@ -366,6 +379,7 @@ export async function getNextAvailableSlot(input: {
   timeZone: string;
   category: BookingCategory;
 } | null> {
+  await ensureGoogleCalendarSchema();
   const query = getDatabase();
   const settings = await getBookingSettings(query);
   const now = Temporal.Instant.from(
@@ -401,6 +415,11 @@ export async function getNextAvailableSlot(input: {
       WHERE status = 'confirmed'
         AND busy_starts_at < ${rangeEnd}::timestamptz
         AND busy_ends_at > ${rangeStart}::timestamptz
+      UNION ALL
+      SELECT starts_at AS busy_starts_at, ends_at AS busy_ends_at
+      FROM google_calendar_busy
+      WHERE starts_at < ${rangeEnd}::timestamptz
+        AND ends_at > ${rangeStart}::timestamptz
     `,
   ]);
 

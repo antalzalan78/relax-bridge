@@ -1,13 +1,28 @@
 import type { APIRoute } from 'astro';
+import { Temporal } from '@js-temporal/polyfill';
 import type { BookingCategory } from '../../lib/booking/types';
-import { todayInTimeZone } from '../../lib/booking/availability';
+import {
+  localDayInstantRange,
+  todayInTimeZone,
+} from '../../lib/booking/availability';
 import { getBookingOptions } from '../../lib/booking/catalog';
-import { getNextAvailableSlot } from '../../lib/server/booking-repository';
+import {
+  getBookingSettings,
+  getNextAvailableSlot,
+} from '../../lib/server/booking-repository';
+import { safelyRefreshGoogleCalendarBusy } from '../../lib/server/google-calendar';
 
 export const prerender = false;
 
 export const GET: APIRoute = async () => {
   try {
+    const settings = await getBookingSettings();
+    const today = Temporal.PlainDate.from(todayInTimeZone(settings.timeZone));
+    const lastDay = today.add({ days: settings.bookingHorizonDays });
+    await safelyRefreshGoogleCalendarBusy({
+      start: localDayInstantRange(today.toString(), settings.timeZone).start,
+      end: localDayInstantRange(lastDay.toString(), settings.timeZone).end,
+    });
     const options = await getBookingOptions('nl');
     const shortestByCategory = new Map<BookingCategory, number>();
 

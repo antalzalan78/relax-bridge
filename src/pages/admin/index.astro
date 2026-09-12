@@ -16,6 +16,16 @@ import {
 import { assertSameOrigin } from '../../lib/server/security';
 import { retryBookingEmails } from '../../lib/server/booking-email';
 import { resolveOpenWindows } from '../../lib/booking/availability';
+import {
+  getGoogleCalendarStatus,
+  listGoogleCalendarBusy,
+  listWritableGoogleCalendars,
+  safelyRefreshGoogleCalendarBusy,
+  safelyRemoveGoogleCalendarEntity,
+  safelySyncGoogleCalendarEntity,
+  selectGoogleCalendar,
+  syncAllToGoogleCalendar,
+} from '../../lib/server/google-calendar';
 import AdminHeader from '../../components/AdminHeader.astro';
 import '../../styles/global.css';
 
@@ -49,9 +59,11 @@ if (Astro.request.method === 'POST') {
         endTime: z.string().regex(/^\d{2}:\d{2}$/),
       }).parse(form);
       if (input.startTime >= input.endTime) throw new Error('Invalid time range');
-      await addAvailabilityRule(input);
+      const id = await addAvailabilityRule(input);
+      await safelySyncGoogleCalendarEntity('availability_rule', id);
     } else if (action === 'delete_rule') {
       const { id } = z.object({ id: z.uuid() }).parse(form);
+      await safelyRemoveGoogleCalendarEntity('availability_rule', id);
       await deleteAvailabilityRule(id);
     } else if (action === 'add_exception') {
       const input = z.object({
@@ -71,16 +83,32 @@ if (Astro.request.method === 'POST') {
       if (input.kind === 'open' && (!startTime || !endTime)) {
         throw new Error('Open exceptions require a time range');
       }
-      await addAvailabilityException({ ...input, startTime, endTime });
+      const id = await addAvailabilityException({ ...input, startTime, endTime });
+      await safelySyncGoogleCalendarEntity('availability_exception', id);
     } else if (action === 'delete_exception') {
       const { id } = z.object({ id: z.uuid() }).parse(form);
+      await safelyRemoveGoogleCalendarEntity('availability_exception', id);
       await deleteAvailabilityException(id);
     } else if (action === 'cancel_booking') {
       const { id } = z.object({ id: z.uuid() }).parse(form);
       await cancelBooking(id);
+      await safelyRemoveGoogleCalendarEntity('booking', id);
     } else if (action === 'retry_booking_emails') {
       const { id } = z.object({ id: z.uuid() }).parse(form);
       await retryBookingEmails(id);
+    } else if (action === 'select_google_calendar') {
+      const { calendarId } = z.object({
+        calendarId: z.string().trim().min(1).max(500),
+      }).parse(form);
+      const calendars = await listWritableGoogleCalendars();
+      const calendar = calendars.find((item) => item.id === calendarId);
+      if (!calendar) throw new Error('The selected Google Calendar is not writable.');
+      await selectGoogleCalendar({
+        calendarId: calendar.id,
+        calendarSummary: calendar.summary,
+      });
+    } else if (action === 'sync_google_calendar') {
+      await syncAllToGoogleCalendar();
     }
     return Astro.redirect(`/admin?week=${weekStart.toString()}`, 303);
   } catch (error) {
@@ -99,10 +127,12 @@ const endInstant = weekEnd.toZonedDateTime({
   plainTime: Temporal.PlainTime.from('00:00'),
 }).toInstant().toString();
 
-const [rules, exceptions, bookings] = await Promise.all([
+await safelyRefreshGoogleCalendarBusy({ start: startInstant, end: endInstant });
+const [rules, exceptions, bookings, googleBusy] = await Promise.all([
   listAvailabilityRules(),
   listAvailabilityExceptions(weekStart.toString(), weekEnd.subtract({ days: 1 }).toString()),
   listBookings(startInstant, endInstant),
+  listGoogleCalendarBusy({ start: startInstant, end: endInstant }),
 ]);
 
 const weekdays = ['Hétfő', 'Kedd', 'Szerda', 'Csütörtök', 'Péntek', 'Szombat', 'Vasárnap'];
@@ -149,6 +179,34 @@ const emailStatusLabel = (value: unknown) => ({
   sent: 'elküldve',
   failed: 'sikertelen',
 }[String(value)] || 'nem volt ütemezve');
+const googleNotice = ({
+  connected: 'A Google-fiók csatlakoztatva. Válaszd ki a használni kívánt naptárt.',
+  denied: 'A Google Calendar hozzáférése nem lett engedélyezve.',
+  'invalid-state': 'A Google-kapcsolat időkorlátja lejárt. Indítsd el újra a csatlakoztatást.',
+  'connection-failed': 'A Google Calendar csatlakoztatása nem sikerült.',
+  'not-configured': 'A Google Calendar környezeti beállításai még hiányoznak.',
+} as Record<string, string>)[Astro.url.searchParams.get('google') || ''];
+let googleStatus = await getGoogleCalendarStatus();
+let googleCalendars: Awaited<ReturnType<typeof listWritableGoogleCalendars>> = [];
+if (googleStatus.configured && googleStatus.connected) {
+  try {
+    googleCalendars = await listWritableGoogleCalendars();
+  } catch (error) {
+    console.error('Google Calendar list could not be loaded', error);
+  }
+}
+const googleBusyByDay = new Map(days.map((day) => [day.toString(), [] as any[]]));
+for (const busy of googleBusy) {
+  const key = localBooking(busy.starts_at).toPlainDate().toString();
+  googleBusyByDay.get(key)?.push(busy);
+}
+const syncTime = (value: unknown) => value
+  ? new Intl.DateTimeFormat('hu-HU', {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+      timeZone: settings.timeZone,
+    }).format(new Date(value as string | number | Date))
+  : 'még nem történt';
 ---
 
 <!doctype html>
@@ -171,6 +229,7 @@ const emailStatusLabel = (value: unknown) => ({
             <span><i class="booking-legend__swatch booking-legend__swatch--open"></i>Foglalható idősáv</span>
             <span><i class="booking-legend__swatch booking-legend__swatch--studio"></i>Stúdió</span>
             <span><i class="booking-legend__swatch booking-legend__swatch--home"></i>Home service</span>
+            <span><i class="booking-legend__swatch booking-legend__swatch--google"></i>Google Naptárban foglalt</span>
           </div>
         </div>
         <nav class="week-nav" aria-label="Hétválasztó">
@@ -185,6 +244,7 @@ const emailStatusLabel = (value: unknown) => ({
           const dayBookings = bookingsByDay.get(day.toString()) || [];
           const dayExceptions = exceptionsByDay.get(day.toString()) || [];
           const openWindows = openWindowsByDay.get(day.toString()) || [];
+          const googleBusyWindows = googleBusyByDay.get(day.toString()) || [];
           return (
             <article class:list={['calendar-day', { 'calendar-day--today': day.equals(today) }]}>
               <header>
@@ -207,6 +267,19 @@ const emailStatusLabel = (value: unknown) => ({
                   <small>{exception.start_time ? `${shortTime(exception.start_time)}–${shortTime(exception.end_time)}` : 'egész nap'}{exception.reason ? ` · ${exception.reason}` : ''}</small>
                 </div>
               ))}
+              {googleBusyWindows.map((busy) => {
+                const busyStart = localBooking(busy.starts_at);
+                const busyEnd = localBooking(busy.ends_at);
+                return (
+                  <div class="google-busy-chip">
+                    <span>Google Naptárban foglalt</span>
+                    <strong>
+                      {String(busyStart.hour).padStart(2, '0')}:{String(busyStart.minute).padStart(2, '0')}
+                      –{String(busyEnd.hour).padStart(2, '0')}:{String(busyEnd.minute).padStart(2, '0')}
+                    </strong>
+                  </div>
+                );
+              })}
               <div class="day-bookings">
                 {dayBookings.length === 0 && <p class="empty-day">Nincs foglalás</p>}
                 {dayBookings.map((booking) => {
@@ -328,6 +401,68 @@ const emailStatusLabel = (value: unknown) => ({
           </div>
         </article>
       </section>
+
+      <section class="google-calendar-panel" aria-labelledby="google-calendar-title">
+        <span class="panel-number">03</span>
+        <div>
+          <span class="eyebrow">Külső naptár</span>
+          <h2 id="google-calendar-title">Google Calendar-szinkronizálás</h2>
+          <p>
+            A weboldalas foglalások és a megnyitott idősávok megjelennek a kiválasztott
+            Google Naptárban. A Google Naptár foglalt eseményeit a weboldal automatikusan
+            kizárja a foglalható időpontokból.
+          </p>
+          {googleNotice && <p class="google-notice">{googleNotice}</p>}
+          {!googleStatus.configured ? (
+            <p class="google-state google-state--pending">
+              A technikai Google-kulcsok beállítása szükséges a csatlakoztatás előtt.
+            </p>
+          ) : !googleStatus.connected ? (
+            <a class="btn btn--primary" href="/api/admin/google-calendar/connect">
+              Google Naptár csatlakoztatása
+            </a>
+          ) : (
+            <div class="google-calendar-controls">
+              <p class="google-state google-state--connected">
+                <strong>Google-fiók csatlakoztatva</strong>
+                {googleStatus.calendarSummary
+                  ? ` · Kiválasztott naptár: ${googleStatus.calendarSummary}`
+                  : ' · Még nincs kiválasztott naptár.'}
+              </p>
+              <form class="google-calendar-form" method="post">
+                <input type="hidden" name="action" value="select_google_calendar" />
+                <label>Naptár
+                  <select name="calendarId" required>
+                    <option value="">Válassz naptárt</option>
+                    {googleCalendars.map((calendar) => (
+                      <option
+                        value={calendar.id}
+                        selected={calendar.id === googleStatus.calendarId}
+                      >
+                        {calendar.summary}{calendar.primary ? ' (elsődleges)' : ''}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <button class="btn btn--primary" type="submit">Naptár mentése</button>
+              </form>
+              {googleStatus.selected && (
+                <form method="post">
+                  <input type="hidden" name="action" value="sync_google_calendar" />
+                  <button class="btn btn--outline" type="submit">Szinkronizálás most</button>
+                </form>
+              )}
+              <dl class="google-sync-meta">
+                <div><dt>Foglalások és nyitvatartás</dt><dd>{syncTime(googleStatus.lastOutboundSyncAt)}</dd></div>
+                <div><dt>Google foglaltság</dt><dd>{syncTime(googleStatus.lastBusySyncAt)}</dd></div>
+              </dl>
+              {googleStatus.lastError && (
+                <p class="google-error">Utolsó szinkronhiba: {googleStatus.lastError}</p>
+              )}
+            </div>
+          )}
+        </div>
+      </section>
     </main>
   </body>
 </html>
@@ -348,6 +483,7 @@ const emailStatusLabel = (value: unknown) => ({
   .booking-legend__swatch--open { width: 1rem; border: 1px solid var(--pine); border-radius: 0.18rem; background: var(--pine-soft); }
   .booking-legend__swatch--studio { background: var(--pine); }
   .booking-legend__swatch--home { background: var(--clay); }
+  .booking-legend__swatch--google { background: #5f6f8f; }
   .calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(9rem, 1fr)); overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow-soft); }
   .calendar-day { min-height: 24rem; padding: 0.75rem; border-right: 1px solid var(--border); }
   .calendar-day:last-child { border: 0; }
@@ -362,6 +498,9 @@ const emailStatusLabel = (value: unknown) => ({
   .exception-chip { display: grid; margin-bottom: 0.5rem; padding: 0.5rem; border-radius: 0.45rem; background: var(--clay-soft); color: var(--clay-dark); font-size: 0.72rem; }
   .exception-chip--open { background: var(--pine-soft); color: var(--pine-dark); }
   .exception-chip small { opacity: 0.78; }
+  .google-busy-chip { display: grid; gap: 0.12rem; margin-bottom: 0.5rem; padding: 0.5rem 0.6rem; border-left: 3px solid #5f6f8f; border-radius: 0.4rem; background: #edf0f6; color: #34415d; }
+  .google-busy-chip span { font-size: 0.62rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; }
+  .google-busy-chip strong { font-size: 0.76rem; }
   .empty-day { color: var(--ink-soft); font-size: 0.75rem; }
   .booking-item { margin-bottom: 0.5rem; border-left: 3px solid; border-radius: 0.4rem; }
   .booking-item--studio { border-left-color: var(--pine); background: var(--pine-soft); }
@@ -406,10 +545,26 @@ const emailStatusLabel = (value: unknown) => ({
   .admin-panel--dark .rule-row { border-color: var(--border-dark); }
   .rule-row span { font-size: 0.84rem; }
   .icon-button { width: 2rem; height: 2rem; border: 0; border-radius: 50%; background: var(--clay-soft); color: var(--clay-dark); cursor: pointer; font-size: 1.2rem; }
+  .google-calendar-panel { position: relative; overflow: hidden; margin-top: 1.5rem; padding: clamp(1.4rem, 3vw, 2.5rem); border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow-soft); }
+  .google-calendar-panel h2 { max-width: none; font-size: clamp(1.8rem, 4vw, 2.8rem); }
+  .google-calendar-panel > div > p { max-width: 52rem; color: var(--ink-soft); }
+  .google-notice, .google-state, .google-error { padding: 0.75rem 0.9rem; border-radius: var(--radius-sm); }
+  .google-notice, .google-state--pending { background: var(--clay-soft); color: var(--clay-dark) !important; }
+  .google-state--connected { background: var(--pine-soft); color: var(--pine-dark) !important; }
+  .google-error { background: #f8e5e2; color: #8f2f24 !important; overflow-wrap: anywhere; }
+  .google-calendar-controls { display: grid; gap: 1rem; margin-top: 1.2rem; }
+  .google-calendar-form { display: grid; grid-template-columns: minmax(15rem, 1fr) auto; gap: 0.75rem; align-items: end; max-width: 48rem; }
+  .google-calendar-form label { color: var(--pine-dark); font-size: 0.67rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+  .google-calendar-form select { display: block; width: 100%; min-height: 2.75rem; margin-top: 0.35rem; padding: 0.55rem; border: 1px solid var(--border); border-radius: var(--radius-sm); background: #fff; color: var(--ink); font: inherit; }
+  .google-sync-meta { display: flex; flex-wrap: wrap; gap: 1rem 2rem; margin: 0; }
+  .google-sync-meta div { display: grid; gap: 0.2rem; }
+  .google-sync-meta dt { color: var(--ink-soft); font-size: 0.67rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+  .google-sync-meta dd { margin: 0; font-weight: 700; }
   @media (max-width: 52rem) {
     .admin-title { display: block; }
     .week-nav { width: fit-content; margin-top: 1rem; }
     .compact-form { grid-template-columns: 1fr; }
     .compact-form .btn, .compact-form .checkbox-label, .compact-form .wide-field { grid-column: auto; }
+    .google-calendar-form { grid-template-columns: 1fr; }
   }
 </style>

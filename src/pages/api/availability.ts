@@ -6,7 +6,11 @@ import {
   getAvailableSlots,
   getBookingSettings,
 } from '../../lib/server/booking-repository';
-import { todayInTimeZone } from '../../lib/booking/availability';
+import {
+  localDayInstantRange,
+  todayInTimeZone,
+} from '../../lib/booking/availability';
+import { safelyRefreshGoogleCalendarBusy } from '../../lib/server/google-calendar';
 
 export const prerender = false;
 
@@ -42,6 +46,11 @@ export const GET: APIRoute = async ({ url }) => {
 
   try {
     if ('from' in parsed.data) {
+      const settings = await getBookingSettings();
+      await safelyRefreshGoogleCalendarBusy({
+        start: localDayInstantRange(parsed.data.from, settings.timeZone).start,
+        end: localDayInstantRange(parsed.data.to, settings.timeZone).end,
+      });
       const calendar = await getAvailableDates({
         from: parsed.data.from,
         to: parsed.data.to,
@@ -62,6 +71,9 @@ export const GET: APIRoute = async ({ url }) => {
     ) {
       return Response.json({ error: 'date_out_of_range' }, { status: 400 });
     }
+
+    const range = localDayInstantRange(parsed.data.date, settings.timeZone);
+    await safelyRefreshGoogleCalendarBusy(range);
 
     const slots = await getAvailableSlots({
       date: parsed.data.date,
