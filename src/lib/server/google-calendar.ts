@@ -12,6 +12,9 @@ import { ensureGoogleCalendarSchema } from './google-calendar-schema';
 const GOOGLE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
 const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const GOOGLE_CALENDAR_API = 'https://www.googleapis.com/calendar/v3';
+const GOOGLE_CALENDAR_CALLBACK_PATH =
+  '/api/admin/google-calendar/callback';
+const GOOGLE_CALENDAR_PRODUCTION_ORIGIN = 'https://www.relaxbridge.nl';
 const OAUTH_STATE_SECONDS = 10 * 60;
 const GOOGLE_SCOPES = [
   'https://www.googleapis.com/auth/calendar.events',
@@ -49,11 +52,26 @@ class GoogleApiError extends Error {
   }
 }
 
+function redirectUri() {
+  const configured = process.env.GOOGLE_CALENDAR_REDIRECT_URI?.trim();
+  if (configured) return configured;
+
+  if (process.env.VERCEL_ENV === 'production') {
+    return `${GOOGLE_CALENDAR_PRODUCTION_ORIGIN}${GOOGLE_CALENDAR_CALLBACK_PATH}`;
+  }
+
+  const previewHost =
+    process.env.VERCEL_BRANCH_URL?.trim() || process.env.VERCEL_URL?.trim();
+  return previewHost
+    ? `https://${previewHost}${GOOGLE_CALENDAR_CALLBACK_PATH}`
+    : undefined;
+}
+
 function configuration() {
   return {
     clientId: process.env.GOOGLE_CALENDAR_CLIENT_ID?.trim(),
     clientSecret: process.env.GOOGLE_CALENDAR_CLIENT_SECRET?.trim(),
-    redirectUri: process.env.GOOGLE_CALENDAR_REDIRECT_URI?.trim(),
+    redirectUri: redirectUri(),
     tokenKey: process.env.GOOGLE_CALENDAR_TOKEN_KEY?.trim(),
   };
 }

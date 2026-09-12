@@ -139,9 +139,13 @@ Ezután állítsd be a következő Vercel-környezeti változókat:
 ```text
 GOOGLE_CALENDAR_CLIENT_ID
 GOOGLE_CALENDAR_CLIENT_SECRET
-GOOGLE_CALENDAR_REDIRECT_URI=https://www.relaxbridge.nl/api/admin/google-calendar/callback
 GOOGLE_CALENDAR_TOKEN_KEY
 ```
+
+A visszahívási címet a rendszer Vercelen automatikusan állítja elő: élesben a
+`www.relaxbridge.nl` címet, előnézetben pedig a stabil `VERCEL_BRANCH_URL`
+ág-domaint használja. A `GOOGLE_CALENDAR_REDIRECT_URI` csak helyi vagy nem
+Vercel-környezetben szükséges felülírásként.
 
 A `GOOGLE_CALENDAR_TOKEN_KEY` egy 32 bájtos, base64 kódolású titkos kulcs. Az
 OAuth hozzáférési és frissítési tokenek ezzel AES-256-GCM titkosítva kerülnek az
