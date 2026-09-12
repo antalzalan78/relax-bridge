@@ -2,6 +2,8 @@ export const creatorMaximumMinutes = 120;
 
 export const creatorBases = {
   relax: { minutes: 60, priceEur: 65, serviceKey: 'relax' },
+  relax90: { minutes: 90, priceEur: 95, serviceKey: 'relax' },
+  back30: { minutes: 30, priceEur: 45, serviceKey: 'neck-shoulder-back' },
   back: { minutes: 60, priceEur: 70, serviceKey: 'neck-shoulder-back' },
 } as const;
 
@@ -43,7 +45,7 @@ export function calculateCreatorSelection(selection: CreatorSelection): CreatorC
   if (![0, 30].includes(back) || ![0, 15, 30].includes(face) || ![0, 15, 30].includes(foot)) {
     return null;
   }
-  if (selection.base === 'back' && back !== 0) return null;
+  if (base.serviceKey === 'neck-shoulder-back' && back !== 0) return null;
 
   const minutes = base.minutes + back + face + foot;
   if (minutes > creatorMaximumMinutes) return null;

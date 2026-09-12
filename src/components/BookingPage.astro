@@ -331,7 +331,7 @@ const homeConfig = {
         && [0, 30].includes(back)
         && validDurations.includes(face)
         && validDurations.includes(foot)
-        && !(base === 'back' && back)
+        && !(baseConfig.serviceKey === 'neck-shoulder-back' && back)
         && minutes <= creatorConfig.maximumMinutes;
 
       if (valid) {
