@@ -134,6 +134,7 @@ const homeConfig = {
             ))}
             <option value="home:custom" data-category="home">{copy.home}</option>
           </select>
+          <p class="field-instruction">{copy.serviceInstruction}</p>
         </div>
 
         <fieldset class="home-builder-fieldset" id="home-builder-fieldset" hidden disabled>
@@ -1233,6 +1234,7 @@ const homeConfig = {
   .booking-calendar__legend { display: flex; gap: 0.42rem; align-items: center; margin-top: 0.75rem; color: var(--ink-soft); font-size: 0.7rem; font-weight: 700; }
   .booking-calendar__legend i { width: 0.85rem; height: 0.85rem; border: 1px solid color-mix(in srgb, var(--logo-green) 52%, var(--border)); border-radius: 0.2rem; background: var(--pine-soft); }
   .slot-fieldset { min-width: 0; margin: 0; padding: 1.5rem 0 0; border: 0; border-top: 1px solid var(--border); }
+  .field-instruction { margin: 0.65rem 0 0; color: var(--ink-soft); font-size: 0.82rem; line-height: 1.5; }
   .slot-status { margin: 0; color: var(--ink-soft); }
   .slot-status:empty { display: none; }
   .slot-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(5.2rem, 1fr)); gap: 0.65rem; }
