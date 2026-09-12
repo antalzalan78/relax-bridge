@@ -206,6 +206,154 @@ export async function getAvailableSlots(input: {
   });
 }
 
+export async function getAvailableDates(input: {
+  from: string;
+  to: string;
+  category: BookingCategory;
+  durationMinutes: number;
+  now?: string;
+}): Promise<{
+  dates: string[];
+  today: string;
+  lastDay: string;
+  timeZone: string;
+}> {
+  const query = getDatabase();
+  const settings = await getBookingSettings(query);
+  const now = Temporal.Instant.from(
+    input.now ?? Temporal.Now.instant().toString(),
+  );
+  const today = now.toZonedDateTimeISO(settings.timeZone).toPlainDate();
+  const bookingLastDay = today.add({ days: settings.bookingHorizonDays });
+  const requestedFirstDay = Temporal.PlainDate.from(input.from);
+  const requestedLastDay = Temporal.PlainDate.from(input.to);
+  const firstDay = Temporal.PlainDate.compare(requestedFirstDay, today) < 0
+    ? today
+    : requestedFirstDay;
+  const lastDay = Temporal.PlainDate.compare(requestedLastDay, bookingLastDay) > 0
+    ? bookingLastDay
+    : requestedLastDay;
+
+  if (Temporal.PlainDate.compare(firstDay, lastDay) > 0) {
+    return {
+      dates: [],
+      today: today.toString(),
+      lastDay: bookingLastDay.toString(),
+      timeZone: settings.timeZone,
+    };
+  }
+
+  const firstDate = firstDay.toString();
+  const lastDate = lastDay.toString();
+  const rangeStart = localDayInstantRange(firstDate, settings.timeZone).start;
+  const rangeEnd = localDayInstantRange(lastDate, settings.timeZone).end;
+  const [rules, exceptions, busyRows] = await Promise.all([
+    query`
+      SELECT weekday, start_time::text AS start_time, end_time::text AS end_time,
+        valid_from::text AS valid_from, valid_until::text AS valid_until
+      FROM availability_rules
+      WHERE active = true
+        AND (valid_from IS NULL OR valid_from <= ${lastDate}::date)
+        AND (valid_until IS NULL OR valid_until >= ${firstDate}::date)
+      ORDER BY weekday, start_time
+    `,
+    query`
+      SELECT day::text AS day, kind,
+        start_time::text AS start_time, end_time::text AS end_time
+      FROM availability_exceptions
+      WHERE day BETWEEN ${firstDate}::date AND ${lastDate}::date
+      ORDER BY day, start_time NULLS FIRST
+    `,
+    query`
+      SELECT busy_starts_at, busy_ends_at
+      FROM bookings
+      WHERE status = 'confirmed'
+        AND busy_starts_at < ${rangeEnd}::timestamptz
+        AND busy_ends_at > ${rangeStart}::timestamptz
+    `,
+  ]);
+
+  const exceptionsByDay = new Map<string, any[]>();
+  for (const exception of exceptions) {
+    const day = String(exception.day);
+    const current = exceptionsByDay.get(day) ?? [];
+    current.push(exception);
+    exceptionsByDay.set(day, current);
+  }
+
+  const busyWindows: InstantWindow[] = busyRows.map((row: any) => ({
+    start: new Date(row.busy_starts_at).toISOString(),
+    end: new Date(row.busy_ends_at).toISOString(),
+  }));
+  const minimumStart = now.add({ hours: settings.minNoticeHours }).toString();
+  const dates: string[] = [];
+
+  for (
+    let day = firstDay;
+    Temporal.PlainDate.compare(day, lastDay) <= 0;
+    day = day.add({ days: 1 })
+  ) {
+    const date = day.toString();
+    const open: LocalTimeWindow[] = rules
+      .filter(
+        (rule: any) =>
+          numberValue(rule.weekday) === day.dayOfWeek &&
+          (!rule.valid_from || String(rule.valid_from) <= date) &&
+          (!rule.valid_until || String(rule.valid_until) >= date),
+      )
+      .map((rule: any) => ({
+        start: shortTime(rule.start_time),
+        end: shortTime(rule.end_time),
+      }));
+    const blocked: InstantWindow[] = [];
+
+    for (const exception of exceptionsByDay.get(date) ?? []) {
+      if (exception.kind === 'open' && exception.start_time && exception.end_time) {
+        open.push({
+          start: shortTime(exception.start_time),
+          end: shortTime(exception.end_time),
+        });
+      } else if (exception.kind === 'blocked') {
+        blocked.push(
+          exception.start_time && exception.end_time
+            ? localTimeWindowInstantRange(date, settings.timeZone, {
+                start: shortTime(exception.start_time),
+                end: shortTime(exception.end_time),
+              })
+            : localDayInstantRange(date, settings.timeZone),
+        );
+      }
+    }
+
+    const isHome = input.category === 'home';
+    const slots = buildAvailableSlots({
+      date,
+      timeZone: settings.timeZone,
+      openWindows: open,
+      blockedWindows: blocked,
+      busyWindows,
+      durationMinutes: input.durationMinutes,
+      bufferBeforeMinutes: isHome
+        ? settings.homeBufferBeforeMinutes
+        : settings.studioBufferBeforeMinutes,
+      bufferAfterMinutes: isHome
+        ? settings.homeBufferAfterMinutes
+        : settings.studioBufferAfterMinutes,
+      stepMinutes: settings.slotIntervalMinutes,
+      minStart: minimumStart,
+    });
+
+    if (slots.length > 0) dates.push(date);
+  }
+
+  return {
+    dates,
+    today: today.toString(),
+    lastDay: bookingLastDay.toString(),
+    timeZone: settings.timeZone,
+  };
+}
+
 export async function getNextAvailableSlot(input: {
   candidates: Array<{
     category: BookingCategory;
