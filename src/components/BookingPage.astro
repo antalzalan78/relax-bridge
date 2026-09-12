@@ -506,6 +506,27 @@ const homeConfig = {
         ? buildHomeOption()
         : options.find((option: any) => option.id === service.value);
 
+    const calendarOption = () => {
+      const selected = selectedOption();
+      if (selected) return selected;
+
+      if (requestedCategory === 'home' || service.value === 'home:custom') {
+        return {
+          category: 'home',
+          minutes: homeMinimumTreatmentMinutes,
+          reservedMinutes: homeMinimumTreatmentMinutes,
+        };
+      }
+
+      if (requestedCategory === 'studio') {
+        return options
+          .filter((option: any) => option.category === 'studio')
+          .sort((left: any, right: any) => left.minutes - right.minutes)[0];
+      }
+
+      return undefined;
+    };
+
     const calendarMonthBounds = () => {
       const year = calendarMonth.getUTCFullYear();
       const month = calendarMonth.getUTCMonth();
@@ -585,7 +606,7 @@ const homeConfig = {
       availableDates = new Set();
       renderCalendar();
 
-      const option = selectedOption();
+      const option = calendarOption();
       if (!option) {
         calendarStatus.textContent = copy.calendarChooseTreatment;
         return;
@@ -836,6 +857,8 @@ const homeConfig = {
       void loadAvailabilityCalendar();
     } else if (service.value === 'home:custom') {
       setChoiceVisibility();
+      void loadAvailabilityCalendar();
+    } else if (requestedCategory === 'studio') {
       void loadAvailabilityCalendar();
     }
 
