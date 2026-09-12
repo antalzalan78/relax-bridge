@@ -174,10 +174,25 @@ const homeConfig = {
           </div>
         </fieldset>
 
-        <div>
-          <label for="booking-date">{copy.date}</label>
-          <input id="booking-date" name="date" type="date" required />
-        </div>
+        <fieldset class="booking-date-field">
+          <legend>{copy.date}</legend>
+          <input id="booking-date" name="date" type="hidden" />
+          <div class="booking-calendar">
+            <div class="booking-calendar__header">
+              <button id="calendar-previous" type="button" aria-label={copy.calendarPrevious}>&larr;</button>
+              <strong id="calendar-month"></strong>
+              <button id="calendar-next" type="button" aria-label={copy.calendarNext}>&rarr;</button>
+            </div>
+            <div class="booking-calendar__weekdays" id="calendar-weekdays" aria-hidden="true"></div>
+            <div class="booking-calendar__grid" id="calendar-grid" role="grid"></div>
+            <p class="booking-calendar__status" id="calendar-status" aria-live="polite">
+              {copy.calendarChooseTreatment}
+            </p>
+            <div class="booking-calendar__legend">
+              <i aria-hidden="true"></i>{copy.calendarAvailable}
+            </div>
+          </div>
+        </fieldset>
 
         <fieldset class="slot-fieldset">
           <legend>{copy.time}</legend>
@@ -363,6 +378,12 @@ const homeConfig = {
         )
       : undefined);
     const date = form.querySelector<HTMLInputElement>('#booking-date')!;
+    const calendarMonthLabel = form.querySelector<HTMLElement>('#calendar-month')!;
+    const calendarWeekdays = form.querySelector<HTMLElement>('#calendar-weekdays')!;
+    const calendarGrid = form.querySelector<HTMLElement>('#calendar-grid')!;
+    const calendarStatus = form.querySelector<HTMLElement>('#calendar-status')!;
+    const calendarPrevious = form.querySelector<HTMLButtonElement>('#calendar-previous')!;
+    const calendarNext = form.querySelector<HTMLButtonElement>('#calendar-next')!;
     const slotStatus = form.querySelector<HTMLElement>('#slot-status')!;
     const slotGrid = form.querySelector<HTMLElement>('#slot-grid')!;
     const start = form.querySelector<HTMLInputElement>('#start')!;
@@ -406,11 +427,46 @@ const homeConfig = {
         day: '2-digit',
       }).format(value);
     const today = dateInAmsterdam();
-    const maximum = new Date(`${today}T12:00:00Z`);
-    maximum.setUTCDate(maximum.getUTCDate() + 60);
-    date.min = today;
-    date.max = dateInAmsterdam(maximum);
-    date.value = today;
+    const utcDate = (value: string) => new Date(`${value}T12:00:00Z`);
+    const isoDate = (value: Date) => value.toISOString().slice(0, 10);
+    const addUtcDays = (value: string, days: number) => {
+      const result = utcDate(value);
+      result.setUTCDate(result.getUTCDate() + days);
+      return isoDate(result);
+    };
+    const defaultMaximum = addUtcDays(today, 60);
+    let calendarMaximum = defaultMaximum;
+    let calendarMonth = new Date(Date.UTC(
+      utcDate(today).getUTCFullYear(),
+      utcDate(today).getUTCMonth(),
+      1,
+      12,
+    ));
+    let availableDates = new Set<string>();
+    let calendarRequest = 0;
+    date.value = '';
+
+    const monthFormatter = new Intl.DateTimeFormat(dateLocale, {
+      month: 'long',
+      year: 'numeric',
+      timeZone: 'UTC',
+    });
+    const dayFormatter = new Intl.DateTimeFormat(dateLocale, {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      timeZone: 'UTC',
+    });
+    const weekdayFormatter = new Intl.DateTimeFormat(dateLocale, {
+      weekday: 'short',
+      timeZone: 'UTC',
+    });
+    for (let index = 0; index < 7; index += 1) {
+      const weekday = document.createElement('span');
+      weekday.textContent = weekdayFormatter.format(new Date(Date.UTC(2026, 0, 5 + index, 12)));
+      calendarWeekdays.append(weekday);
+    }
 
     const activeHomeSelects = () =>
       homeTreatmentSelects.slice(0, Number(homeGuestCount.value || 1));
@@ -449,6 +505,143 @@ const homeConfig = {
       service.value === 'home:custom'
         ? buildHomeOption()
         : options.find((option: any) => option.id === service.value);
+
+    const calendarOption = () => {
+      const selected = selectedOption();
+      if (selected) return selected;
+
+      if (requestedCategory === 'home' || service.value === 'home:custom') {
+        return {
+          category: 'home',
+          minutes: homeMinimumTreatmentMinutes,
+          reservedMinutes: homeMinimumTreatmentMinutes,
+        };
+      }
+
+      if (requestedCategory === 'studio') {
+        return options
+          .filter((option: any) => option.category === 'studio')
+          .sort((left: any, right: any) => left.minutes - right.minutes)[0];
+      }
+
+      return undefined;
+    };
+
+    const calendarMonthBounds = () => {
+      const year = calendarMonth.getUTCFullYear();
+      const month = calendarMonth.getUTCMonth();
+      return {
+        first: new Date(Date.UTC(year, month, 1, 12)),
+        last: new Date(Date.UTC(year, month + 1, 0, 12)),
+      };
+    };
+
+    const renderCalendar = () => {
+      const { first, last } = calendarMonthBounds();
+      const firstWeekday = (first.getUTCDay() + 6) % 7;
+      const minimumMonth = new Date(Date.UTC(
+        utcDate(today).getUTCFullYear(),
+        utcDate(today).getUTCMonth(),
+        1,
+        12,
+      ));
+      const maximumDate = utcDate(calendarMaximum);
+      const maximumMonth = new Date(Date.UTC(
+        maximumDate.getUTCFullYear(),
+        maximumDate.getUTCMonth(),
+        1,
+        12,
+      ));
+
+      calendarMonthLabel.textContent = monthFormatter.format(first);
+      calendarPrevious.disabled = calendarMonth.getTime() <= minimumMonth.getTime();
+      calendarNext.disabled = calendarMonth.getTime() >= maximumMonth.getTime();
+      calendarGrid.replaceChildren();
+
+      for (let index = 0; index < firstWeekday; index += 1) {
+        const blank = document.createElement('span');
+        blank.className = 'booking-calendar__blank';
+        blank.setAttribute('aria-hidden', 'true');
+        calendarGrid.append(blank);
+      }
+
+      for (let day = 1; day <= last.getUTCDate(); day += 1) {
+        const calendarDate = new Date(Date.UTC(
+          first.getUTCFullYear(),
+          first.getUTCMonth(),
+          day,
+          12,
+        ));
+        const value = isoDate(calendarDate);
+        const available = availableDates.has(value);
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'booking-calendar__day';
+        button.textContent = String(day);
+        button.setAttribute('role', 'gridcell');
+        button.setAttribute('aria-label', dayFormatter.format(calendarDate));
+        button.setAttribute('aria-pressed', String(date.value === value));
+        button.disabled = !available || value < today || value > calendarMaximum;
+        if (available) button.dataset.available = 'true';
+        if (value === today) button.dataset.today = 'true';
+        if (date.value === value) button.dataset.selected = 'true';
+        button.addEventListener('click', () => {
+          date.value = value;
+          renderCalendar();
+          void loadSlots();
+        });
+        calendarGrid.append(button);
+      }
+    };
+
+    const loadAvailabilityCalendar = async (resetDate = false) => {
+      const requestId = ++calendarRequest;
+      if (resetDate) {
+        date.value = '';
+        start.value = '';
+        details.hidden = true;
+        slotGrid.replaceChildren();
+        slotStatus.textContent = service.value === 'home:custom' ? copy.homeChooseAll : copy.chooseFirst;
+      }
+      availableDates = new Set();
+      renderCalendar();
+
+      const option = calendarOption();
+      if (!option) {
+        calendarStatus.textContent = copy.calendarChooseTreatment;
+        return;
+      }
+
+      calendarStatus.textContent = copy.calendarLoading;
+      const { first, last } = calendarMonthBounds();
+      const params = new URLSearchParams({
+        from: isoDate(first),
+        to: isoDate(last),
+        category: option.category,
+        minutes: String(option.reservedMinutes || option.minutes),
+      });
+
+      try {
+        const response = await fetch(`/api/availability?${params}`);
+        if (!response.ok) throw new Error('availability');
+        const payload = await response.json();
+        if (requestId !== calendarRequest) return;
+        calendarMaximum = payload.lastDay || defaultMaximum;
+        availableDates = new Set(payload.dates || []);
+        if (date.value && !availableDates.has(date.value)) {
+          date.value = '';
+          start.value = '';
+          details.hidden = true;
+          slotGrid.replaceChildren();
+        }
+        calendarStatus.textContent = availableDates.size ? '' : copy.calendarNoAvailability;
+        renderCalendar();
+      } catch {
+        if (requestId !== calendarRequest) return;
+        calendarStatus.textContent = copy.error;
+        renderCalendar();
+      }
+    };
 
     const updateHomeBuilder = () => {
       const guestCount = Number(homeGuestCount.value || 1);
@@ -606,8 +799,28 @@ const homeConfig = {
       }
     }
 
-    service.addEventListener('change', loadSlots);
-    date.addEventListener('change', loadSlots);
+    calendarPrevious.addEventListener('click', () => {
+      calendarMonth = new Date(Date.UTC(
+        calendarMonth.getUTCFullYear(),
+        calendarMonth.getUTCMonth() - 1,
+        1,
+        12,
+      ));
+      void loadAvailabilityCalendar(true);
+    });
+    calendarNext.addEventListener('click', () => {
+      calendarMonth = new Date(Date.UTC(
+        calendarMonth.getUTCFullYear(),
+        calendarMonth.getUTCMonth() + 1,
+        1,
+        12,
+      ));
+      void loadAvailabilityCalendar(true);
+    });
+    service.addEventListener('change', () => {
+      setChoiceVisibility();
+      void loadAvailabilityCalendar(true);
+    });
     homeGuestCount.addEventListener('change', () => {
       const active = activeHomeSelects();
       const selectedMinutes = () => active.reduce((total, select) => {
@@ -628,20 +841,25 @@ const homeConfig = {
         longest.select.value = '';
       }
       updateHomeBuilder();
-      void loadSlots();
+      void loadAvailabilityCalendar(true);
     });
     homeTreatmentSelects.forEach((select) => {
       select.addEventListener('change', () => {
         updateHomeBuilder();
-        void loadSlots();
+        void loadAvailabilityCalendar(true);
       });
     });
 
+    renderCalendar();
     if (preselectedOption) {
       service.value = preselectedOption.id;
-      void loadSlots();
+      setChoiceVisibility();
+      void loadAvailabilityCalendar();
     } else if (service.value === 'home:custom') {
-      void loadSlots();
+      setChoiceVisibility();
+      void loadAvailabilityCalendar();
+    } else if (requestedCategory === 'studio') {
+      void loadAvailabilityCalendar();
     }
 
     form.addEventListener('submit', async (event) => {
@@ -686,6 +904,7 @@ const homeConfig = {
           if (response.status === 409) {
             formError.textContent = copy.unavailable;
             formError.hidden = false;
+            await loadAvailabilityCalendar();
             await loadSlots();
             return;
           }
@@ -708,7 +927,13 @@ const homeConfig = {
     another.addEventListener('click', () => {
       form.reset();
       if (requestedCategory === 'home') service.value = 'home:custom';
-      date.value = today;
+      calendarMonth = new Date(Date.UTC(
+        utcDate(today).getUTCFullYear(),
+        utcDate(today).getUTCMonth(),
+        1,
+        12,
+      ));
+      date.value = '';
       start.value = '';
       details.hidden = true;
       slotGrid.replaceChildren();
@@ -717,6 +942,7 @@ const homeConfig = {
       confirmation.hidden = true;
       form.hidden = false;
       form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      void loadAvailabilityCalendar();
     });
   }
 </script>
@@ -905,6 +1131,89 @@ const homeConfig = {
   textarea:focus { outline: 2px solid var(--logo-green); outline-offset: 2px; }
   select:disabled { cursor: not-allowed; opacity: 0.62; }
   textarea { resize: vertical; }
+  .booking-date-field { min-width: 0; margin: 0; padding: 0; border: 0; }
+  .booking-calendar {
+    max-width: 25rem;
+    padding: clamp(0.8rem, 2vw, 1rem);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: #fff;
+  }
+  .booking-calendar__header {
+    display: grid;
+    grid-template-columns: 2.4rem minmax(0, 1fr) 2.4rem;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 0.85rem;
+  }
+  .booking-calendar__header strong {
+    color: var(--pine-dark);
+    font-family: 'Iowan Old Style', Georgia, serif;
+    font-size: 1.08rem;
+    text-align: center;
+  }
+  .booking-calendar__header button {
+    display: grid;
+    width: 2.4rem;
+    height: 2.4rem;
+    place-items: center;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: var(--surface);
+    color: var(--pine-dark);
+    cursor: pointer;
+    font: inherit;
+  }
+  .booking-calendar__header button:hover:not(:disabled) { border-color: var(--logo-green); background: var(--pine-soft); }
+  .booking-calendar__header button:focus-visible { outline: 2px solid var(--logo-green); outline-offset: 2px; }
+  .booking-calendar__header button:disabled { cursor: not-allowed; opacity: 0.3; }
+  .booking-calendar__weekdays,
+  .booking-calendar__grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.3rem; }
+  .booking-calendar__weekdays { margin-bottom: 0.35rem; }
+  :global(.booking-calendar__weekdays span) {
+    color: var(--ink-soft);
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+  }
+  :global(.booking-calendar__blank) { aspect-ratio: 1; }
+  :global(.booking-calendar__day) {
+    display: grid;
+    min-width: 0;
+    aspect-ratio: 1;
+    place-items: center;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 0.42rem;
+    background: transparent;
+    color: var(--ink-soft);
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+  :global(.booking-calendar__day:disabled) { opacity: 0.32; }
+  :global(.booking-calendar__day[data-available='true']) {
+    border-color: color-mix(in srgb, var(--logo-green) 52%, var(--border));
+    background: var(--pine-soft);
+    color: var(--pine-dark);
+    cursor: pointer;
+    opacity: 1;
+  }
+  :global(.booking-calendar__day[data-available='true']:hover) { background: color-mix(in srgb, var(--logo-green) 24%, #fff); }
+  :global(.booking-calendar__day[data-today='true']) { box-shadow: inset 0 0 0 1px var(--clay); }
+  :global(.booking-calendar__day[data-selected='true']) {
+    border-color: var(--logo-green);
+    background: var(--logo-green);
+    color: #fff;
+    box-shadow: none;
+  }
+  :global(.booking-calendar__day:focus-visible) { outline: 2px solid var(--logo-green); outline-offset: 2px; }
+  .booking-calendar__status { min-height: 1.2rem; margin: 0.8rem 0 0; color: var(--ink-soft); font-size: 0.74rem; line-height: 1.45; }
+  .booking-calendar__status:empty { min-height: 0; margin: 0; }
+  .booking-calendar__legend { display: flex; gap: 0.42rem; align-items: center; margin-top: 0.75rem; color: var(--ink-soft); font-size: 0.7rem; font-weight: 700; }
+  .booking-calendar__legend i { width: 0.85rem; height: 0.85rem; border: 1px solid color-mix(in srgb, var(--logo-green) 52%, var(--border)); border-radius: 0.2rem; background: var(--pine-soft); }
   .slot-fieldset { min-width: 0; margin: 0; padding: 1.5rem 0 0; border: 0; border-top: 1px solid var(--border); }
   .slot-status { margin: 0; color: var(--ink-soft); }
   .slot-status:empty { display: none; }
