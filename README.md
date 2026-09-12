@@ -119,6 +119,48 @@ A statisztikai tábla az első éles látogatáskor automatikusan létrejön; a
 `npm.cmd run db:migrate` parancs is létrehozza a `0003_website_analytics.sql`
 migrációból.
 
+### Google Calendar-szinkronizálás
+
+Az adminfelület egy kiválasztott, írható Google Naptárhoz kapcsolható. A
+végleges foglalások foglalt eseményként, a heti és egyedi nyitott idősávok
+átlátszó „Beschikbaar” eseményként jelennek meg. A kiválasztott Google Naptár
+egyéb foglalt eseményeit a foglalórendszer kizárja a szabad időpontokból.
+
+A Google Cloud projektben kapcsold be a Google Calendar API-t, hozz létre Web
+application típusú OAuth-klienst, és add hozzá ezt az engedélyezett átirányítási
+címet:
+
+```text
+https://www.relaxbridge.nl/api/admin/google-calendar/callback
+```
+
+Ezután állítsd be a következő Vercel-környezeti változókat:
+
+```text
+GOOGLE_CALENDAR_CLIENT_ID
+GOOGLE_CALENDAR_CLIENT_SECRET
+GOOGLE_CALENDAR_TOKEN_KEY
+```
+
+A visszahívási címet a rendszer Vercelen automatikusan állítja elő: élesben a
+`www.relaxbridge.nl` címet, előnézetben pedig a stabil `VERCEL_BRANCH_URL`
+ág-domaint használja. A `GOOGLE_CALENDAR_REDIRECT_URI` csak helyi vagy nem
+Vercel-környezetben szükséges felülírásként.
+
+A `GOOGLE_CALENDAR_TOKEN_KEY` egy 32 bájtos, base64 kódolású titkos kulcs. Az
+OAuth hozzáférési és frissítési tokenek ezzel AES-256-GCM titkosítva kerülnek az
+adatbázisba. A kulcs például így készíthető:
+
+```powershell
+node -e "console.log(require('node:crypto').randomBytes(32).toString('base64'))"
+```
+
+Az adatbázis migrálása és az új verzió telepítése után az `/admin` oldalon a
+„Google Naptár csatlakoztatása” gombbal egyszer engedélyezni kell a hozzáférést,
+majd ki kell választani a használni kívánt naptárt. A rendszer azonnal szinkronizál
+minden jövőbeli foglalást és elérhetőséget, valamint naponta helyreállító
+szinkronizálást futtat.
+
 ## A logó
 
 A forrás a `src/assets/logo-source.png` — fehér hátterű, átlátszóság nélkül.

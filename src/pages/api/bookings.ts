@@ -13,6 +13,7 @@ import { calculateCreatorSelection } from '../../lib/booking/massage-creator';
 import {
   consumeRateLimit,
   createConfirmedBooking,
+  getBookingSettings,
   SlotUnavailableError,
 } from '../../lib/server/booking-repository';
 import {
@@ -21,6 +22,12 @@ import {
   requestFingerprint,
 } from '../../lib/server/security';
 import { dispatchPendingBookingEmails } from '../../lib/server/booking-email';
+import {
+  safelyRefreshGoogleCalendarBusy,
+  safelySyncGoogleCalendarEntity,
+} from '../../lib/server/google-calendar';
+import { localDayInstantRange } from '../../lib/booking/availability';
+import { Temporal } from '@js-temporal/polyfill';
 
 export const prerender = false;
 
@@ -311,6 +318,15 @@ export const POST: APIRoute = async ({ request }) => {
       return Response.json({ error: 'invalid_service' }, { status: 400 });
     }
 
+    const settings = await getBookingSettings();
+    const bookingDay = Temporal.Instant.from(parsed.data.start)
+      .toZonedDateTimeISO(settings.timeZone)
+      .toPlainDate()
+      .toString();
+    await safelyRefreshGoogleCalendarBusy(
+      localDayInstantRange(bookingDay, settings.timeZone),
+    );
+
     const booking = await createConfirmedBooking({
       option,
       locale: parsed.data.locale,
@@ -321,6 +337,8 @@ export const POST: APIRoute = async ({ request }) => {
       homeAddress: parsed.data.homeAddress,
       notes: bookingNotes(parsed.data, homeBooking?.note),
     });
+
+    await safelySyncGoogleCalendarEntity('booking', booking.id);
 
     try {
       await dispatchPendingBookingEmails({ bookingId: booking.id, limit: 2 });
