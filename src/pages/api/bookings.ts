@@ -44,7 +44,7 @@ const bookingSchema = z
     homeAddress: z.string().trim().max(300).optional(),
     creatorScent: z.enum(['orange', 'rose', 'lavender', 'any', 'none']).optional(),
     creatorMusic: z.enum(['instrumental', 'nature', 'lofi', 'own', 'any', 'none']).optional(),
-    creatorBase: z.enum(['relax', 'back']).optional(),
+    creatorBase: z.enum(['relax', 'relax90', 'back30', 'back']).optional(),
     creatorBack: z.union([z.literal(0), z.literal(30)]).optional(),
     creatorFace: z.union([z.literal(0), z.literal(15), z.literal(30)]).optional(),
     creatorFoot: z.union([z.literal(0), z.literal(15), z.literal(30)]).optional(),
@@ -116,8 +116,12 @@ const creatorLabels = {
     base: 'Basis',
     addons: 'Aanvullingen',
     total: 'Totaal',
-    relax: '60 min Relaxmassage',
-    back: '60 min Nek-, schouder- en rugmassage',
+    bases: {
+      relax: '60 min Relaxmassage',
+      relax90: '90 min Relaxmassage',
+      back30: '30 min Nek-, schouder- en rugmassage',
+      back: '60 min Nek-, schouder- en rugmassage',
+    },
     backAddon: 'Gerichte rug-, nek- en schouderbehandeling',
     faceAddon: 'Gezichts- en hoofdmassage',
     footAddon: 'Voetmassage',
@@ -131,8 +135,12 @@ const creatorLabels = {
     base: 'Base',
     addons: 'Add-ons',
     total: 'Total',
-    relax: '60 min Relax Massage',
-    back: '60 min Neck, Shoulder & Back Massage',
+    bases: {
+      relax: '60 min Relax Massage',
+      relax90: '90 min Relax Massage',
+      back30: '30 min Neck, Shoulder & Back Massage',
+      back: '60 min Neck, Shoulder & Back Massage',
+    },
     backAddon: 'Back, Neck & Shoulder focus',
     faceAddon: 'Face & Head Massage',
     footAddon: 'Foot Massage',
@@ -146,8 +154,12 @@ const creatorLabels = {
     base: 'Alapkezelés',
     addons: 'Kiegészítők',
     total: 'Összesen',
-    relax: '60 perc Relaxmasszázs',
-    back: '60 perc Nyak–váll–hátmasszázs',
+    bases: {
+      relax: '60 perc Relaxmasszázs',
+      relax90: '90 perc Relaxmasszázs',
+      back30: '30 perc Nyak–váll–hátmasszázs',
+      back: '60 perc Nyak–váll–hátmasszázs',
+    },
     backAddon: 'Célzott hát-, nyak- és vállkezelés',
     faceAddon: 'Arc- és fejmasszázs',
     footAddon: 'Talpmasszázs',
@@ -261,7 +273,7 @@ function bookingNotes(
           customTreatment.face ? `${labels.faceAddon} (${customTreatment.face} min)` : null,
           customTreatment.foot ? `${labels.footAddon} (${customTreatment.foot} min)` : null,
         ].filter(Boolean);
-        const base = customTreatment.base === 'relax' ? labels.relax : labels.back;
+        const base = labels.bases[customTreatment.base];
         return `Massage Creator — ${labels.base}: ${base} · ${labels.addons}: ${addons.length ? addons.join(', ') : labels.none} · ${labels.total}: ${customTreatment.minutes} min, € ${customTreatment.priceEur}`;
       })()
     : undefined;

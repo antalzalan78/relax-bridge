@@ -19,6 +19,12 @@ const alternates = {
   hu: massageCreatorPath('hu'),
 };
 const creatorConfig = { bases: creatorBases, addons: creatorAddons, maximumMinutes: creatorMaximumMinutes };
+const creatorBaseOptions = [
+  { value: 'relax', title: copy.relaxTitle, body: copy.relaxBody, config: creatorBases.relax },
+  { value: 'relax90', title: copy.relax90Title, body: copy.relaxBody, config: creatorBases.relax90 },
+  { value: 'back30', title: copy.back30Title, body: copy.backBody, config: creatorBases.back30 },
+  { value: 'back', title: copy.backTitle, body: copy.backBody, config: creatorBases.back },
+] as const;
 ---
 
 <Base
@@ -58,20 +64,15 @@ const creatorConfig = { bases: creatorBases, addons: creatorAddons, maximumMinut
         <h2>{copy.baseHeading}</h2>
         <p class="lead">{copy.baseIntro}</p>
         <div class="creator-base-grid">
-          <label class="creator-base-card">
-            <input type="radio" name="creatorBase" value="relax" />
-            <span class="creator-base-card__check" aria-hidden="true">✓</span>
-            <strong>{copy.relaxTitle}</strong>
-            <span>{copy.relaxBody}</span>
-            <small>€ {creatorBases.relax.priceEur}</small>
-          </label>
-          <label class="creator-base-card">
-            <input type="radio" name="creatorBase" value="back" />
-            <span class="creator-base-card__check" aria-hidden="true">✓</span>
-            <strong>{copy.backTitle}</strong>
-            <span>{copy.backBody}</span>
-            <small>€ {creatorBases.back.priceEur}</small>
-          </label>
+          {creatorBaseOptions.map((option) => (
+            <label class="creator-base-card">
+              <input type="radio" name="creatorBase" value={option.value} />
+              <span class="creator-base-card__check" aria-hidden="true">✓</span>
+              <strong>{option.title}</strong>
+              <span>{option.body}</span>
+              <small>€ {option.config.priceEur}</small>
+            </label>
+          ))}
         </div>
         <div class="creator-actions creator-actions--end">
           <button class="btn btn--primary" type="button" data-next="2" disabled>
@@ -216,6 +217,12 @@ const creatorConfig = { bases: creatorBases, addons: creatorAddons, maximumMinut
       foot: selectedMinutes('creatorFoot'),
     });
     const priceFor = (kind: string, minutes: number) => minutes ? Number(config.addons[kind][minutes]) : 0;
+    const baseLabels: Record<string, string> = {
+      relax: copy.relaxTitle,
+      relax90: copy.relax90Title,
+      back30: copy.back30Title,
+      back: copy.backTitle,
+    };
     const calculate = () => {
       const value = selection();
       const base = config.bases[value.base];
@@ -259,7 +266,7 @@ const creatorConfig = { bases: creatorBases, addons: creatorAddons, maximumMinut
     const fillReview = () => {
       const value = calculate();
       if (!value) return;
-      reviewBase.textContent = value.base === 'relax' ? copy.relaxTitle : copy.backTitle;
+      reviewBase.textContent = baseLabels[value.base] || '';
       const addons = [];
       if (value.back) addons.push(addonLabel(copy.backAddon, value.back));
       if (value.face) addons.push(addonLabel(copy.faceAddon, value.face));
@@ -285,8 +292,9 @@ const creatorConfig = { bases: creatorBases, addons: creatorAddons, maximumMinut
     baseInputs.forEach((input) => input.addEventListener('change', () => {
       firstNext.disabled = false;
       resetAddons();
-      backGroup.hidden = input.value === 'back';
-      backGroup.disabled = input.value === 'back';
+      const isBackBase = config.bases[input.value]?.serviceKey === 'neck-shoulder-back';
+      backGroup.hidden = isBackBase;
+      backGroup.disabled = isBackBase;
       updateSummary();
     }));
     creatorForm.querySelectorAll<HTMLInputElement>('input[type="radio"]').forEach((input) => {

@@ -38,3 +38,22 @@ test('uses the supplied twenty-euro price for both 15-minute add-ons', () => {
   assert.equal(face?.priceEur, 85);
   assert.equal(foot?.priceEur, 85);
 });
+
+test('supports the new 90-minute Relax Massage base', () => {
+  const result = calculateCreatorSelection({ base: 'relax90', face: 30 });
+  assert.equal(result?.minutes, 120);
+  assert.equal(result?.priceEur, 135);
+  assert.equal(result?.serviceKey, 'relax');
+  assert.equal(
+    calculateCreatorSelection({ base: 'relax90', face: 30, foot: 15 }),
+    null,
+  );
+});
+
+test('supports the new 30-minute back massage base without duplicate back work', () => {
+  const result = calculateCreatorSelection({ base: 'back30', face: 30, foot: 30 });
+  assert.equal(result?.minutes, 90);
+  assert.equal(result?.priceEur, 125);
+  assert.equal(result?.serviceKey, 'neck-shoulder-back');
+  assert.equal(calculateCreatorSelection({ base: 'back30', back: 30 }), null);
+});
