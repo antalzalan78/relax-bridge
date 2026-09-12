@@ -53,7 +53,10 @@ export async function startAdminSession(
   cookies.set(COOKIE_NAME, token, {
     httpOnly: true,
     secure,
-    sameSite: 'strict',
+    // Google OAuth returns through a cross-site top-level GET. Lax keeps the
+    // admin session available for that callback while state-changing admin
+    // requests remain protected by the same-origin checks.
+    sameSite: 'lax',
     path: '/',
     maxAge: SESSION_SECONDS,
   });
