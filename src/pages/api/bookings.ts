@@ -114,7 +114,7 @@ const bookingSchema = z
 
 const creatorLabels = {
   nl: {
-    scent: 'Geur voor olie en ruimte',
+    scent: 'Geur voor de behandeling',
     music: 'Muziek',
     base: 'Basis',
     addons: 'Aanvullingen',
@@ -133,7 +133,7 @@ const creatorLabels = {
     musicOptions: { instrumental: 'Instrumentaal', nature: 'Natuurgeluiden', lofi: 'Lo-fi-muziek', own: 'Eigen muziek', any: 'Ik laat het aan jou over', none: 'Stilte' },
   },
   en: {
-    scent: 'Scent for oil and room',
+    scent: 'Scent for the treatment',
     music: 'Music',
     base: 'Base',
     addons: 'Add-ons',
@@ -152,7 +152,7 @@ const creatorLabels = {
     musicOptions: { instrumental: 'Instrumental', nature: 'Sounds of nature', lofi: 'Lo-fi music', own: 'Your own music', any: 'I’ll leave it to you', none: 'Silence' },
   },
   hu: {
-    scent: 'Illat az olajhoz és a szobához',
+    scent: 'Illat a kezeléshez',
     music: 'Zene',
     base: 'Alapkezelés',
     addons: 'Kiegészítők',
