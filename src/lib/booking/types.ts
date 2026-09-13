@@ -1,6 +1,22 @@
 export type BookingCategory = 'studio' | 'home';
 export type BookingLocale = 'nl' | 'en' | 'hu';
 
+export type MassageCreatorTreatmentKey = 'relax' | 'back' | 'face' | 'foot';
+
+export interface MassageCreatorTreatmentDetail {
+  key: MassageCreatorTreatmentKey;
+  minutes: number;
+  priceEur: number;
+}
+
+export interface MassageCreatorBookingDetails {
+  kind: 'massage_creator';
+  base: MassageCreatorTreatmentDetail;
+  addons: MassageCreatorTreatmentDetail[];
+}
+
+export type BookingServiceDetails = MassageCreatorBookingDetails;
+
 export interface BookingSettings {
   timeZone: string;
   slotIntervalMinutes: number;

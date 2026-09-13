@@ -7,6 +7,10 @@ async function createBookingEmailDeliverySchema(): Promise<void> {
   await database.begin(async (transaction) => {
     await transaction`SELECT pg_advisory_xact_lock(734052025)`;
     await transaction`
+      ALTER TABLE bookings
+      ADD COLUMN IF NOT EXISTS service_details jsonb
+    `;
+    await transaction`
       CREATE TABLE IF NOT EXISTS booking_email_deliveries (
         id uuid PRIMARY KEY,
         booking_id uuid NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
