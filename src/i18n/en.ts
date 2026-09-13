@@ -127,6 +127,10 @@ export default {
         body: 'I come to your home and bring everything needed — you only need to relax. The price includes travel time, preparation and the treatment. I will ask for your exact address and phone number so I can reach you easily. Please note: shorter treatments are not available for home service.',
       },
       {
+        title: 'When is it better to postpone a massage?',
+        body: 'Massage is intended to provide pleasant, safe relaxation. However, there are situations when it is better to choose another appointment. Please postpone your massage if you have a fever, an infectious illness, acute inflammation, a recent injury, an open wound or thrombosis. If you have a serious medical condition, are currently receiving treatment for one, have recently had surgery, or are unsure whether massage is suitable for you, please consult your doctor before booking. If you take blood thinners, have osteoporosis, significant varicose veins or another condition that may require gentler treatment or avoiding certain areas, please let me know before the massage. Relax Bridge massages are wellness and relaxation treatments and do not replace medical examination or treatment.',
+      },
+      {
         title: 'Short questionnaire',
         body: 'Which times and options matter to you when booking a massage? Four short, anonymous questions help me shape Relax Bridge around what people need.',
       },

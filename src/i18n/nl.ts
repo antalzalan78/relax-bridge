@@ -127,6 +127,10 @@ export default {
         body: 'Ik kom bij je thuis en neem alles mee wat nodig is — jij hoeft alleen maar te ontspannen. De prijs is inclusief reistijd, voorbereiding en de behandeling. Ik vraag je om je exacte adres en telefoonnummer, zodat ik je makkelijk kan bereiken. Let op: bij Home service zijn kortere behandelingen niet beschikbaar.',
       },
       {
+        title: 'Wanneer kun je een massage beter uitstellen?',
+        body: 'Massage is bedoeld om op een prettige en veilige manier te ontspannen. Er zijn echter situaties waarin het beter is om een andere afspraak te kiezen. Stel de massage alsjeblieft uit als je koorts of een besmettelijke ziekte hebt, of als er sprake is van een acute ontsteking, een recente verwonding, een open wond of trombose. Als je een ernstige aandoening hebt, momenteel onder medische behandeling bent, onlangs bent geopereerd of twijfelt of massage geschikt voor je is, overleg dan vóór het boeken met je behandelend arts. Gebruik je bloedverdunners, heb je osteoporose, ernstige spataderen of een andere aandoening waarbij een zachtere behandeling of het vermijden van bepaalde gebieden nodig kan zijn, laat dit dan vóór de massage weten. De massages van Relax Bridge zijn wellness- en ontspanningsbehandelingen en vervangen geen medisch onderzoek of medische behandeling.',
+      },
+      {
         title: 'Korte vragenlijst',
         body: 'Welke momenten en mogelijkheden zijn voor jou belangrijk bij het boeken van een massage? Met vier korte, anonieme vragen help je mij het aanbod van Relax Bridge beter te laten aansluiten.',
       },

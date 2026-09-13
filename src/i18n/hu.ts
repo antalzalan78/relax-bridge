@@ -127,6 +127,10 @@ export default {
         body: 'Hozzád megyek, és mindent viszek, amire szükség van — neked csak pihenned kell. Az ár tartalmazza az utazási időt, a felkészülést és a kezelést. Elkérem a pontos címedet és a telefonszámodat, hogy könnyen elérjelek. Fontos: a rövidebb kezelések házhoz nem elérhetők.',
       },
       {
+        title: 'Mikor érdemes elhalasztani a masszázst?',
+        body: 'A masszázs célja a kellemes, biztonságos kikapcsolódás. Vannak azonban olyan helyzetek, amikor jobb egy másik időpontot választani. Kérlek, halaszd el a masszázst, ha lázas vagy, fertőző betegséged van, akut gyulladás, friss sérülés, nyílt seb vagy trombózis áll fenn. Ha komoly vagy jelenleg kezelés alatt álló betegséged van, nemrég műtéten estél át, vagy bizonytalan vagy abban, hogy a masszázs megfelelő-e számodra, kérlek, a foglalás előtt egyeztess kezelőorvosoddal. Ha véralvadásgátlót szedsz, csontritkulásod, erősebb visszerességed vagy más olyan állapotod van, amely miatt gyengédebb kezelésre vagy bizonyos területek kihagyására lehet szükség, kérlek, jelezd a masszázs előtt. A Relax Bridge masszázsai wellness- és relaxációs kezelések, nem helyettesítik az orvosi vizsgálatot vagy kezelést.',
+      },
+      {
         title: 'Rövid kérdőív',
         body: 'Mely időpontok és lehetőségek fontosak neked egy masszázs foglalásakor? Négy rövid, névtelen kérdéssel segíthetsz, hogy a Relax Bridge jobban igazodjon az igényekhez.',
       },
