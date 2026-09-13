@@ -71,6 +71,10 @@ export default {
       label: 'Studio Visit',
       title: 'Szívesen látlak az otthonomban.',
       body: 'Egy csendes hely Tilburgban, ahol semmit nem kell csinálnod.',
+      location: {
+        title: 'Stúdió helyszíne: Tilburg – Reeshof',
+        body: 'A pontos címet a visszaigazolt foglalás után küldjük el.',
+      },
       subtitle:
         'Válassz a négy kezelés közül, vagy alkosd meg a sajátodat a Massage Creator segítségével.',
       cta: 'Kezelések megtekintése',
