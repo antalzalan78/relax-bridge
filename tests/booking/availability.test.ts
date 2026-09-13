@@ -5,7 +5,10 @@ import {
   localDayInstantRange,
   resolveOpenWindows,
 } from '../../src/lib/booking/availability.ts';
-import { homeServiceTravelBufferMinutes } from '../../src/lib/booking/home-service.ts';
+import {
+  homeServiceBufferMinutes,
+  studioVisitBufferMinutes,
+} from '../../src/lib/booking/buffers.ts';
 
 const base = {
   date: '2026-08-10',
@@ -15,15 +18,15 @@ const base = {
   busyWindows: [],
   durationMinutes: 60,
   bufferBeforeMinutes: 0,
-  bufferAfterMinutes: 15,
+  bufferAfterMinutes: 0,
   stepMinutes: 15,
 };
 
-test('creates slots on the configured grid and keeps the after-buffer inside opening hours', () => {
+test('offers the complete opening window when there is no earlier treatment', () => {
   const slots = buildAvailableSlots(base);
   assert.deepEqual(
     slots.map((slot) => slot.label),
-    ['09:00', '09:15', '09:30', '09:45', '10:00', '10:15', '10:30', '10:45'],
+    ['09:00', '09:15', '09:30', '09:45', '10:00', '10:15', '10:30', '10:45', '11:00'],
   );
   assert.equal(slots.at(-1)?.busyEnd, '2026-08-10T10:00:00Z');
 });
@@ -36,33 +39,53 @@ test('does not offer slots whose service or buffer overlaps an existing booking'
   });
   assert.deepEqual(
     slots.map((slot) => slot.label),
-    ['09:00', '09:15', '11:00', '11:15'],
+    ['09:00', '09:15', '09:30', '11:00', '11:15', '11:30'],
   );
 });
 
-test('reserves travel time before and after home appointments', () => {
+test('does not delay the first Home Service in an opening window', () => {
   const slots = buildAvailableSlots({
     ...base,
     openWindows: [{ start: '09:00', end: '14:00' }],
-    bufferBeforeMinutes: homeServiceTravelBufferMinutes,
-    bufferAfterMinutes: homeServiceTravelBufferMinutes,
+    bufferBeforeMinutes: homeServiceBufferMinutes,
   });
-  assert.equal(slots[0].label, '10:00');
-  assert.equal(slots[0].busyStart, '2026-08-10T07:00:00Z');
-  assert.equal(slots.at(-1)?.label, '12:00');
+  assert.equal(slots[0].label, '09:00');
+  assert.equal(slots[0].busyStart, '2026-08-10T05:00:00Z');
+  assert.equal(slots.at(-1)?.label, '13:00');
   assert.equal(slots.at(-1)?.busyEnd, '2026-08-10T12:00:00Z');
 });
 
-test('keeps two hours between separate Home Service treatments', () => {
+test('requires two hours before a Home Service when a treatment precedes it', () => {
   const slots = buildAvailableSlots({
     ...base,
     openWindows: [{ start: '09:00', end: '17:00' }],
-    busyWindows: [{ start: '2026-08-10T08:00:00Z', end: '2026-08-10T11:00:00Z' }],
-    bufferBeforeMinutes: homeServiceTravelBufferMinutes,
-    bufferAfterMinutes: homeServiceTravelBufferMinutes,
+    busyWindows: [{ start: '2026-08-10T07:00:00Z', end: '2026-08-10T08:00:00Z' }],
+    bufferBeforeMinutes: homeServiceBufferMinutes,
   });
 
-  assert.equal(slots[0].label, '14:00');
+  assert.equal(slots[0].label, '12:00');
+});
+
+test('requires 30 minutes before a Studio Visit when a treatment precedes it', () => {
+  const slots = buildAvailableSlots({
+    ...base,
+    openWindows: [{ start: '09:00', end: '17:00' }],
+    busyWindows: [{ start: '2026-08-10T07:00:00Z', end: '2026-08-10T08:00:00Z' }],
+    bufferBeforeMinutes: studioVisitBufferMinutes,
+  });
+
+  assert.equal(slots[0].label, '10:30');
+});
+
+test('does not treat a manually blocked period as a preceding treatment', () => {
+  const slots = buildAvailableSlots({
+    ...base,
+    openWindows: [{ start: '09:00', end: '14:00' }],
+    blockedWindows: [{ start: '2026-08-10T07:00:00Z', end: '2026-08-10T08:00:00Z' }],
+    bufferBeforeMinutes: homeServiceBufferMinutes,
+  });
+
+  assert.equal(slots[0].label, '10:00');
 });
 
 test('honours partial blocked periods and the minimum notice instant', () => {
@@ -71,7 +94,7 @@ test('honours partial blocked periods and the minimum notice instant', () => {
     blockedWindows: [{ start: '2026-08-10T07:45:00Z', end: '2026-08-10T08:30:00Z' }],
     minStart: '2026-08-10T07:30:00Z',
   });
-  assert.deepEqual(slots.map((slot) => slot.label), ['10:30', '10:45']);
+  assert.deepEqual(slots.map((slot) => slot.label), ['10:30', '10:45', '11:00']);
 });
 
 test('uses real local-day duration across daylight-saving changes', () => {

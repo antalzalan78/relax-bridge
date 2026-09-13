@@ -144,10 +144,8 @@ export function buildAvailableSlots(input: BuildSlotsInput): AvailableSlot[] {
       localWindowToEpoch(date, input.timeZone, window),
     ),
   );
-  const unavailable = [
-    ...input.blockedWindows.map(instantWindowToEpoch),
-    ...input.busyWindows.map(instantWindowToEpoch),
-  ];
+  const blocked = input.blockedWindows.map(instantWindowToEpoch);
+  const busy = input.busyWindows.map(instantWindowToEpoch);
   const minimumStart = input.minStart
     ? Temporal.Instant.from(input.minStart).epochMilliseconds
     : Number.NEGATIVE_INFINITY;
@@ -156,20 +154,22 @@ export function buildAvailableSlots(input: BuildSlotsInput): AvailableSlot[] {
 
   for (const window of openWindows) {
     for (
-      let serviceStart = window.start + input.bufferBeforeMinutes * minute;
-      serviceStart +
-        (input.durationMinutes + input.bufferAfterMinutes) * minute <=
-      window.end;
+      let serviceStart = window.start;
+      serviceStart + input.durationMinutes * minute <= window.end;
       serviceStart += input.stepMinutes * minute
     ) {
       if (serviceStart < minimumStart) continue;
 
       const serviceEnd = serviceStart + input.durationMinutes * minute;
+      const service = { start: serviceStart, end: serviceEnd };
       const busyStart = serviceStart - input.bufferBeforeMinutes * minute;
       const busyEnd = serviceEnd + input.bufferAfterMinutes * minute;
       const occupied = { start: busyStart, end: busyEnd };
 
-      if (unavailable.some((window) => overlaps(occupied, window))) continue;
+      if (
+        blocked.some((window) => overlaps(service, window)) ||
+        busy.some((window) => overlaps(occupied, window))
+      ) continue;
 
       slots.push({
         start: toIso(serviceStart),
