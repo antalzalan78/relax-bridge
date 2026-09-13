@@ -513,10 +513,11 @@ function bookingEvent(row: any, timeZone: string): GoogleEvent {
     `Telefoon: ${row.customer_phone}`,
     row.notes ? `Notitie: ${row.notes}` : null,
   ].filter(Boolean).join('\n');
+  const location = [row.home_address, row.home_postal_code].filter(Boolean).join(', ');
   return {
     summary: `Relax Bridge · ${row.customer_name} · ${row.service_title}`,
     description,
-    location: row.home_address || undefined,
+    location: location || undefined,
     start: { dateTime: new Date(row.starts_at).toISOString(), timeZone },
     end: { dateTime: new Date(row.ends_at).toISOString(), timeZone },
     transparency: 'opaque',

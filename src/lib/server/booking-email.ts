@@ -74,6 +74,7 @@ async function claimDelivery(bookingId?: string): Promise<ClaimedDelivery | null
       booking.customer_email,
       booking.customer_phone,
       booking.home_address,
+      booking.home_postal_code,
       booking.notes,
       booking.service_details,
       booking.locale,
@@ -99,6 +100,7 @@ async function claimDelivery(bookingId?: string): Promise<ClaimedDelivery | null
     customerEmail: String(row.customer_email),
     customerPhone: String(row.customer_phone),
     homeAddress: row.home_address ? String(row.home_address) : undefined,
+    homePostalCode: row.home_postal_code ? String(row.home_postal_code) : undefined,
     notes: row.notes ? String(row.notes) : undefined,
     serviceDetails: row.service_details && typeof row.service_details === 'object'
       ? row.service_details as BookingEmailDetails['serviceDetails']

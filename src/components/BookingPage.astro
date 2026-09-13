@@ -254,6 +254,10 @@ const homeConfig = {
             <label for="home-address">{copy.address}</label>
             <input id="home-address" name="homeAddress" autocomplete="street-address" maxlength="300" />
           </div>
+          <div id="postal-code-field" hidden>
+            <label for="home-postal-code">{copy.postalCode}</label>
+            <input id="home-postal-code" name="homePostalCode" autocomplete="postal-code" maxlength="20" />
+          </div>
         </div>
 
         <label for="notes">{copy.notes}</label>
@@ -397,6 +401,8 @@ const homeConfig = {
     const summary = form.querySelector<HTMLElement>('#appointment-summary')!;
     const addressField = form.querySelector<HTMLElement>('#address-field')!;
     const address = form.querySelector<HTMLInputElement>('#home-address')!;
+    const postalCodeField = form.querySelector<HTMLElement>('#postal-code-field')!;
+    const postalCode = form.querySelector<HTMLInputElement>('#home-postal-code')!;
     const creatorFieldset = form.querySelector<HTMLFieldSetElement>('#creator-fieldset')!;
     const homeFieldset = form.querySelector<HTMLFieldSetElement>('#home-builder-fieldset')!;
     const homeGuestCount = form.querySelector<HTMLSelectElement>('#home-guest-count')!;
@@ -799,6 +805,8 @@ const homeConfig = {
             const home = option.category === 'home';
             addressField.hidden = !home;
             address.required = home;
+            postalCodeField.hidden = !home;
+            postalCode.required = home;
             details.hidden = false;
             preferencesContinue.hidden = home;
             const nextSection = home ? details : creatorFieldset;
@@ -898,7 +906,8 @@ const homeConfig = {
         customerName: data.get('customerName'),
         customerEmail: data.get('customerEmail'),
         customerPhone: data.get('customerPhone'),
-        homeAddress: data.get('homeAddress') || undefined,
+        homeAddress: option.category === 'home' ? data.get('homeAddress') || undefined : undefined,
+        homePostalCode: option.category === 'home' ? data.get('homePostalCode') || undefined : undefined,
         creatorScent: data.get('creatorScent') || undefined,
         creatorMusic: data.get('creatorMusic') || undefined,
         creatorBase: option.creatorBase || undefined,

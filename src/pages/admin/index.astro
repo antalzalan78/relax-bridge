@@ -300,7 +300,9 @@ const syncTime = (value: unknown) => value
                         <p>{booking.service_title} · {booking.duration_minutes} perc · € {Number(booking.price_eur)}</p>
                         <p>{String(start.hour).padStart(2, '0')}:{String(start.minute).padStart(2, '0')}–{String(end.hour).padStart(2, '0')}:{String(end.minute).padStart(2, '0')}</p>
                         <p><a href={`tel:${booking.customer_phone}`}>{booking.customer_phone}</a><br /><a href={`mailto:${booking.customer_email}`}>{booking.customer_email}</a></p>
-                        {booking.home_address && <p><strong>Cím:</strong> {booking.home_address}</p>}
+                        {(booking.home_address || booking.home_postal_code) && (
+                          <p><strong>Cím:</strong> {[booking.home_address, booking.home_postal_code].filter(Boolean).join(', ')}</p>
+                        )}
                         {booking.notes && <p><strong>Megjegyzés:</strong> {booking.notes}</p>}
                         <p class="reference">{booking.reference}</p>
                         {(booking.customer_email_status || booking.owner_email_status) && (

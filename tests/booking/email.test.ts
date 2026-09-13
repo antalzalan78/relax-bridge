@@ -44,10 +44,13 @@ test('includes the home address in a Hungarian confirmation', () => {
     locale: 'hu',
     category: 'home',
     homeAddress: 'Tilburg <centrum>',
+    homePostalCode: '5038 EA',
   }, context);
   assert.match(message.subject, /visszaigazolása/i);
   assert.match(message.text, /Tilburg <centrum>/);
+  assert.match(message.text, /5038 EA/);
   assert.match(message.html, /Tilburg &lt;centrum&gt;/);
+  assert.match(message.html, /5038 EA/);
 });
 
 for (const [locale, expected] of [

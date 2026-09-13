@@ -39,6 +39,7 @@ export interface ConfirmedBookingInput {
   customerEmail: string;
   customerPhone: string;
   homeAddress?: string;
+  homePostalCode?: string;
   notes?: string;
   serviceDetails?: BookingServiceDetails;
 }
@@ -602,13 +603,13 @@ export async function createConfirmedBooking(
         INSERT INTO bookings (
           id, reference, service_key, service_category, service_title,
           duration_minutes, price_eur, customer_name, customer_email,
-          customer_phone, home_address, notes, service_details, locale, starts_at, ends_at,
+          customer_phone, home_address, home_postal_code, notes, service_details, locale, starts_at, ends_at,
           busy_starts_at, busy_ends_at, status
         ) VALUES (
           ${id}, ${reference}, ${input.option.key}, ${input.option.category},
           ${input.option.title}, ${input.option.minutes}, ${input.option.priceEur},
           ${input.customerName}, ${input.customerEmail.toLowerCase()},
-          ${input.customerPhone}, ${input.homeAddress || null}, ${input.notes || null},
+          ${input.customerPhone}, ${input.homeAddress || null}, ${input.homePostalCode || null}, ${input.notes || null},
           ${input.serviceDetails ? JSON.stringify(input.serviceDetails) : null}::jsonb,
           ${input.locale}, ${selected.start}::timestamptz, ${selected.end}::timestamptz,
           ${selected.busyStart}::timestamptz, ${selected.busyEnd}::timestamptz,
@@ -683,7 +684,7 @@ export async function listBookings(from: string, to: string) {
     SELECT booking.id, booking.reference, booking.service_title,
       booking.service_category, booking.duration_minutes, booking.price_eur,
       booking.customer_name, booking.customer_email, booking.customer_phone,
-      booking.home_address, booking.notes, booking.locale, booking.starts_at,
+      booking.home_address, booking.home_postal_code, booking.notes, booking.locale, booking.starts_at,
       booking.ends_at, booking.status, booking.created_at,
       customer_delivery.status AS customer_email_status,
       owner_delivery.status AS owner_email_status
