@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { calculateCreatorSelection } from '../../src/lib/booking/massage-creator.ts';
+import {
+  calculateCreatorSelection,
+  createMassageCreatorBookingDetails,
+} from '../../src/lib/booking/massage-creator.ts';
 
 test('calculates a 120-minute Relax Massage composition and its final price', () => {
   assert.deepEqual(
@@ -56,4 +59,17 @@ test('supports the new 30-minute back massage base without duplicate back work',
   assert.equal(result?.priceEur, 125);
   assert.equal(result?.serviceKey, 'neck-shoulder-back');
   assert.equal(calculateCreatorSelection({ base: 'back30', back: 30 }), null);
+});
+
+test('creates a detailed booking snapshot for the confirmation email', () => {
+  const selection = calculateCreatorSelection({ base: 'relax', back: 30, face: 15 });
+  assert.ok(selection);
+  assert.deepEqual(createMassageCreatorBookingDetails(selection), {
+    kind: 'massage_creator',
+    base: { key: 'relax', minutes: 60, priceEur: 65 },
+    addons: [
+      { key: 'back', minutes: 30, priceEur: 45 },
+      { key: 'face', minutes: 15, priceEur: 20 },
+    ],
+  });
 });

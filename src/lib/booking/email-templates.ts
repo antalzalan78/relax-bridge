@@ -1,4 +1,9 @@
-import type { BookingCategory, BookingLocale } from './types';
+import type {
+  BookingCategory,
+  BookingLocale,
+  BookingServiceDetails,
+  MassageCreatorTreatmentDetail,
+} from './types';
 
 export interface BookingEmailDetails {
   id: string;
@@ -12,6 +17,7 @@ export interface BookingEmailDetails {
   customerPhone: string;
   homeAddress?: string;
   notes?: string;
+  serviceDetails?: BookingServiceDetails;
   locale: BookingLocale;
   startsAt: string;
   endsAt: string;
@@ -51,6 +57,16 @@ const customerCopy = {
     studio: 'Relax Bridge studio in Tilburg',
     home: 'Bij jou thuis',
     minutes: 'minuten',
+    baseTreatment: 'Basisbehandeling',
+    addOn: 'Aanvulling',
+    addOns: 'Aanvullingen',
+    noAddOns: 'Geen aanvullingen',
+    creatorTreatments: {
+      relax: 'Relaxmassage',
+      back: 'Nek-, schouder- en rugmassage',
+      face: 'Gezichts- en hoofdmassage',
+      foot: 'Voetmassage',
+    },
     change: 'Wil je iets wijzigen of annuleren? Neem dan contact op via WhatsApp of antwoord op deze e-mail.',
     closing: 'Tot dan,',
   },
@@ -68,6 +84,16 @@ const customerCopy = {
     studio: 'Relax Bridge studio in Tilburg',
     home: 'At your home',
     minutes: 'minutes',
+    baseTreatment: 'Base treatment',
+    addOn: 'Add-on',
+    addOns: 'Add-ons',
+    noAddOns: 'No add-ons',
+    creatorTreatments: {
+      relax: 'Relax Massage',
+      back: 'Neck, Shoulder & Back Massage',
+      face: 'Face & Head Massage',
+      foot: 'Foot Massage',
+    },
     change: 'Would you like to change or cancel your appointment? Contact us via WhatsApp or reply to this email.',
     closing: 'See you then,',
   },
@@ -85,6 +111,16 @@ const customerCopy = {
     studio: 'Relax Bridge stúdió, Tilburg',
     home: 'Az otthonodban',
     minutes: 'perc',
+    baseTreatment: 'Alapkezelés',
+    addOn: 'Kiegészítő',
+    addOns: 'Kiegészítők',
+    noAddOns: 'Nincs kiegészítő',
+    creatorTreatments: {
+      relax: 'Relaxmasszázs',
+      back: 'Nyak–váll–hátmasszázs',
+      face: 'Arc- és fejmasszázs',
+      foot: 'Talpmasszázs',
+    },
     change: 'Módosításhoz vagy lemondáshoz írj WhatsAppon, vagy válaszolj erre az e-mailre.',
     closing: 'Szeretettel várlak,',
   },
@@ -126,11 +162,34 @@ function formatDetails(booking: BookingEmailDetails, timeZone: string) {
       hour12: false,
       timeZone,
     }).format(endsAt),
-    price: new Intl.NumberFormat(locale, {
-      style: 'currency',
-      currency: 'EUR',
-    }).format(booking.priceEur),
+    price: formatCurrency(booking.priceEur, booking.locale),
   };
+}
+
+function formatCurrency(value: number, language: BookingLocale): string {
+  return new Intl.NumberFormat(localeTags[language], {
+    style: 'currency',
+    currency: 'EUR',
+  }).format(value);
+}
+
+function creatorDetailRows(
+  details: BookingServiceDetails | undefined,
+  language: BookingLocale,
+): ReadonlyArray<readonly [string, string]> {
+  if (!details || details.kind !== 'massage_creator') return [];
+  const copy = customerCopy[language];
+  const formatItem = (item: MassageCreatorTreatmentDetail) =>
+    `${copy.creatorTreatments[item.key]} · ${item.minutes} ${copy.minutes} · ${formatCurrency(item.priceEur, language)}`;
+
+  return [
+    [copy.baseTreatment, formatItem(details.base)],
+    ...(details.addons.length
+      ? details.addons.map(
+          (item, index) => [`${copy.addOn} ${index + 1}`, formatItem(item)] as const,
+        )
+      : [[copy.addOns, copy.noAddOns] as const]),
+  ];
 }
 
 function emailShell(content: string, language: BookingLocale): string {
@@ -181,15 +240,17 @@ export function buildCustomerBookingEmail(
   const formatted = formatDetails(booking, context.timeZone);
   const location = customerLocation(booking, context);
   const subject = `${copy.subject} · ${formatted.shortDate} ${formatted.startTime}`;
+  const creatorRows = creatorDetailRows(booking.serviceDetails, booking.locale);
   const rows = [
     [copy.service, booking.serviceTitle],
+    ...creatorRows,
     [copy.date, formatted.date],
     [copy.time, `${formatted.startTime}–${formatted.endTime}`],
     [copy.duration, `${booking.durationMinutes} ${copy.minutes}`],
     [copy.price, formatted.price],
     [copy.location, location],
     [copy.reference, booking.reference],
-  ] as const;
+  ] as ReadonlyArray<readonly [string, string]>;
 
   const html = emailShell(`
     <p style="margin:0 0 10px;font-size:18px">${escapeHtml(copy.greeting)} ${escapeHtml(booking.customerName)},</p>

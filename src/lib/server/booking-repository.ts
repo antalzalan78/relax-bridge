@@ -14,6 +14,7 @@ import type {
   BookingCategory,
   BookingLocale,
   BookingOption,
+  BookingServiceDetails,
   BookingSettings,
   InstantWindow,
   LocalTimeWindow,
@@ -39,6 +40,7 @@ export interface ConfirmedBookingInput {
   customerPhone: string;
   homeAddress?: string;
   notes?: string;
+  serviceDetails?: BookingServiceDetails;
 }
 
 function shortTime(value: unknown): string {
@@ -600,13 +602,14 @@ export async function createConfirmedBooking(
         INSERT INTO bookings (
           id, reference, service_key, service_category, service_title,
           duration_minutes, price_eur, customer_name, customer_email,
-          customer_phone, home_address, notes, locale, starts_at, ends_at,
+          customer_phone, home_address, notes, service_details, locale, starts_at, ends_at,
           busy_starts_at, busy_ends_at, status
         ) VALUES (
           ${id}, ${reference}, ${input.option.key}, ${input.option.category},
           ${input.option.title}, ${input.option.minutes}, ${input.option.priceEur},
           ${input.customerName}, ${input.customerEmail.toLowerCase()},
           ${input.customerPhone}, ${input.homeAddress || null}, ${input.notes || null},
+          ${input.serviceDetails ? JSON.stringify(input.serviceDetails) : null}::jsonb,
           ${input.locale}, ${selected.start}::timestamptz, ${selected.end}::timestamptz,
           ${selected.busyStart}::timestamptz, ${selected.busyEnd}::timestamptz,
           'confirmed'

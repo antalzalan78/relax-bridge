@@ -1,3 +1,5 @@
+import type { MassageCreatorBookingDetails } from './types';
+
 export const creatorMaximumMinutes = 120;
 
 export const creatorBases = {
@@ -62,5 +64,30 @@ export function calculateCreatorSelection(selection: CreatorSelection): CreatorC
     minutes,
     priceEur: base.priceEur + backPrice + facePrice + footPrice,
     serviceKey: base.serviceKey,
+  };
+}
+
+export function createMassageCreatorBookingDetails(
+  creator: CreatorCalculation,
+): MassageCreatorBookingDetails {
+  const base = creatorBases[creator.base];
+  return {
+    kind: 'massage_creator',
+    base: {
+      key: base.serviceKey === 'relax' ? 'relax' : 'back',
+      minutes: base.minutes,
+      priceEur: base.priceEur,
+    },
+    addons: [
+      ...(creator.back
+        ? [{ key: 'back' as const, minutes: creator.back, priceEur: creatorAddons.back[creator.back] }]
+        : []),
+      ...(creator.face
+        ? [{ key: 'face' as const, minutes: creator.face, priceEur: creatorAddons.face[creator.face] }]
+        : []),
+      ...(creator.foot
+        ? [{ key: 'foot' as const, minutes: creator.foot, priceEur: creatorAddons.foot[creator.foot] }]
+        : []),
+    ],
   };
 }

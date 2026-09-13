@@ -9,7 +9,10 @@ import {
   calculateHomeServicePrice,
   homeServiceTravelFeeEur,
 } from '../../lib/booking/home-service';
-import { calculateCreatorSelection } from '../../lib/booking/massage-creator';
+import {
+  calculateCreatorSelection,
+  createMassageCreatorBookingDetails,
+} from '../../lib/booking/massage-creator';
 import {
   consumeRateLimit,
   createConfirmedBooking,
@@ -348,6 +351,9 @@ export const POST: APIRoute = async ({ request }) => {
       customerPhone: parsed.data.customerPhone,
       homeAddress: parsed.data.homeAddress,
       notes: bookingNotes(parsed.data, homeBooking?.note),
+      serviceDetails: creator
+        ? createMassageCreatorBookingDetails(creator)
+        : undefined,
     });
 
     await safelySyncGoogleCalendarEntity('booking', booking.id);
