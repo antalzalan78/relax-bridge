@@ -72,6 +72,7 @@ const booking = {
     creatorMusic: 'Muziek',
     creatorMusicPlaceholder: 'Kies muziek',
     creatorMusicOptions: [
+      { value: 'instrumental', label: 'Instrumentaal' },
       { value: 'nature', label: 'Natuurgeluiden' },
       { value: 'lofi', label: 'Lo-fi-muziek' },
       { value: 'own', label: 'Eigen muziek' },
@@ -164,6 +165,7 @@ const booking = {
     creatorMusic: 'Music',
     creatorMusicPlaceholder: 'Choose music',
     creatorMusicOptions: [
+      { value: 'instrumental', label: 'Instrumental' },
       { value: 'nature', label: 'Sounds of nature' },
       { value: 'lofi', label: 'Lo-fi music' },
       { value: 'own', label: 'Your own music' },
@@ -256,6 +258,7 @@ const booking = {
     creatorMusic: 'Zene',
     creatorMusicPlaceholder: 'Válassz zenét',
     creatorMusicOptions: [
+      { value: 'instrumental', label: 'Instrumentális' },
       { value: 'nature', label: 'Természet hangjai' },
       { value: 'lofi', label: 'Lo-fi zene' },
       { value: 'own', label: 'Saját zene' },
