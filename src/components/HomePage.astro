@@ -168,8 +168,13 @@ const jsonLd = [
 
       <section class="studio-offer-group" id="studio-services">
         <header class="studio-offer-group__heading">
-          <span class="eyebrow">Studio Visit 1</span>
-          <h2>{studioCopy.readyHeading}</h2>
+          <div class="studio-offer-group__heading-copy">
+            <span class="eyebrow">Studio Visit 1</span>
+            <h2>{studioCopy.readyHeading}</h2>
+          </div>
+          <a class="btn btn--primary" href={studioReadyBookingHref}>
+            {d.hero.primaryCta}<span aria-hidden="true">&rarr;</span>
+          </a>
         </header>
 
         <div class="studio-treatment-list studio-treatment-list--with-prices">
@@ -205,11 +210,6 @@ const jsonLd = [
             })}
         </div>
         <p class="studio-offer-group__payment-note" id={anchors.prices}>{d.prices.intro}</p>
-        <div class="studio-choice-action">
-          <a class="btn btn--primary" href={studioReadyBookingHref}>
-            {d.hero.primaryCta}<span aria-hidden="true">&rarr;</span>
-          </a>
-        </div>
       </section>
 
       <section class="massage-creator massage-creator--studio-intro">
