@@ -71,6 +71,10 @@ export default {
       label: 'Studio Visit',
       title: 'You are welcome in my home.',
       body: 'A quiet place in Tilburg where you do not have to do anything.',
+      location: {
+        title: 'Studio location: Tilburg – Reeshof',
+        body: 'The exact address will be sent after your booking has been confirmed.',
+      },
       subtitle:
         'Choose from four treatments, or create your own treatment with the Massage Creator.',
       cta: 'See the treatments',

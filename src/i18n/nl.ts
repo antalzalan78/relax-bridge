@@ -71,6 +71,10 @@ export default {
       label: 'Studio Visit',
       title: 'Je bent welkom bij mij thuis.',
       body: 'Een rustige plek in Tilburg waar je niets hoeft te doen.',
+      location: {
+        title: 'Locatie van de studio: Tilburg – Reeshof',
+        body: 'Het exacte adres ontvang je na de bevestiging van je boeking.',
+      },
       subtitle:
         'Kies uit vier behandelingen, of stel je eigen behandeling samen met de Massage Creator.',
       cta: 'Bekijk de behandelingen',

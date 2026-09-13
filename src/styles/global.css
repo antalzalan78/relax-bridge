@@ -855,6 +855,27 @@ img {
   margin-top: 1.2rem;
 }
 
+.studio-location-note {
+  display: grid;
+  gap: 0.25rem;
+  max-width: 38rem;
+  margin-top: 1.25rem;
+  padding: 0.9rem 1rem;
+  border-left: 3px solid var(--clay);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: color-mix(in srgb, var(--surface) 76%, transparent);
+  color: var(--ink-soft);
+  line-height: 1.55;
+}
+
+.studio-location-note strong {
+  color: var(--pine-dark);
+}
+
+.studio-location-note span {
+  display: block;
+}
+
 .location-showcase__subtitle {
   max-width: 34rem;
   margin: 1.25rem 0 0;
