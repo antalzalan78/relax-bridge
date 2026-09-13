@@ -5,7 +5,10 @@ import {
   localDayInstantRange,
   localTimeWindowInstantRange,
 } from '../booking/availability';
-import { homeServiceTravelBufferMinutes } from '../booking/home-service';
+import {
+  homeServiceBufferMinutes,
+  studioVisitBufferMinutes,
+} from '../booking/buffers';
 import type {
   AvailableSlot,
   BookingCategory,
@@ -54,11 +57,7 @@ export async function getBookingSettings(
       time_zone,
       slot_interval_minutes,
       min_notice_hours,
-      booking_horizon_days,
-      studio_buffer_before_minutes,
-      studio_buffer_after_minutes,
-      home_buffer_before_minutes,
-      home_buffer_after_minutes
+      booking_horizon_days
     FROM booking_settings
     WHERE id = 1
   `;
@@ -70,16 +69,55 @@ export async function getBookingSettings(
     slotIntervalMinutes: numberValue(row.slot_interval_minutes),
     minNoticeHours: numberValue(row.min_notice_hours),
     bookingHorizonDays: numberValue(row.booking_horizon_days),
-    studioBufferBeforeMinutes: numberValue(row.studio_buffer_before_minutes),
-    studioBufferAfterMinutes: numberValue(row.studio_buffer_after_minutes),
-    homeBufferBeforeMinutes: Math.max(
-      numberValue(row.home_buffer_before_minutes),
-      homeServiceTravelBufferMinutes,
-    ),
-    homeBufferAfterMinutes: Math.max(
-      numberValue(row.home_buffer_after_minutes),
-      homeServiceTravelBufferMinutes,
-    ),
+    studioBufferBeforeMinutes: studioVisitBufferMinutes,
+    studioBufferAfterMinutes: 0,
+    homeBufferBeforeMinutes: homeServiceBufferMinutes,
+    homeBufferAfterMinutes: 0,
+  };
+}
+
+function busyWindowFromRow(
+  row: any,
+  settings: BookingSettings,
+): InstantWindow {
+  const start = Temporal.Instant.from(new Date(row.starts_at).toISOString());
+  const end = Temporal.Instant.from(new Date(row.ends_at).toISOString());
+  const category = row.service_category as BookingCategory | null;
+  if (!category) return { start: start.toString(), end: end.toString() };
+
+  const isHome = category === 'home';
+  const bufferBeforeMinutes = isHome
+    ? settings.homeBufferBeforeMinutes
+    : settings.studioBufferBeforeMinutes;
+  const bufferAfterMinutes = isHome
+    ? settings.homeBufferAfterMinutes
+    : settings.studioBufferAfterMinutes;
+
+  return {
+    start: start.subtract({ minutes: bufferBeforeMinutes }).toString(),
+    end: end.add({ minutes: bufferAfterMinutes }).toString(),
+  };
+}
+
+function expandedBookingQueryRange(
+  range: InstantWindow,
+  settings: BookingSettings,
+): InstantWindow {
+  const maximumBefore = Math.max(
+    settings.studioBufferBeforeMinutes,
+    settings.homeBufferBeforeMinutes,
+  );
+  const maximumAfter = Math.max(
+    settings.studioBufferAfterMinutes,
+    settings.homeBufferAfterMinutes,
+  );
+  return {
+    start: Temporal.Instant.from(range.start)
+      .subtract({ minutes: maximumAfter })
+      .toString(),
+    end: Temporal.Instant.from(range.end)
+      .add({ minutes: maximumBefore })
+      .toString(),
   };
 }
 
@@ -142,23 +180,21 @@ async function getBusyWindows(
 ): Promise<InstantWindow[]> {
   await ensureGoogleCalendarSchema();
   const range = localDayInstantRange(date, settings.timeZone);
+  const bookingRange = expandedBookingQueryRange(range, settings);
   const rows = await query`
-    SELECT busy_starts_at, busy_ends_at
+    SELECT starts_at, ends_at, service_category
     FROM bookings
     WHERE status = 'confirmed'
-      AND busy_starts_at < ${range.end}::timestamptz
-      AND busy_ends_at > ${range.start}::timestamptz
+      AND starts_at < ${bookingRange.end}::timestamptz
+      AND ends_at > ${bookingRange.start}::timestamptz
     UNION ALL
-    SELECT starts_at AS busy_starts_at, ends_at AS busy_ends_at
+    SELECT starts_at, ends_at, NULL::text AS service_category
     FROM google_calendar_busy
     WHERE starts_at < ${range.end}::timestamptz
       AND ends_at > ${range.start}::timestamptz
   `;
 
-  return rows.map((row: any) => ({
-    start: new Date(row.busy_starts_at).toISOString(),
-    end: new Date(row.busy_ends_at).toISOString(),
-  }));
+  return rows.map((row: any) => busyWindowFromRow(row, settings));
 }
 
 async function getAvailableSlotsWithQuery(input: {
@@ -255,6 +291,10 @@ export async function getAvailableDates(input: {
   const lastDate = lastDay.toString();
   const rangeStart = localDayInstantRange(firstDate, settings.timeZone).start;
   const rangeEnd = localDayInstantRange(lastDate, settings.timeZone).end;
+  const bookingRange = expandedBookingQueryRange(
+    { start: rangeStart, end: rangeEnd },
+    settings,
+  );
   const [rules, exceptions, busyRows] = await Promise.all([
     query`
       SELECT weekday, start_time::text AS start_time, end_time::text AS end_time,
@@ -273,13 +313,13 @@ export async function getAvailableDates(input: {
       ORDER BY day, start_time NULLS FIRST
     `,
     query`
-      SELECT busy_starts_at, busy_ends_at
+      SELECT starts_at, ends_at, service_category
       FROM bookings
       WHERE status = 'confirmed'
-        AND busy_starts_at < ${rangeEnd}::timestamptz
-        AND busy_ends_at > ${rangeStart}::timestamptz
+        AND starts_at < ${bookingRange.end}::timestamptz
+        AND ends_at > ${bookingRange.start}::timestamptz
       UNION ALL
-      SELECT starts_at AS busy_starts_at, ends_at AS busy_ends_at
+      SELECT starts_at, ends_at, NULL::text AS service_category
       FROM google_calendar_busy
       WHERE starts_at < ${rangeEnd}::timestamptz
         AND ends_at > ${rangeStart}::timestamptz
@@ -294,10 +334,9 @@ export async function getAvailableDates(input: {
     exceptionsByDay.set(day, current);
   }
 
-  const busyWindows: InstantWindow[] = busyRows.map((row: any) => ({
-    start: new Date(row.busy_starts_at).toISOString(),
-    end: new Date(row.busy_ends_at).toISOString(),
-  }));
+  const busyWindows: InstantWindow[] = busyRows.map((row: any) =>
+    busyWindowFromRow(row, settings),
+  );
   const minimumStart = now.add({ hours: settings.minNoticeHours }).toString();
   const dates: string[] = [];
 
@@ -391,6 +430,10 @@ export async function getNextAvailableSlot(input: {
   const lastDate = lastDay.toString();
   const rangeStart = localDayInstantRange(firstDate, settings.timeZone).start;
   const rangeEnd = localDayInstantRange(lastDate, settings.timeZone).end;
+  const bookingRange = expandedBookingQueryRange(
+    { start: rangeStart, end: rangeEnd },
+    settings,
+  );
 
   const [rules, exceptions, busyRows] = await Promise.all([
     query`
@@ -410,13 +453,13 @@ export async function getNextAvailableSlot(input: {
       ORDER BY day, start_time NULLS FIRST
     `,
     query`
-      SELECT busy_starts_at, busy_ends_at
+      SELECT starts_at, ends_at, service_category
       FROM bookings
       WHERE status = 'confirmed'
-        AND busy_starts_at < ${rangeEnd}::timestamptz
-        AND busy_ends_at > ${rangeStart}::timestamptz
+        AND starts_at < ${bookingRange.end}::timestamptz
+        AND ends_at > ${bookingRange.start}::timestamptz
       UNION ALL
-      SELECT starts_at AS busy_starts_at, ends_at AS busy_ends_at
+      SELECT starts_at, ends_at, NULL::text AS service_category
       FROM google_calendar_busy
       WHERE starts_at < ${rangeEnd}::timestamptz
         AND ends_at > ${rangeStart}::timestamptz
@@ -431,10 +474,9 @@ export async function getNextAvailableSlot(input: {
     exceptionsByDay.set(day, current);
   }
 
-  const busyWindows: InstantWindow[] = busyRows.map((row: any) => ({
-    start: new Date(row.busy_starts_at).toISOString(),
-    end: new Date(row.busy_ends_at).toISOString(),
-  }));
+  const busyWindows: InstantWindow[] = busyRows.map((row: any) =>
+    busyWindowFromRow(row, settings),
+  );
   const minimumStart = now.add({ hours: settings.minNoticeHours }).toString();
 
   for (let offset = 0; offset <= settings.bookingHorizonDays; offset += 1) {

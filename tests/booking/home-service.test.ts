@@ -3,9 +3,9 @@ import test from 'node:test';
 import {
   calculateHomeServiceSelection,
   calculateHomeServicePrice,
-  homeServiceTravelBufferMinutes,
   homeServiceTravelFeeEur,
 } from '../../src/lib/booking/home-service.ts';
+import { homeServiceBufferMinutes } from '../../src/lib/booking/buffers.ts';
 
 test('calculates one Home Service treatment without preparation time', () => {
   assert.deepEqual(
@@ -17,7 +17,7 @@ test('calculates one Home Service treatment without preparation time', () => {
     },
   );
   assert.equal(homeServiceTravelFeeEur, 15);
-  assert.equal(homeServiceTravelBufferMinutes, 60);
+  assert.equal(homeServiceBufferMinutes, 120);
 });
 
 test('adds the travel fee once per Home Service booking', () => {
