@@ -59,9 +59,8 @@ const booking = {
     address: 'Adres voor de afspraak aan huis',
     creatorTitle: 'Massage Creator',
     preferencesTitle: 'Studio Visit-voorkeuren',
-    creatorIntro:
-      'Kies zonder meerprijs een geur voor de massageolie en de ruimte, en de muziek die bij je past. Deze keuzes zijn optioneel.',
-    creatorScent: 'Geur voor olie en ruimte',
+    creatorIntro: 'Je kunt een geur voor de behandeling kiezen.',
+    creatorScent: 'Geur voor de behandeling',
     creatorScentPlaceholder: 'Kies een geur',
     creatorScentOptions: [
       { value: 'orange', label: 'Sinaasappel' },
@@ -152,9 +151,8 @@ const booking = {
     address: 'Address for the home appointment',
     creatorTitle: 'Massage Creator',
     preferencesTitle: 'Studio Visit preferences',
-    creatorIntro:
-      'Choose a scent for the massage oil and the room, and your preferred music, at no extra charge. These choices are optional.',
-    creatorScent: 'Scent for oil and room',
+    creatorIntro: 'You can choose a scent for your treatment.',
+    creatorScent: 'Scent for the treatment',
     creatorScentPlaceholder: 'Choose a scent',
     creatorScentOptions: [
       { value: 'orange', label: 'Orange' },
@@ -245,9 +243,8 @@ const booking = {
     address: 'Az otthoni kezelés címe',
     creatorTitle: 'Massage Creator',
     preferencesTitle: 'Studio Visit beállítások',
-    creatorIntro:
-      'Felár nélkül választhatsz illatot a masszázsolajhoz és a szobához, valamint zenét. A választások nem kötelezőek.',
-    creatorScent: 'Illat az olajhoz és a szobához',
+    creatorIntro: 'Választhatsz illatot a kezeléshez.',
+    creatorScent: 'Illat a kezeléshez',
     creatorScentPlaceholder: 'Válassz illatot',
     creatorScentOptions: [
       { value: 'orange', label: 'Narancs' },

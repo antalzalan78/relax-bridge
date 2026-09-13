@@ -948,10 +948,17 @@ img {
 }
 
 .studio-offer-group__heading {
-  display: grid;
-  gap: 0.4rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem clamp(1.5rem, 4vw, 3.5rem);
+  align-items: flex-end;
   padding-bottom: 1.25rem;
   border-bottom: 1px solid var(--border);
+}
+
+.studio-offer-group__heading-copy {
+  display: grid;
+  gap: 0.4rem;
 }
 
 .studio-offer-group__heading h2 {
@@ -1658,6 +1665,11 @@ img {
 }
 
 @media (max-width: 36rem) {
+  .studio-offer-group__heading .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
   .studio-treatment-card {
     grid-template-columns: 1.8rem minmax(0, 1fr);
     gap: 0.65rem;
