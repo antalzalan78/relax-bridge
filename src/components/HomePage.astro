@@ -34,6 +34,7 @@ const studio = await getServices(locale, 'studio');
 const home = await getServices(locale, 'home');
 const bookingHref = bookingPath(locale);
 const studioBookingHref = studioVisitBookingPath(locale);
+const studioReadyBookingHref = `${bookingHref}?category=studio`;
 const creatorHref = massageCreatorPath(locale);
 const homeBookingHref = `${bookingHref}?category=home`;
 
@@ -204,6 +205,11 @@ const jsonLd = [
             })}
         </div>
         <p class="studio-offer-group__payment-note" id={anchors.prices}>{d.prices.intro}</p>
+        <div class="studio-choice-action">
+          <a class="btn btn--primary" href={studioReadyBookingHref}>
+            {d.hero.primaryCta}<span aria-hidden="true">&rarr;</span>
+          </a>
+        </div>
       </section>
 
       <section class="massage-creator massage-creator--studio-intro">
