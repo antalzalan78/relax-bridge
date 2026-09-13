@@ -11,6 +11,10 @@ async function createBookingEmailDeliverySchema(): Promise<void> {
       ADD COLUMN IF NOT EXISTS service_details jsonb
     `;
     await transaction`
+      ALTER TABLE bookings
+      ADD COLUMN IF NOT EXISTS home_postal_code text
+    `;
+    await transaction`
       CREATE TABLE IF NOT EXISTS booking_email_deliveries (
         id uuid PRIMARY KEY,
         booking_id uuid NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,

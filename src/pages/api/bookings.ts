@@ -45,6 +45,7 @@ const bookingSchema = z
     customerEmail: z.email().max(200),
     customerPhone: z.string().trim().min(6).max(40),
     homeAddress: z.string().trim().max(300).optional(),
+    homePostalCode: z.string().trim().min(3).max(20).optional(),
     creatorScent: z.enum(['orange', 'rose', 'lavender', 'any', 'none']).optional(),
     creatorMusic: z.enum(['instrumental', 'nature', 'lofi', 'own', 'any', 'none']).optional(),
     creatorBase: z.enum(['relax', 'relax90', 'back30', 'back']).optional(),
@@ -71,6 +72,13 @@ const bookingSchema = z
         code: 'custom',
         path: ['homeAddress'],
         message: 'Address is required for home appointments.',
+      });
+    }
+    if (value.category === 'home' && !value.homePostalCode) {
+      context.addIssue({
+        code: 'custom',
+        path: ['homePostalCode'],
+        message: 'Postal code is required for home appointments.',
       });
     }
     if (value.category === 'home') {
@@ -350,6 +358,7 @@ export const POST: APIRoute = async ({ request }) => {
       customerEmail: parsed.data.customerEmail,
       customerPhone: parsed.data.customerPhone,
       homeAddress: parsed.data.homeAddress,
+      homePostalCode: parsed.data.homePostalCode,
       notes: bookingNotes(parsed.data, homeBooking?.note),
       serviceDetails: creator
         ? createMassageCreatorBookingDetails(creator)

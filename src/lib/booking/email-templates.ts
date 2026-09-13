@@ -16,6 +16,7 @@ export interface BookingEmailDetails {
   customerEmail: string;
   customerPhone: string;
   homeAddress?: string;
+  homePostalCode?: string;
   notes?: string;
   serviceDetails?: BookingServiceDetails;
   locale: BookingLocale;
@@ -225,8 +226,9 @@ function customerLocation(
 ): string {
   const copy = customerCopy[booking.locale];
   if (booking.category === 'home') {
-    return booking.homeAddress
-      ? `${copy.home}: ${booking.homeAddress}`
+    const address = [booking.homeAddress, booking.homePostalCode].filter(Boolean).join(', ');
+    return address
+      ? `${copy.home}: ${address}`
       : copy.home;
   }
   return context.studioAddress || copy.studio;
@@ -286,8 +288,9 @@ export function buildOwnerBookingEmail(
   context: BookingEmailContext,
 ): BookingEmailMessage {
   const formatted = formatDetails(booking, context.timeZone);
+  const homeLocation = [booking.homeAddress, booking.homePostalCode].filter(Boolean).join(', ');
   const location = booking.category === 'home'
-    ? booking.homeAddress || 'Otthoni kezelés – cím nincs megadva'
+    ? homeLocation || 'Otthoni kezelés – cím nincs megadva'
     : context.studioAddress || 'Relax Bridge stúdió, Tilburg';
   const subject = `Új foglalás · ${formatted.shortDate} ${formatted.startTime} · ${booking.customerName}`;
   const rows = [
