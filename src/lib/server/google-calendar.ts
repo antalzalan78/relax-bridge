@@ -270,7 +270,13 @@ async function refreshAccessToken(row: ConnectionRow): Promise<string> {
   });
   const token = await response.json() as Record<string, unknown>;
   if (!response.ok || typeof token.access_token !== 'string') {
-    throw new GoogleApiError('Google access token refresh failed.', response.status);
+    const errorCode = typeof token.error === 'string' && /^[a-z_]+$/.test(token.error)
+      ? token.error
+      : 'unknown_error';
+    throw new GoogleApiError(
+      `Google access token refresh failed (${response.status}: ${errorCode}).`,
+      response.status,
+    );
   }
   const expiresIn = Number(token.expires_in || 3600);
   await getDatabase()`
