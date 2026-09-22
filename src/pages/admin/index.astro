@@ -36,6 +36,7 @@ if (!session) return Astro.redirect('/admin/login');
 
 const settings = await getBookingSettings();
 const today = Temporal.Now.zonedDateTimeISO(settings.timeZone).toPlainDate();
+const view = Astro.url.searchParams.get('view') === 'month' ? 'month' : 'week';
 const requestedWeek = Astro.url.searchParams.get('week');
 let selected = today;
 try {
@@ -45,6 +46,24 @@ const weekStart = selected.subtract({ days: selected.dayOfWeek - 1 });
 const weekEnd = weekStart.add({ days: 7 });
 const previousWeek = weekStart.subtract({ days: 7 }).toString();
 const nextWeek = weekStart.add({ days: 7 }).toString();
+const requestedMonth = Astro.url.searchParams.get('month');
+let monthStart = selected.with({ day: 1 });
+try {
+  if (requestedMonth && /^\d{4}-\d{2}$/.test(requestedMonth)) {
+    monthStart = Temporal.PlainDate.from(`${requestedMonth}-01`);
+  }
+} catch {}
+const monthKey = monthStart.toString().slice(0, 7);
+const previousMonth = monthStart.subtract({ months: 1 }).toString().slice(0, 7);
+const nextMonth = monthStart.add({ months: 1 }).toString().slice(0, 7);
+const monthGridStart = monthStart.subtract({ days: monthStart.dayOfWeek - 1 });
+const lastDayOfMonth = monthStart.add({ months: 1 }).subtract({ days: 1 });
+const monthGridEnd = lastDayOfMonth.add({ days: 8 - lastDayOfMonth.dayOfWeek });
+const periodStart = view === 'month' ? monthGridStart : weekStart;
+const periodEnd = view === 'month' ? monthGridEnd : weekEnd;
+const currentQuery = view === 'month'
+  ? `view=month&month=${monthKey}`
+  : `week=${weekStart}${requestedMonth ? `&month=${monthKey}` : ''}`;
 
 if (Astro.request.method === 'POST') {
   try {
@@ -110,7 +129,7 @@ if (Astro.request.method === 'POST') {
     } else if (action === 'sync_google_calendar') {
       await syncAllToGoogleCalendar();
     }
-    return Astro.redirect(`/admin?week=${weekStart.toString()}`, 303);
+    return Astro.redirect(`/admin?${currentQuery}`, 303);
   } catch (error) {
     if (error instanceof Response) return error;
     console.error('Admin action failed', error);
@@ -118,11 +137,11 @@ if (Astro.request.method === 'POST') {
   }
 }
 
-const startInstant = weekStart.toZonedDateTime({
+const startInstant = periodStart.toZonedDateTime({
   timeZone: settings.timeZone,
   plainTime: Temporal.PlainTime.from('00:00'),
 }).toInstant().toString();
-const endInstant = weekEnd.toZonedDateTime({
+const endInstant = periodEnd.toZonedDateTime({
   timeZone: settings.timeZone,
   plainTime: Temporal.PlainTime.from('00:00'),
 }).toInstant().toString();
@@ -130,7 +149,7 @@ const endInstant = weekEnd.toZonedDateTime({
 await safelyRefreshGoogleCalendarBusy({ start: startInstant, end: endInstant });
 const [rules, exceptions, bookings, googleBusy] = await Promise.all([
   listAvailabilityRules(),
-  listAvailabilityExceptions(weekStart.toString(), weekEnd.subtract({ days: 1 }).toString()),
+  listAvailabilityExceptions(periodStart.toString(), periodEnd.subtract({ days: 1 }).toString()),
   listBookings(startInstant, endInstant),
   listGoogleCalendarBusy({ start: startInstant, end: endInstant }),
 ]);
@@ -141,7 +160,10 @@ const localDate = (value: unknown) =>
 const localBooking = (value: unknown) =>
   Temporal.Instant.from(value instanceof Date ? value.toISOString() : String(value))
     .toZonedDateTimeISO(settings.timeZone);
-const days = Array.from({ length: 7 }, (_, index) => weekStart.add({ days: index }));
+const days = Array.from(
+  { length: periodStart.until(periodEnd).days },
+  (_, index) => periodStart.add({ days: index }),
+);
 const bookingsByDay = new Map(days.map((day) => [day.toString(), [] as any[]]));
 for (const booking of bookings) {
   const key = localBooking(booking.starts_at).toPlainDate().toString();
@@ -195,11 +217,27 @@ if (googleStatus.configured && googleStatus.connected) {
     console.error('Google Calendar list could not be loaded', error);
   }
 }
-const googleBusyByDay = new Map(days.map((day) => [day.toString(), [] as any[]]));
-for (const busy of googleBusy) {
-  const key = localBooking(busy.starts_at).toPlainDate().toString();
-  googleBusyByDay.get(key)?.push(busy);
-}
+const googleBusyByDay = new Map(days.map((day) => {
+  const dayStart = day.toZonedDateTime({
+    timeZone: settings.timeZone,
+    plainTime: Temporal.PlainTime.from('00:00'),
+  }).toInstant().epochMilliseconds;
+  const dayEnd = day.add({ days: 1 }).toZonedDateTime({
+    timeZone: settings.timeZone,
+    plainTime: Temporal.PlainTime.from('00:00'),
+  }).toInstant().epochMilliseconds;
+  return [day.toString(), googleBusy.filter((busy) =>
+    new Date(busy.starts_at).getTime() < dayEnd &&
+    new Date(busy.ends_at).getTime() > dayStart
+  )] as const;
+}));
+const busyTimeOnDay = (value: unknown, day: Temporal.PlainDate, edge: 'start' | 'end') => {
+  const local = localBooking(value);
+  const localDay = local.toPlainDate().toString();
+  if (edge === 'start' && localDay < day.toString()) return '00:00';
+  if (edge === 'end' && localDay > day.toString()) return '24:00';
+  return `${String(local.hour).padStart(2, '0')}:${String(local.minute).padStart(2, '0')}`;
+};
 const syncTime = (value: unknown) => value
   ? new Intl.DateTimeFormat('hu-HU', {
       dateStyle: 'medium',
@@ -232,13 +270,28 @@ const syncTime = (value: unknown) => value
             <span><i class="booking-legend__swatch booking-legend__swatch--google"></i>Google Naptárban foglalt</span>
           </div>
         </div>
-        <nav class="week-nav" aria-label="Hétválasztó">
-          <a href={`/admin?week=${previousWeek}`} aria-label="Előző hét">&larr;</a>
-          <strong>{weekStart.toLocaleString('hu-HU', { day: 'numeric', month: 'long' })} – {weekEnd.subtract({ days: 1 }).toLocaleString('hu-HU', { day: 'numeric', month: 'long', year: 'numeric' })}</strong>
-          <a href={`/admin?week=${nextWeek}`} aria-label="Következő hét">&rarr;</a>
-        </nav>
+        <div class="calendar-controls">
+          <nav class="view-switch" aria-label="Naptárnézet">
+            <a href={`/admin?week=${view === 'month' ? monthStart.toString() : weekStart.toString()}${view === 'month' || requestedMonth ? `&month=${monthKey}` : ''}`} aria-current={view === 'week' ? 'page' : undefined}>Heti nézet</a>
+            <a href={`/admin?view=month&month=${view === 'week' && !requestedMonth ? weekStart.add({ days: 3 }).toString().slice(0, 7) : monthKey}`} aria-current={view === 'month' ? 'page' : undefined}>Havi nézet</a>
+          </nav>
+          {view === 'week' ? (
+            <nav class="week-nav" aria-label="Hétválasztó">
+              <a href={`/admin?week=${previousWeek}`} aria-label="Előző hét">&larr;</a>
+              <strong>{weekStart.toLocaleString('hu-HU', { day: 'numeric', month: 'long' })} – {weekEnd.subtract({ days: 1 }).toLocaleString('hu-HU', { day: 'numeric', month: 'long', year: 'numeric' })}</strong>
+              <a href={`/admin?week=${nextWeek}`} aria-label="Következő hét">&rarr;</a>
+            </nav>
+          ) : (
+            <nav class="week-nav" aria-label="Hónapválasztó">
+              <a href={`/admin?view=month&month=${previousMonth}`} aria-label="Előző hónap">&larr;</a>
+              <strong>{monthStart.toLocaleString('hu-HU', { year: 'numeric', month: 'long' })}</strong>
+              <a href={`/admin?view=month&month=${nextMonth}`} aria-label="Következő hónap">&rarr;</a>
+            </nav>
+          )}
+        </div>
       </section>
 
+      {view === 'week' ? (
       <section class="calendar-grid" aria-label="Heti foglalások">
         {days.map((day, index) => {
           const dayBookings = bookingsByDay.get(day.toString()) || [];
@@ -268,14 +321,12 @@ const syncTime = (value: unknown) => value
                 </div>
               ))}
               {googleBusyWindows.map((busy) => {
-                const busyStart = localBooking(busy.starts_at);
-                const busyEnd = localBooking(busy.ends_at);
                 return (
                   <div class="google-busy-chip">
                     <span>Google Naptárban foglalt</span>
                     <strong>
-                      {String(busyStart.hour).padStart(2, '0')}:{String(busyStart.minute).padStart(2, '0')}
-                      –{String(busyEnd.hour).padStart(2, '0')}:{String(busyEnd.minute).padStart(2, '0')}
+                      {busyTimeOnDay(busy.starts_at, day, 'start')}
+                      –{busyTimeOnDay(busy.ends_at, day, 'end')}
                     </strong>
                   </div>
                 );
@@ -339,6 +390,66 @@ const syncTime = (value: unknown) => value
           );
         })}
       </section>
+      ) : (
+      <section class="month-calendar" aria-label="Havi foglalások">
+        <div class="month-grid">
+          {weekdays.map((weekday, index) => (
+            <span class="month-weekday">
+              <span class="month-weekday__full">{weekday}</span>
+              <span class="month-weekday__short">{['H', 'K', 'Sze', 'Cs', 'P', 'Szo', 'V'][index]}</span>
+            </span>
+          ))}
+          {days.map((day) => {
+            const date = day.toString();
+            const dayBookings = bookingsByDay.get(date) || [];
+            const dayExceptions = exceptionsByDay.get(date) || [];
+            const openWindows = openWindowsByDay.get(date) || [];
+            const googleBusyWindows = googleBusyByDay.get(date) || [];
+            const dayWeek = day.subtract({ days: day.dayOfWeek - 1 }).toString();
+            return (
+              <a
+                class:list={['month-day', {
+                  'month-day--today': day.equals(today),
+                  'month-day--outside': day.month !== monthStart.month || day.year !== monthStart.year,
+                }]}
+                href={`/admin?week=${dayWeek}&month=${date.slice(0, 7)}`}
+                aria-label={`${day.toLocaleString('hu-HU', { year: 'numeric', month: 'long', day: 'numeric' })}: ${openWindows.length} foglalható idősáv, ${dayBookings.length} foglalás, ${dayExceptions.length} egyedi módosítás, ${googleBusyWindows.length} Google-foglaltság. Részletek a heti nézetben.`}
+              >
+                <span class="month-day__number">{day.day}</span>
+                <span class="month-day__items">
+                  {openWindows.map((window) => (
+                    <span class="month-chip month-chip--open" title={`Foglalható ${window.start}–${window.end}`}>
+                      <span class="month-chip__label">Foglalható </span>{window.start}–{window.end}
+                    </span>
+                  ))}
+                  {dayExceptions.map((exception) => (
+                    <span class:list={['month-chip', `month-chip--${exception.kind}`]}>
+                      {exception.kind === 'blocked' ? 'Zárva' : 'Extra nyitva'}
+                      <span class="month-chip__detail">{exception.start_time ? ` ${shortTime(exception.start_time)}–${shortTime(exception.end_time)}` : ' egész nap'}</span>
+                    </span>
+                  ))}
+                  {googleBusyWindows.map((busy) => {
+                    return <span class="month-chip month-chip--google" title="Google Naptárban foglalt">
+                      <span class="month-chip__label">Google </span>
+                      {busyTimeOnDay(busy.starts_at, day, 'start')}
+                      –{busyTimeOnDay(busy.ends_at, day, 'end')}
+                    </span>;
+                  })}
+                  {dayBookings.map((booking) => {
+                    const start = localBooking(booking.starts_at);
+                    return <span class:list={['month-chip', `month-chip--${booking.service_category}`, { 'month-chip--cancelled': booking.status === 'cancelled' }]}>
+                      {String(start.hour).padStart(2, '0')}:{String(start.minute).padStart(2, '0')}
+                      <span class="month-chip__label"> {booking.customer_name}</span>
+                    </span>;
+                  })}
+                </span>
+              </a>
+            );
+          })}
+        </div>
+        <p class="month-hint">Kattints egy napra a foglalások részleteihez és a heti nézethez.</p>
+      </section>
+      )}
 
       <section class="admin-panels">
         <article class="admin-panel">
@@ -375,7 +486,7 @@ const syncTime = (value: unknown) => value
           <p>Zárj le egy napot vagy idősávot, illetve adj hozzá extra nyitvatartást.</p>
           <form class="compact-form" method="post">
             <input type="hidden" name="action" value="add_exception" />
-            <label>Dátum<input name="day" type="date" value={weekStart.toString()} required /></label>
+            <label>Dátum<input name="day" type="date" value={view === 'month' ? monthStart.toString() : weekStart.toString()} required /></label>
             <label>Típus
               <select name="kind" required>
                 <option value="blocked">Nem elérhető</option>
@@ -389,7 +500,7 @@ const syncTime = (value: unknown) => value
             <button class="btn btn--light" type="submit">Módosítás hozzáadása</button>
           </form>
           <div class="rule-list">
-            {exceptions.length === 0 && <p>Ezen a héten nincs egyedi módosítás.</p>}
+            {exceptions.length === 0 && <p>A megjelenített időszakban nincs egyedi módosítás.</p>}
             {exceptions.map((exception) => (
               <div class="rule-row">
                 <span><strong>{localDate(exception.day)}</strong> {exception.kind === 'blocked' ? 'zárva' : 'extra nyitva'} {exception.start_time ? `${shortTime(exception.start_time)}–${shortTime(exception.end_time)}` : 'egész nap'}</span>
@@ -475,6 +586,11 @@ const syncTime = (value: unknown) => value
   .admin-main { padding-block: 3rem 6rem; }
   .admin-title { display: flex; align-items: end; justify-content: space-between; gap: 2rem; margin-bottom: 2rem; }
   .admin-title h1 { max-width: none; font-size: clamp(2.5rem, 5vw, 4.4rem); }
+  .calendar-controls { display: grid; justify-items: end; gap: 0.65rem; }
+  .view-switch { display: flex; padding: 0.2rem; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); }
+  .view-switch a { padding: 0.45rem 0.85rem; border-radius: 999px; color: var(--pine-dark); font-size: 0.78rem; font-weight: 700; text-decoration: none; }
+  .view-switch a[aria-current='page'] { background: var(--pine-dark); color: #fff; }
+  .view-switch a:not([aria-current='page']):hover { background: var(--pine-soft); }
   .week-nav { display: flex; align-items: center; gap: 0.8rem; padding: 0.45rem; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); }
   .week-nav a { display: grid; width: 2.25rem; height: 2.25rem; place-items: center; border-radius: 50%; color: var(--pine); text-decoration: none; }
   .week-nav a:hover { background: var(--pine-soft); }
@@ -493,6 +609,26 @@ const syncTime = (value: unknown) => value
   .calendar-day > header span { color: var(--ink-soft); font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
   .calendar-day > header strong { display: grid; width: 2rem; height: 2rem; place-items: center; border-radius: 50%; font-family: 'Iowan Old Style', Georgia, serif; }
   .calendar-day--today > header strong { background: var(--clay); color: #fff; }
+  .month-calendar { overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow-soft); }
+  .month-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+  .month-weekday { padding: 0.7rem 0.55rem; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); color: var(--ink-soft); font-size: 0.7rem; font-weight: 800; text-align: center; text-transform: uppercase; }
+  .month-weekday:nth-child(7) { border-right: 0; }
+  .month-weekday__short { display: none; }
+  .month-day { display: block; min-width: 0; min-height: 9rem; padding: 0.55rem; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); color: var(--ink); text-decoration: none; }
+  .month-day:nth-child(7n) { border-right: 0; }
+  .month-day:hover, .month-day:focus-visible { background: var(--pine-soft); }
+  .month-day--outside { background: #f8f5ef; opacity: 0.6; }
+  .month-day__number { display: grid; width: 1.75rem; height: 1.75rem; margin-bottom: 0.3rem; place-items: center; border-radius: 50%; font-family: 'Iowan Old Style', Georgia, serif; font-weight: 700; }
+  .month-day--today .month-day__number { background: var(--clay); color: #fff; }
+  .month-day__items { display: grid; min-width: 0; gap: 0.2rem; }
+  .month-chip { display: block; min-width: 0; overflow: hidden; padding: 0.2rem 0.35rem; border-left: 3px solid; border-radius: 0.25rem; font-size: 0.67rem; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+  .month-chip--open { border-color: var(--pine); background: var(--pine-soft); color: var(--pine-dark); }
+  .month-chip--blocked { border-color: var(--clay); background: var(--clay-soft); color: var(--clay-dark); }
+  .month-chip--google { border-color: #5f6f8f; background: #edf0f6; color: #34415d; }
+  .month-chip--studio { border-color: var(--pine); background: var(--pine-soft); color: var(--pine-dark); }
+  .month-chip--home { border-color: var(--clay); background: var(--clay-soft); color: var(--clay-dark); }
+  .month-chip--cancelled { border-color: var(--border); background: #eeeae3; color: var(--ink-soft); text-decoration: line-through; }
+  .month-hint { margin: 0; padding: 0.7rem 1rem; color: var(--ink-soft); font-size: 0.75rem; }
   .open-window-list { display: grid; gap: 0.4rem; margin-bottom: 0.6rem; }
   .open-window { display: grid; gap: 0.12rem; padding: 0.55rem 0.6rem; border: 1px solid rgb(40 82 71 / 0.22); border-left: 3px solid var(--pine); border-radius: 0.45rem; background: var(--pine-soft); color: var(--pine-dark); }
   .open-window span { font-size: 0.62rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
@@ -564,9 +700,20 @@ const syncTime = (value: unknown) => value
   .google-sync-meta dd { margin: 0; font-weight: 700; }
   @media (max-width: 52rem) {
     .admin-title { display: block; }
-    .week-nav { width: fit-content; margin-top: 1rem; }
+    .calendar-controls { justify-items: start; margin-top: 1rem; }
+    .week-nav { width: fit-content; max-width: 100%; }
+    .week-nav strong { min-width: 0; }
     .compact-form { grid-template-columns: 1fr; }
     .compact-form .btn, .compact-form .checkbox-label, .compact-form .wide-field { grid-column: auto; }
     .google-calendar-form { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 42rem) {
+    .month-weekday { padding: 0.45rem 0; }
+    .month-weekday__full { display: none; }
+    .month-weekday__short { display: inline; }
+    .month-day { min-height: 4.8rem; padding: 0.2rem; }
+    .month-day__number { width: 1.45rem; height: 1.45rem; margin-bottom: 0.2rem; font-size: 0.8rem; }
+    .month-chip { min-height: 0.38rem; padding: 0; border-left-width: 2px; font-size: 0; }
+    .month-hint { font-size: 0.7rem; }
   }
 </style>
