@@ -5,6 +5,7 @@ import {
   localDayInstantRange,
   localTimeWindowInstantRange,
 } from '../booking/availability';
+import { bookingMinimumStart } from '../booking/booking-window';
 import {
   homeServiceBufferMinutes,
   studioVisitBufferMinutes,
@@ -209,17 +210,19 @@ async function getAvailableSlotsWithQuery(input: {
   now?: string;
 }): Promise<AvailableSlot[]> {
   const settings = input.settings ?? (await getBookingSettings(input.query));
+  const minimumStart = bookingMinimumStart({
+    date: input.date,
+    category: input.category,
+    now: input.now ?? Temporal.Now.instant(),
+    settings,
+  });
+  if (!minimumStart) return [];
   const { open, blocked } = await getOpenAndBlockedWindows(
     input.query,
     input.date,
     settings,
   );
   const busy = await getBusyWindows(input.query, input.date, settings);
-  const minimumStart = Temporal.Instant.from(
-    input.now ?? Temporal.Now.instant().toString(),
-  )
-    .add({ hours: settings.minNoticeHours })
-    .toString();
   const isHome = input.category === 'home';
 
   return buildAvailableSlots({
@@ -340,7 +343,6 @@ export async function getAvailableDates(input: {
   const busyWindows: InstantWindow[] = busyRows.map((row: any) =>
     busyWindowFromRow(row, settings),
   );
-  const minimumStart = now.add({ hours: settings.minNoticeHours }).toString();
   const dates: string[] = [];
 
   for (
@@ -349,6 +351,13 @@ export async function getAvailableDates(input: {
     day = day.add({ days: 1 })
   ) {
     const date = day.toString();
+    const minimumStart = bookingMinimumStart({
+      date,
+      category: input.category,
+      now,
+      settings,
+    });
+    if (!minimumStart) continue;
     const open: LocalTimeWindow[] = rules
       .filter(
         (rule: any) =>
@@ -480,8 +489,6 @@ export async function getNextAvailableSlot(input: {
   const busyWindows: InstantWindow[] = busyRows.map((row: any) =>
     busyWindowFromRow(row, settings),
   );
-  const minimumStart = now.add({ hours: settings.minNoticeHours }).toString();
-
   for (let offset = 0; offset <= settings.bookingHorizonDays; offset += 1) {
     const day = today.add({ days: offset });
     const date = day.toString();
@@ -517,6 +524,13 @@ export async function getNextAvailableSlot(input: {
     }
 
     const available = input.candidates.flatMap((candidate) => {
+      const minimumStart = bookingMinimumStart({
+        date,
+        category: candidate.category,
+        now,
+        settings,
+      });
+      if (!minimumStart) return [];
       const isHome = candidate.category === 'home';
       const [slot] = buildAvailableSlots({
         date,
