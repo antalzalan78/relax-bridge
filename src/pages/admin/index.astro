@@ -14,7 +14,7 @@ import {
   listBookings,
 } from '../../lib/server/booking-repository';
 import { assertSameOrigin } from '../../lib/server/security';
-import { retryBookingEmails } from '../../lib/server/booking-email';
+import { dispatchPendingBookingEmails, retryBookingEmails } from '../../lib/server/booking-email';
 import { resolveOpenWindows } from '../../lib/booking/availability';
 import {
   getGoogleCalendarStatus,
@@ -110,8 +110,14 @@ if (Astro.request.method === 'POST') {
       await deleteAvailabilityException(id);
     } else if (action === 'cancel_booking') {
       const { id } = z.object({ id: z.uuid() }).parse(form);
-      await cancelBooking(id);
-      await safelyRemoveGoogleCalendarEntity('booking', id);
+      if (await cancelBooking(id)) {
+        await safelyRemoveGoogleCalendarEntity('booking', id);
+        try {
+          await dispatchPendingBookingEmails({ bookingId: id, limit: 1 });
+        } catch (error) {
+          console.error('Cancellation email dispatch failed; queued for retry', { bookingId: id, error });
+        }
+      }
     } else if (action === 'retry_booking_emails') {
       const { id } = z.object({ id: z.uuid() }).parse(form);
       await retryBookingEmails(id);
@@ -200,6 +206,7 @@ const emailStatusLabel = (value: unknown) => ({
   sending: 'küldés alatt',
   sent: 'elküldve',
   failed: 'sikertelen',
+  suppressed: 'nem küldtük el',
 }[String(value)] || 'nem volt ütemezve');
 const googleNotice = ({
   connected: 'A Google-fiók csatlakoztatva. Válaszd ki a használni kívánt naptárt.',
@@ -356,7 +363,13 @@ const syncTime = (value: unknown) => value
                         )}
                         {booking.notes && <p><strong>Megjegyzés:</strong> {booking.notes}</p>}
                         <p class="reference">{booking.reference}</p>
-                        {(booking.customer_email_status || booking.owner_email_status) && (
+                        {booking.status === 'cancelled' ? (
+                          <div class="email-delivery" aria-label="Lemondási e-mail kézbesítése">
+                            <span class:list={{ 'email-delivery--sent': booking.cancellation_email_status === 'sent' }}>
+                              Lemondás az ügyfélnek: {emailStatusLabel(booking.cancellation_email_status)}
+                            </span>
+                          </div>
+                        ) : (booking.customer_email_status || booking.owner_email_status) && (
                           <div class="email-delivery" aria-label="E-mail-kézbesítés">
                             <span class:list={{ 'email-delivery--sent': booking.customer_email_status === 'sent' }}>
                               Ügyfél: {emailStatusLabel(booking.customer_email_status)}
@@ -366,12 +379,16 @@ const syncTime = (value: unknown) => value
                             </span>
                           </div>
                         )}
-                        {(booking.customer_email_status && booking.customer_email_status !== 'sent') ||
-                        (booking.owner_email_status && booking.owner_email_status !== 'sent') ? (
+                        {(booking.status === 'cancelled'
+                          ? booking.cancellation_email_status === 'pending' || booking.cancellation_email_status === 'failed'
+                          : booking.customer_email_status === 'pending' || booking.customer_email_status === 'failed' ||
+                            booking.owner_email_status === 'pending' || booking.owner_email_status === 'failed') ? (
                           <form method="post">
                             <input type="hidden" name="action" value="retry_booking_emails" />
                             <input type="hidden" name="id" value={booking.id} />
-                            <button class="retry-link" type="submit">E-mailek újrapróbálása</button>
+                            <button class="retry-link" type="submit">
+                              {booking.status === 'cancelled' ? 'Lemondási e-mail újrapróbálása' : 'E-mailek újrapróbálása'}
+                            </button>
                           </form>
                         ) : null}
                         {booking.status === 'confirmed' ? (

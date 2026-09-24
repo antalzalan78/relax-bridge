@@ -18,9 +18,9 @@ async function createBookingEmailDeliverySchema(): Promise<void> {
       CREATE TABLE IF NOT EXISTS booking_email_deliveries (
         id uuid PRIMARY KEY,
         booking_id uuid NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
-        kind text NOT NULL CHECK (kind IN ('customer_confirmation', 'owner_notification')),
+        kind text NOT NULL CHECK (kind IN ('customer_confirmation', 'owner_notification', 'customer_cancellation')),
         status text NOT NULL DEFAULT 'pending'
-          CHECK (status IN ('pending', 'sending', 'sent', 'failed')),
+          CHECK (status IN ('pending', 'sending', 'sent', 'failed', 'suppressed')),
         attempts smallint NOT NULL DEFAULT 0 CHECK (attempts >= 0),
         next_attempt_at timestamptz NOT NULL DEFAULT now(),
         claimed_at timestamptz,
@@ -31,6 +31,24 @@ async function createBookingEmailDeliverySchema(): Promise<void> {
         sent_at timestamptz,
         UNIQUE (booking_id, kind)
       )
+    `;
+    await transaction`
+      ALTER TABLE booking_email_deliveries
+      DROP CONSTRAINT IF EXISTS booking_email_deliveries_kind_check
+    `;
+    await transaction`
+      ALTER TABLE booking_email_deliveries
+      ADD CONSTRAINT booking_email_deliveries_kind_check
+      CHECK (kind IN ('customer_confirmation', 'owner_notification', 'customer_cancellation'))
+    `;
+    await transaction`
+      ALTER TABLE booking_email_deliveries
+      DROP CONSTRAINT IF EXISTS booking_email_deliveries_status_check
+    `;
+    await transaction`
+      ALTER TABLE booking_email_deliveries
+      ADD CONSTRAINT booking_email_deliveries_status_check
+      CHECK (status IN ('pending', 'sending', 'sent', 'failed', 'suppressed'))
     `;
     await transaction`
       CREATE INDEX IF NOT EXISTS booking_email_deliveries_pending_idx

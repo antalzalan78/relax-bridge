@@ -127,6 +127,30 @@ const customerCopy = {
   },
 } as const;
 
+const cancellationCopy = {
+  nl: {
+    subject: 'Je afspraak bij Relax Bridge is geannuleerd',
+    heading: 'Afspraak geannuleerd',
+    intro: 'Je afspraak is geannuleerd. Hieronder vind je de gegevens van de geannuleerde reservering.',
+    contact: 'Is dit niet wat je verwachtte of wil je een nieuwe afspraak maken? Neem contact op via WhatsApp of antwoord op deze e-mail.',
+    closing: 'Met vriendelijke groet,',
+  },
+  en: {
+    subject: 'Your Relax Bridge appointment has been cancelled',
+    heading: 'Appointment cancelled',
+    intro: 'Your appointment has been cancelled. The details of the cancelled booking are below.',
+    contact: 'If this was unexpected or you would like to book another appointment, contact us via WhatsApp or reply to this email.',
+    closing: 'Kind regards,',
+  },
+  hu: {
+    subject: 'Relax Bridge időpontod lemondva',
+    heading: 'Lemondott foglalás',
+    intro: 'A foglalásodat lemondtuk. Az alábbi időpont már nem érvényes.',
+    contact: 'Ha ez váratlanul ért, vagy új időpontot szeretnél, írj WhatsAppon, vagy válaszolj erre az e-mailre.',
+    closing: 'Üdvözlettel,',
+  },
+} as const;
+
 function escapeHtml(value: string): string {
   return value
     .replaceAll('&', '&amp;')
@@ -273,6 +297,53 @@ export function buildCustomerBookingEmail(
     ...rows.map(([label, value]) => `${label}: ${value}`),
     '',
     copy.change,
+    `WhatsApp: ${context.whatsappUrl}`,
+    `E-mail: ${context.ownerEmail}`,
+    '',
+    copy.closing,
+    'Relax Bridge',
+  ].join('\n');
+
+  return { subject, html, text };
+}
+
+export function buildCustomerCancellationEmail(
+  booking: BookingEmailDetails,
+  context: BookingEmailContext,
+): BookingEmailMessage {
+  const copy = cancellationCopy[booking.locale];
+  const labels = customerCopy[booking.locale];
+  const formatted = formatDetails(booking, context.timeZone);
+  const rows = [
+    [labels.service, booking.serviceTitle],
+    ...creatorDetailRows(booking.serviceDetails, booking.locale),
+    [labels.date, formatted.date],
+    [labels.time, `${formatted.startTime}–${formatted.endTime}`],
+    [labels.duration, `${booking.durationMinutes} ${labels.minutes}`],
+    [labels.location, customerLocation(booking, context)],
+    [labels.reference, booking.reference],
+  ] as ReadonlyArray<readonly [string, string]>;
+  const subject = `${copy.subject} · ${formatted.shortDate} ${formatted.startTime}`;
+  const html = emailShell(`
+    <p style="margin:0 0 8px;color:#a85030;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase">${escapeHtml(copy.heading)}</p>
+    <p style="margin:0 0 10px;font-size:18px">${escapeHtml(labels.greeting)} ${escapeHtml(booking.customerName)},</p>
+    <p style="margin:0 0 24px;color:#625f56;line-height:1.6">${escapeHtml(copy.intro)}</p>
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;border:1px solid #ded4c4;border-radius:12px">
+      ${rows.map(([label, value]) => detailRow(label, value)).join('')}
+    </table>
+    <p style="margin:24px 0 0;color:#625f56;line-height:1.6">${escapeHtml(copy.contact)}</p>
+    <p style="margin:14px 0 0"><a href="${escapeHtml(context.whatsappUrl)}" style="color:#a85030;font-weight:700">WhatsApp</a> · <a href="mailto:${escapeHtml(context.ownerEmail)}" style="color:#285247">${escapeHtml(context.ownerEmail)}</a></p>
+    <p style="margin:28px 0 0;line-height:1.6">${escapeHtml(copy.closing)}<br><strong>Relax Bridge</strong></p>
+  `, booking.locale);
+  const text = [
+    `${labels.greeting} ${booking.customerName},`,
+    '',
+    copy.heading,
+    copy.intro,
+    '',
+    ...rows.map(([label, value]) => `${label}: ${value}`),
+    '',
+    copy.contact,
     `WhatsApp: ${context.whatsappUrl}`,
     `E-mail: ${context.ownerEmail}`,
     '',
