@@ -687,7 +687,8 @@ export async function listBookings(from: string, to: string) {
       booking.home_address, booking.home_postal_code, booking.notes, booking.locale, booking.starts_at,
       booking.ends_at, booking.status, booking.created_at,
       customer_delivery.status AS customer_email_status,
-      owner_delivery.status AS owner_email_status
+      owner_delivery.status AS owner_email_status,
+      cancellation_delivery.status AS cancellation_email_status
     FROM bookings AS booking
     LEFT JOIN booking_email_deliveries AS customer_delivery
       ON customer_delivery.booking_id = booking.id
@@ -695,6 +696,9 @@ export async function listBookings(from: string, to: string) {
     LEFT JOIN booking_email_deliveries AS owner_delivery
       ON owner_delivery.booking_id = booking.id
       AND owner_delivery.kind = 'owner_notification'
+    LEFT JOIN booking_email_deliveries AS cancellation_delivery
+      ON cancellation_delivery.booking_id = booking.id
+      AND cancellation_delivery.kind = 'customer_cancellation'
     WHERE booking.starts_at >= ${from}::timestamptz
       AND booking.starts_at < ${to}::timestamptz
     ORDER BY booking.starts_at
@@ -742,10 +746,29 @@ export async function deleteAvailabilityException(id: string) {
   await getDatabase()`DELETE FROM availability_exceptions WHERE id = ${id}`;
 }
 
-export async function cancelBooking(id: string) {
-  await getDatabase()`
-    UPDATE bookings
-    SET status = 'cancelled', cancelled_at = now()
-    WHERE id = ${id} AND status = 'confirmed'
-  `;
+export async function cancelBooking(id: string): Promise<boolean> {
+  await ensureBookingEmailDeliverySchema();
+  return getDatabase().begin(async (transaction) => {
+    const [cancelled] = await transaction`
+      UPDATE bookings
+      SET status = 'cancelled', cancelled_at = now()
+      WHERE id = ${id} AND status = 'confirmed'
+      RETURNING id
+    `;
+    if (!cancelled) return false;
+
+    await transaction`
+      UPDATE booking_email_deliveries
+      SET status = 'suppressed', claimed_at = NULL, updated_at = now()
+      WHERE booking_id = ${id}
+        AND kind IN ('customer_confirmation', 'owner_notification')
+        AND status IN ('pending', 'failed', 'sending')
+    `;
+    await transaction`
+      INSERT INTO booking_email_deliveries (id, booking_id, kind)
+      VALUES (${randomUUID()}, ${id}, 'customer_cancellation')
+      ON CONFLICT (booking_id, kind) DO NOTHING
+    `;
+    return true;
+  });
 }

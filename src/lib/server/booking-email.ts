@@ -1,5 +1,6 @@
 import {
   buildCustomerBookingEmail,
+  buildCustomerCancellationEmail,
   buildOwnerBookingEmail,
   type BookingEmailDetails,
   type BookingEmailMessage,
@@ -7,7 +8,7 @@ import {
 import { ensureBookingEmailDeliverySchema } from './booking-email-schema';
 import { getDatabase } from './db';
 
-type DeliveryKind = 'customer_confirmation' | 'owner_notification';
+type DeliveryKind = 'customer_confirmation' | 'owner_notification' | 'customer_cancellation';
 
 interface ClaimedDelivery extends BookingEmailDetails {
   deliveryId: string;
@@ -39,15 +40,20 @@ async function claimDelivery(bookingId?: string): Promise<ClaimedDelivery | null
   const database = getDatabase();
   const [row] = await database`
     WITH candidate AS (
-      SELECT id
-      FROM booking_email_deliveries
-      WHERE (${bookingId || null}::uuid IS NULL OR booking_id = ${bookingId || null}::uuid)
+      SELECT delivery.id
+      FROM booking_email_deliveries AS delivery
+      JOIN bookings AS booking ON booking.id = delivery.booking_id
+      WHERE (${bookingId || null}::uuid IS NULL OR delivery.booking_id = ${bookingId || null}::uuid)
         AND (
-          (status IN ('pending', 'failed') AND next_attempt_at <= now())
-          OR (status = 'sending' AND claimed_at < now() - interval '15 minutes')
+          (booking.status = 'confirmed' AND delivery.kind IN ('customer_confirmation', 'owner_notification'))
+          OR (booking.status = 'cancelled' AND delivery.kind = 'customer_cancellation')
         )
-      ORDER BY created_at
-      FOR UPDATE SKIP LOCKED
+        AND (
+          (delivery.status IN ('pending', 'failed') AND delivery.next_attempt_at <= now())
+          OR (delivery.status = 'sending' AND delivery.claimed_at < now() - interval '15 minutes')
+        )
+      ORDER BY delivery.created_at
+      FOR UPDATE OF delivery SKIP LOCKED
       LIMIT 1
     ), claimed AS (
       UPDATE booking_email_deliveries AS delivery
@@ -148,7 +154,7 @@ async function markSent(deliveryId: string, providerMessageId: string): Promise<
     UPDATE booking_email_deliveries
     SET status = 'sent', provider_message_id = ${providerMessageId},
         sent_at = now(), claimed_at = NULL, updated_at = now(), last_error = NULL
-    WHERE id = ${deliveryId}
+    WHERE id = ${deliveryId} AND status = 'sending'
   `;
 }
 
@@ -160,8 +166,23 @@ async function markFailed(delivery: ClaimedDelivery, error: unknown): Promise<vo
     SET status = 'failed', claimed_at = NULL,
         next_attempt_at = now() + (${delaySeconds} * interval '1 second'),
         last_error = ${message.slice(0, 1000)}, updated_at = now()
-    WHERE id = ${delivery.deliveryId}
+    WHERE id = ${delivery.deliveryId} AND status = 'sending'
   `;
+}
+
+async function isDeliveryStillEligible(delivery: ClaimedDelivery): Promise<boolean> {
+  const [row] = await getDatabase()`
+    SELECT 1
+    FROM booking_email_deliveries AS email
+    JOIN bookings AS booking ON booking.id = email.booking_id
+    WHERE email.id = ${delivery.deliveryId}
+      AND email.status = 'sending'
+      AND (
+        (booking.status = 'confirmed' AND email.kind IN ('customer_confirmation', 'owner_notification'))
+        OR (booking.status = 'cancelled' AND email.kind = 'customer_cancellation')
+      )
+  `;
+  return Boolean(row);
 }
 
 export async function dispatchPendingBookingEmails(input: {
@@ -187,12 +208,15 @@ export async function dispatchPendingBookingEmails(input: {
       timeZone: configuration.timeZone,
       whatsappUrl: configuration.whatsappUrl,
     };
-    const isCustomer = delivery.deliveryKind === 'customer_confirmation';
-    const message = isCustomer
-      ? buildCustomerBookingEmail(delivery, context)
-      : buildOwnerBookingEmail(delivery, context);
+    const isCustomer = delivery.deliveryKind !== 'owner_notification';
+    const message = delivery.deliveryKind === 'customer_cancellation'
+      ? buildCustomerCancellationEmail(delivery, context)
+      : isCustomer
+        ? buildCustomerBookingEmail(delivery, context)
+        : buildOwnerBookingEmail(delivery, context);
 
     try {
+      if (!await isDeliveryStillEligible(delivery)) continue;
       const providerId = await sendWithResend({
         apiKey: configuration.apiKey,
         from: configuration.from,
@@ -221,11 +245,21 @@ export async function retryBookingEmails(
   bookingId: string,
 ): Promise<BookingEmailDispatchResult> {
   await ensureBookingEmailDeliverySchema();
+  const [booking] = await getDatabase()`
+    SELECT status FROM bookings WHERE id = ${bookingId}
+  `;
+  if (!booking) return { sent: 0, failed: 0, skipped: true };
+  const isCancelled = booking.status === 'cancelled';
   await getDatabase()`
     UPDATE booking_email_deliveries
     SET status = 'pending', next_attempt_at = now(), claimed_at = NULL,
         last_error = NULL, updated_at = now()
-    WHERE booking_id = ${bookingId} AND status <> 'sent'
+    WHERE booking_id = ${bookingId}
+      AND status IN ('pending', 'failed')
+      AND (
+        (${isCancelled} AND kind = 'customer_cancellation')
+        OR (NOT ${isCancelled} AND kind IN ('customer_confirmation', 'owner_notification'))
+      )
   `;
   return dispatchPendingBookingEmails({ bookingId, limit: 2 });
 }

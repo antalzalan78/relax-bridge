@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   buildCustomerBookingEmail,
+  buildCustomerCancellationEmail,
   buildOwnerBookingEmail,
   type BookingEmailContext,
   type BookingEmailDetails,
@@ -102,4 +103,40 @@ test('builds the owner notification with customer contact details', () => {
   assert.match(message.subject, /Új foglalás/);
   assert.match(message.text, /anna@example.com/);
   assert.match(message.text, /Első alkalom/);
+});
+
+for (const [locale, subject, notice] of [
+  ['nl', /geannuleerd/i, /Je afspraak is geannuleerd/],
+  ['en', /cancelled/i, /Your appointment has been cancelled/],
+  ['hu', /lemondva/i, /A foglalásodat lemondtuk/],
+] as const) {
+  test(`builds the ${locale} customer cancellation email with booking details`, () => {
+    const message = buildCustomerCancellationEmail({ ...booking, locale }, context);
+    assert.match(message.subject, subject);
+    assert.match(message.text, notice);
+    assert.match(message.text, /RB-20260811-ABC123/);
+    assert.match(message.text, /Relax Massage/);
+    assert.match(message.html, /Anna &amp; Co/);
+    assert.doesNotMatch(message.text, /confirmed|végleges|staat vast/i);
+  });
+}
+
+test('includes Massage Creator details and escapes the home address in a cancellation', () => {
+  const message = buildCustomerCancellationEmail({
+    ...booking,
+    locale: 'hu',
+    category: 'home',
+    homeAddress: 'Tilburg <centrum>',
+    homePostalCode: '5038 EA',
+    serviceTitle: 'Massage Creator',
+    serviceDetails: {
+      kind: 'massage_creator',
+      base: { key: 'relax', minutes: 60, priceEur: 65 },
+      addons: [{ key: 'face', minutes: 15, priceEur: 20 }],
+    },
+  }, context);
+  assert.match(message.text, /Alapkezelés: Relaxmasszázs/);
+  assert.match(message.text, /Kiegészítő 1: Arc- és fejmasszázs/);
+  assert.match(message.text, /Tilburg <centrum>, 5038 EA/);
+  assert.match(message.html, /Tilburg &lt;centrum&gt;, 5038 EA/);
 });
