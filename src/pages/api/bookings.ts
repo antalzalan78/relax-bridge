@@ -30,6 +30,7 @@ import {
   safelySyncGoogleCalendarEntity,
 } from '../../lib/server/google-calendar';
 import { localDayInstantRange } from '../../lib/booking/availability';
+import { recordBookingJourneySuccess } from '../../lib/server/website-analytics-repository';
 import { Temporal } from '@js-temporal/polyfill';
 
 export const prerender = false;
@@ -65,6 +66,7 @@ const bookingSchema = z
     notes: z.string().trim().max(1000).optional(),
     website: z.string().max(0).optional(),
     consent: z.literal(true),
+    analyticsSessionId: z.uuid().optional(),
   })
   .superRefine((value, context) => {
     if (value.category === 'home' && !value.homeAddress) {
@@ -364,6 +366,21 @@ export const POST: APIRoute = async ({ request }) => {
         ? createMassageCreatorBookingDetails(creator)
         : undefined,
     });
+
+    if (
+      parsed.data.analyticsSessionId
+      && request.headers.get('dnt') !== '1'
+      && request.headers.get('sec-gpc') !== '1'
+    ) {
+      try {
+        await recordBookingJourneySuccess(parsed.data.analyticsSessionId);
+      } catch (error) {
+        console.error('Booking saved, but conversion statistics could not be recorded', {
+          bookingId: booking.id,
+          error,
+        });
+      }
+    }
 
     await safelySyncGoogleCalendarEntity('booking', booking.id);
 

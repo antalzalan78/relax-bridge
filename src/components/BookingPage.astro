@@ -299,6 +299,8 @@ const homeConfig = {
 </Base>
 
 <script>
+  import { getAnalyticsSessionId } from '../scripts/website-analytics';
+
   const bookingChoice = document.querySelector<HTMLElement>('#booking-choice');
   const bookingFlow = document.querySelector<HTMLElement>('#booking-flow');
   const bookingParams = new URLSearchParams(window.location.search);
@@ -918,6 +920,7 @@ const homeConfig = {
         notes: data.get('notes') || undefined,
         website: data.get('website') || undefined,
         consent: data.get('consent') === 'on',
+        analyticsSessionId: getAnalyticsSessionId(),
       };
 
       try {

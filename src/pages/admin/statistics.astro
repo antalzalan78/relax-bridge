@@ -1,7 +1,11 @@
 ---
 import AdminHeader from '../../components/AdminHeader.astro';
 import { getAdminSession } from '../../lib/server/admin-auth';
-import { getWebsiteTrafficSummary } from '../../lib/server/website-analytics-repository';
+import {
+  getConfirmedBookingCountLast30Days,
+  getWebsiteJourneySummary,
+  getWebsiteTrafficSummary,
+} from '../../lib/server/website-analytics-repository';
 import '../../styles/global.css';
 
 export const prerender = false;
@@ -9,7 +13,11 @@ export const prerender = false;
 const session = await getAdminSession(Astro.cookies);
 if (!session) return Astro.redirect('/admin/login');
 
-const summary = await getWebsiteTrafficSummary();
+const [summary, journey, confirmedBookings] = await Promise.all([
+  getWebsiteTrafficSummary(),
+  getWebsiteJourneySummary(),
+  getConfirmedBookingCountLast30Days(),
+]);
 const maxDaily = Math.max(1, ...summary.daily.map((item) => item.count));
 const percentage = (count: number) => summary.last30Days
   ? Math.round((count / summary.last30Days) * 100)
@@ -32,9 +40,28 @@ const sourceNames: Record<string, string> = {
   x: 'X / Twitter',
   linkedin: 'LinkedIn',
 };
-const sourceLabel = (source: string) => source.startsWith('utm:')
+const sourceLabel = (source: string) => source === 'utm:qr'
+  ? 'QR-kód'
+  : source.startsWith('utm:')
   ? `Kampány: ${source.slice(4)}`
   : sourceNames[source] || source;
+const journeyPageNames: Record<string, string> = {
+  home: 'Főoldal',
+  booking: 'Foglalási oldal',
+  'booking-click': 'Foglalásra kattintás',
+  'booking-success': 'Sikeres foglalás',
+  'studio-visit': 'Studio Visit',
+  'massage-creator': 'Massage Creator',
+  'studio-relax': 'Relaxmasszázs',
+  'studio-back': 'Nyak–váll–hátmasszázs',
+  'studio-face': 'Arcmasszázs',
+  'studio-foot': 'Talpmasszázs',
+  'home-relax': 'Relaxmasszázs házhoz',
+  'home-back': 'Nyak–váll–hátmasszázs házhoz',
+};
+const journeyStepLabel = (step: string, index: number) => index === 0
+  ? sourceLabel(step)
+  : journeyPageNames[step] || step;
 const regionNames = new Intl.DisplayNames(['hu'], { type: 'region' });
 const countryLabel = (country: string) => country === '??'
   ? 'Ismeretlen ország'
@@ -63,8 +90,53 @@ const visiblePaths = summary.entryPaths.slice(0, 8);
     <main class="admin-wrap admin-main">
       <section class="admin-title">
         <span class="eyebrow">Utolsó 30 nap</span>
-        <h1>Honnan érkeznek a látogatók?</h1>
-        <p>A számok anonim látogatásokat mutatnak. Egy böngészőfül megnyitása egy látogatás; nincs egyedi látogatóazonosítás.</p>
+        <h1>Hogyan jutnak el a foglalásig?</h1>
+        <p>Az útvonalakat anonim munkamenetenként, összesítve mutatjuk. Egy munkamenet nem feltétlenül egy külön ember; a korábbi forgalmi összesítés ettől külön mérés.</p>
+      </section>
+
+      <section class="journey-card" aria-labelledby="journey-title">
+        <span class="section-kicker">Új útvonal-mérés · utolsó 30 nap</span>
+        <h2 id="journey-title">Látogatói út és foglalás</h2>
+        <p class="card-note">Az adatok az új mérés élesítése után kezdenek gyűlni; korábbi látogatói útvonalak nem állíthatók vissza. Nem követünk azonosítható személyeket vagy böngészőket több munkameneten át.</p>
+        <div class="journey-metrics">
+          <article><span>Egyedi munkamenetek</span><strong>{journey.uniqueSessions}</strong><small>Becsült egyedi látogatások, nem külön személyek</small></article>
+          <article><span>Oldalbetöltések</span><strong>{journey.pageViews}</strong><small>Minden mért nyilvános oldalmegnyitás</small></article>
+          <article><span>Foglalási kattintások</span><strong>{journey.bookingClicks}</strong><small>Foglalási oldalra mutató gombok és linkek</small></article>
+          <article><span>Tényleges foglalások</span><strong>{confirmedBookings}</strong><small>Az elmúlt 30 napban létrehozott, jelenleg visszaigazolt foglalások</small></article>
+        </div>
+        <p class="journey-reach">
+          <span>Foglalási oldalig jutó munkamenetek: <strong>{journey.bookingPageSessions}</strong></span>
+          <span>Foglalásra kattintó munkamenetek: <strong>{journey.clickingSessions}</strong></span>
+          <span>Követhető foglaló munkamenetek: <strong>{journey.convertingSessions}</strong></span>
+        </p>
+        <p class="journey-coverage">Az útvonalakban {journey.successfulBookings} mentett foglalás kapcsolható az anonim méréshez. A fenti tényleges foglalásszám a foglalási rendszerből származik, ezért eltérhet tőle.</p>
+        <div class="journey-routes">
+          <h3>Leggyakoribb útvonalak</h3>
+          <p>Az első legfeljebb két megnyitott oldal a foglalás előtt, majd a foglalási oldal és az eredmény; útvonalankénti összesített munkamenetszám.</p>
+          {journey.journeys.length ? (
+            <ol>
+              {journey.journeys.map((route) => (
+                <li>
+                  <div class="journey-steps">
+                    {route.steps.map((step, index) => (
+                      <>
+                        {index > 0 && <span class="journey-arrow" aria-hidden="true">→</span>}
+                        <span>{journeyStepLabel(step, index)}</span>
+                      </>
+                    ))}
+                  </div>
+                  <strong>{route.sessions} munkamenet</strong>
+                </li>
+              ))}
+            </ol>
+          ) : <p class="journey-empty">Még nincs útvonaladat.</p>}
+        </div>
+      </section>
+
+      <section class="legacy-heading">
+        <span class="section-kicker">Korábbi forgalmi összesítés</span>
+        <h2>Honnan érkeznek a látogatások?</h2>
+        <p>Ez az eddigi, böngészőfülenként egyszer számolt látogatásmérés; nem azonos az új munkamenet- és oldalbetöltés-számokkal.</p>
       </section>
 
       <section class="summary-grid" aria-label="Látogatási összefoglaló">
@@ -180,6 +252,29 @@ const visiblePaths = summary.entryPaths.slice(0, 8);
   .admin-title { margin-bottom: 2rem; }
   .admin-title h1 { max-width: 16ch; font-size: clamp(2.5rem, 5vw, 4.4rem); }
   .admin-title p { max-width: 50rem; color: var(--ink-soft); line-height: 1.65; }
+  .journey-card { margin-bottom: 2.5rem; padding: clamp(1.25rem, 3vw, 2rem); border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); }
+  .journey-card h2, .legacy-heading h2 { max-width: none; margin: 0.4rem 0 0; font-size: clamp(1.7rem, 3vw, 2.4rem); }
+  .journey-card > .card-note { min-height: 0; max-width: 56rem; }
+  .journey-metrics { display: grid; gap: 0.75rem; margin-top: 1.5rem; }
+  .journey-metrics article { display: flex; min-height: 9rem; flex-direction: column; justify-content: space-between; gap: 0.5rem; padding: 1.15rem; border-radius: var(--radius); background: var(--pine-soft); }
+  .journey-metrics article > span { color: var(--pine-dark); font-size: 0.7rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+  .journey-metrics strong { color: var(--pine-dark); font-family: 'Iowan Old Style', Georgia, serif; font-size: clamp(2.2rem, 4vw, 3.2rem); line-height: 1; }
+  .journey-metrics small { color: var(--ink-soft); line-height: 1.35; }
+  .journey-reach { display: flex; flex-wrap: wrap; gap: 0.55rem; margin: 1.4rem 0 0; }
+  .journey-reach span { padding: 0.5rem 0.7rem; border-radius: 999px; background: var(--clay-soft); color: var(--ink-soft); font-size: 0.78rem; }
+  .journey-reach strong { color: var(--pine-dark); }
+  .journey-coverage { max-width: 56rem; margin: 0.9rem 0 0; color: var(--ink-soft); font-size: 0.78rem; line-height: 1.5; }
+  .journey-routes { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+  .journey-routes h3 { margin: 0; font-size: 1.35rem; }
+  .journey-routes > p { color: var(--ink-soft); font-size: 0.82rem; line-height: 1.5; }
+  .journey-routes ol { margin: 1rem 0 0; padding: 0; list-style: none; }
+  .journey-routes li { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.7rem; padding: 0.85rem 0; border-top: 1px solid var(--border); }
+  .journey-routes li > strong { color: var(--pine-dark); font-size: 0.78rem; white-space: nowrap; }
+  .journey-steps { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; }
+  .journey-steps > span:not(.journey-arrow) { padding: 0.3rem 0.52rem; border-radius: 999px; background: var(--paper); color: var(--ink); font-size: 0.74rem; }
+  .journey-arrow { color: var(--clay-dark); }
+  .legacy-heading { margin-bottom: 1rem; }
+  .legacy-heading p { max-width: 50rem; color: var(--ink-soft); font-size: 0.86rem; line-height: 1.55; }
   .summary-grid { display: grid; gap: 1rem; }
   .summary-grid article { display: flex; min-height: 9rem; flex-direction: column; justify-content: space-between; padding: 1.35rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); }
   .summary-grid article > span, .section-kicker { color: var(--clay-dark); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
@@ -222,8 +317,10 @@ const visiblePaths = summary.entryPaths.slice(0, 8);
   .path-list code { overflow: hidden; color: var(--ink-soft); font-size: 0.74rem; text-overflow: ellipsis; white-space: nowrap; }
   .path-list strong { color: var(--pine-dark); font-size: 0.76rem; }
   @media (min-width: 42rem) { .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 42rem) { .journey-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   @media (min-width: 68rem) {
     .summary-grid { grid-template-columns: 0.7fr 0.7fr 0.8fr 1.45fr; }
+    .journey-metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     .breakdown-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .breakdown-card--wide { grid-column: 1 / -1; }
   }
