@@ -11,7 +11,7 @@ const privacy = {
       'Lees welke persoonsgegevens Relax Bridge verwerkt voor afspraken, waarom dat gebeurt en welke privacyrechten je hebt.',
     intro:
       'Relax Bridge gaat zorgvuldig om met je persoonsgegevens. Hier lees je welke gegevens we verwerken wanneer je een afspraak maakt, waarom we dat doen en welke keuzes en rechten je hebt.',
-    updated: 'Laatst bijgewerkt: 11 september 2026',
+    updated: 'Laatst bijgewerkt: 26 september 2026',
     controllerTitle: 'Wie is verantwoordelijk?',
     controllerBody:
       'Relax Bridge in Tilburg is de verwerkingsverantwoordelijke voor de persoonsgegevens die via deze website en het boekingssysteem worden verwerkt.',
@@ -30,7 +30,7 @@ const privacy = {
           'technische verzendinformatie over de bevestigingsmails;',
           'een eenrichtingshash van het netwerkadres voor beveiliging en het beperken van misbruik.',
           'bij de vragenlijst: de gekozen antwoorden, taal, verzendtijd en eventueel zelf ingevoerde tekst; de vragenlijst vraagt niet om naam of contactgegevens.',
-          'voor anonieme bezoekstatistieken: datum, verwijzende website of campagnebron, landcode, eerste bezochte pagina en paginataal; het IP-adres wordt niet opgeslagen.',
+          'voor bezoekstatistieken: datum, verwijzende website of campagnebron, landcode, eerste bezochte pagina en paginataal; daarnaast een tijdelijk willekeurig sessienummer, bezochte publieke paginacategorieën, klikken naar de boekingspagina en het feit dat een boeking is opgeslagen. Het IP-adres en de contactgegevens uit de boeking worden niet bij deze sessiegegevens opgeslagen.',
         ],
         note:
           'Vul in vrije tekstvelden geen naam, contactgegevens, medische gegevens of andere gevoelige informatie in. Bespreek informatie die voor een behandeling nodig is liever rechtstreeks met Relax Bridge.',
@@ -43,7 +43,7 @@ const privacy = {
           'Gegevens die deel uitmaken van de financiële administratie worden verwerkt om aan wettelijke verplichtingen te voldoen. Beperkte technische gegevens worden verwerkt op basis van het gerechtvaardigde belang om de website en het boekingssysteem te beveiligen en misbruik te voorkomen.',
           'De boekingsgegevens worden niet gebruikt voor nieuwsbrieven of andere marketing zonder een afzonderlijke, vrijwillige toestemming.',
           'Antwoorden op de vragenlijst worden verwerkt om voorkeuren in geaggregeerde vorm te begrijpen en het aanbod en de beschikbaarheid van Relax Bridge te verbeteren. Hiervoor geldt het gerechtvaardigde belang in zorgvuldige dienstverlening; er worden geen directe identificatiegegevens gevraagd en de antwoorden worden niet gekoppeld aan een boeking.',
-          'Anonieme, samengevoegde bezoekstatistieken worden gebruikt om te begrijpen via welke websites, campagnes, landen en pagina’s bezoekers de website vinden. Er worden geen bezoekersprofielen gemaakt.',
+          'Tijdelijke sessiegegevens worden op basis van het gerechtvaardigde belang in websiteverbetering gebruikt om in samengevoegde vorm te zien hoe bezoekers via pagina’s bij de boeking komen. Er worden geen persoonsgerichte marketingprofielen gemaakt en er wordt geen blijvende identificatie gebruikt om bezoekers tussen bezoeken te herkennen.',
         ],
       },
       {
@@ -61,7 +61,7 @@ const privacy = {
           'Boekings- en contactgegevens die niet bij de fiscale administratie horen, worden in beginsel uiterlijk twee jaar na de afspraak verwijderd of geanonimiseerd. Gegevens die onderdeel zijn van de wettelijk verplichte financiële administratie kunnen zeven jaar worden bewaard.',
           'Technische beveiligings- en e-mailverzendgegevens worden niet langer bewaard dan nodig voor beveiliging, foutoplossing en betrouwbare aflevering. Een langere bewaartermijn geldt alleen wanneer dat nodig is voor een wettelijke verplichting of een juridisch geschil.',
           'Losse antwoorden op de vragenlijst worden maximaal twee jaar bewaard. Daarna worden ze verwijderd of uitsluitend in samengevoegde, niet tot een persoon herleidbare statistieken behouden.',
-          'Samengevoegde bezoekstatistieken worden maximaal dertien maanden bewaard.',
+          'Sessiegebeurtenissen ouder dan 45 dagen worden bij de volgende meting of statistiekopvraag verwijderd. Samengevoegde bezoekstatistieken worden maximaal dertien maanden bewaard.',
         ],
       },
       {
@@ -75,7 +75,7 @@ const privacy = {
         id: 'cookies',
         title: 'Cookies',
         paragraphs: [
-          'De openbare website gebruikt geen advertentie- of analysecookies. Een tijdelijke markering in de browsersessie voorkomt dat dezelfde pagina-navigatie binnen één geopend tabblad als meerdere bezoeken wordt geteld; deze verdwijnt wanneer het tabblad wordt gesloten en identificeert de bezoeker niet. Het afgeschermde beheergedeelte gebruikt uitsluitend een strikt noodzakelijke sessiecookie voor het ingelogd houden van de beheerder.',
+          'De openbare website gebruikt geen advertentie- of analysecookies. In het sessiegeheugen van één browsertabblad staat tijdelijk een willekeurig sessienummer om paginaweergaven, boekingsklikken en een opgeslagen boeking samen te tellen. Het nummer verdwijnt bij het sluiten van het tabblad en wordt uiterlijk na 24 uur vernieuwd; het herkent je niet bij een later bezoek. Het afgeschermde beheergedeelte gebruikt uitsluitend een strikt noodzakelijke sessiecookie voor het ingelogd houden van de beheerder.',
         ],
       },
       {
@@ -107,7 +107,7 @@ const privacy = {
       'Learn which personal data Relax Bridge processes for appointments, why it is used and which privacy rights you have.',
     intro:
       'Relax Bridge handles your personal data with care. This notice explains which information is processed when you book an appointment, why it is needed and which choices and rights you have.',
-    updated: 'Last updated: 11 September 2026',
+    updated: 'Last updated: 26 September 2026',
     controllerTitle: 'Who is responsible?',
     controllerBody:
       'Relax Bridge in Tilburg is the data controller for personal data processed through this website and booking system.',
@@ -126,7 +126,7 @@ const privacy = {
           'technical delivery information for confirmation emails;',
           'a one-way hash of the network address for security and abuse prevention.',
           'for the questionnaire: selected answers, language, submission time and any text entered voluntarily; the questionnaire does not ask for a name or contact details.',
-          'for anonymous visit statistics: date, referring website or campaign source, country code, first page visited and page language; the IP address is not stored.',
+          'for visit statistics: date, referring website or campaign source, country code, first page visited and page language; also a temporary random session number, categories of public pages viewed, clicks to the booking page and whether a booking was saved. The IP address and booking contact details are not stored with these session events.',
         ],
         note:
           'Do not enter your name, contact details, medical information or other sensitive data in free-text fields. Please discuss information needed for a treatment directly with Relax Bridge.',
@@ -139,7 +139,7 @@ const privacy = {
           'Information forming part of the financial administration is processed to comply with legal obligations. Limited technical data is processed on the basis of the legitimate interest in securing the website and booking system and preventing abuse.',
           'Booking details are not used for newsletters or other marketing without separate, freely given consent.',
           'Questionnaire answers are processed to understand preferences in aggregate and improve the services and availability offered by Relax Bridge. This is based on the legitimate interest in providing a thoughtful service; no direct identifiers are requested and answers are not linked to a booking.',
-          'Anonymous, aggregated visit statistics are used to understand through which websites, campaigns, countries and pages visitors find the website. No visitor profiles are created.',
+          'Temporary session events are used, on the basis of the legitimate interest in improving the website, to show in aggregate how visitors reach a booking through the pages. No person-specific marketing profiles are created, and no lasting identifier is used to recognise visitors across visits.',
         ],
       },
       {
@@ -157,7 +157,7 @@ const privacy = {
           'Booking and contact details that do not form part of the tax administration are generally deleted or anonymised no later than two years after the appointment. Information that forms part of legally required financial records may be retained for seven years.',
           'Technical security and email-delivery data is kept only as long as needed for security, troubleshooting and reliable delivery. A longer period applies only where required by law or needed for a legal dispute.',
           'Individual questionnaire answers are retained for no more than two years. They are then deleted or kept only as combined statistics that cannot be linked to a person.',
-          'Aggregated visit statistics are retained for no more than thirteen months.',
+          'Session events older than 45 days are deleted on the next measurement or statistics request. Aggregated visit statistics are retained for no more than thirteen months.',
         ],
       },
       {
@@ -171,7 +171,7 @@ const privacy = {
         id: 'cookies',
         title: 'Cookies',
         paragraphs: [
-          'The public website does not use advertising or analytics cookies. A temporary browser-session marker prevents navigation within one open tab from being counted as multiple visits; it disappears when the tab is closed and does not identify the visitor. The protected administration area uses only a strictly necessary session cookie to keep the administrator signed in.',
+          'The public website does not use advertising or analytics cookies. A random session number is held temporarily in one browser tab’s session storage to count page views, booking clicks and a saved booking together. It disappears when the tab closes and is renewed after at most 24 hours; it does not recognise you on a later visit. The protected administration area uses only a strictly necessary session cookie to keep the administrator signed in.',
         ],
       },
       {
@@ -203,7 +203,7 @@ const privacy = {
       'Ismerd meg, milyen személyes adatokat kezel a Relax Bridge a foglalásokhoz, miért használja azokat, és milyen jogaid vannak.',
     intro:
       'A Relax Bridge gondosan kezeli a személyes adataidat. Itt megtudhatod, milyen adatokat kezelünk az időpontfoglalás során, miért van rájuk szükség, és milyen jogaid vannak.',
-    updated: 'Utolsó frissítés: 2026. szeptember 11.',
+    updated: 'Utolsó frissítés: 2026. szeptember 26.',
     controllerTitle: 'Ki felel az adatkezelésért?',
     controllerBody:
       'A tilburgi Relax Bridge az adatkezelő a weboldalon és a foglalási rendszerben kezelt személyes adatok tekintetében.',
@@ -222,7 +222,7 @@ const privacy = {
           'a visszaigazoló e-mailek technikai kézbesítési adatai;',
           'a hálózati címből készült egyirányú lenyomat a biztonság és a visszaélések megelőzése érdekében.',
           'a kérdőívnél a kiválasztott válaszok, az oldal nyelve, a beküldés ideje és az esetleg önként megadott szöveg; a kérdőív nem kér nevet vagy elérhetőséget.',
-          'az anonim látogatási statisztikához a dátum, a hivatkozó webhely vagy kampányforrás, az országkód, az elsőként megnyitott oldal és az oldal nyelve; az IP-címet nem tároljuk.',
+          'a látogatási statisztikához a dátum, a hivatkozó webhely vagy kampányforrás, az országkód, az elsőként megnyitott oldal és az oldal nyelve; továbbá egy ideiglenes, véletlenszerű munkamenetszám, a megnyitott nyilvános oldalak kategóriái, a foglalási kattintások és a mentett foglalás ténye. Az IP-címet és a foglalás kapcsolattartási adatait nem tároljuk ezekkel a munkamenet-eseményekkel.',
         ],
         note:
           'A szabad szöveges mezőkben ne adj meg nevet, elérhetőséget, egészségügyi vagy más érzékeny adatot. A kezeléshez szükséges információt inkább közvetlenül egyeztesd a Relax Bridge-dzsel.',
@@ -235,7 +235,7 @@ const privacy = {
           'A pénzügyi nyilvántartás részét képező adatokat jogi kötelezettség teljesítéséhez kezeljük. Korlátozott technikai adatokat jogos érdek alapján használunk a weboldal és a foglalási rendszer védelmére, valamint a visszaélések megelőzésére.',
           'A foglalási adatokat külön, önkéntes hozzájárulás nélkül nem használjuk hírlevélhez vagy más marketinghez.',
           'A kérdőív válaszait összesített formában az igények megértéséhez, valamint a Relax Bridge kínálatának és elérhetőségének fejlesztéséhez kezeljük. Ennek jogalapja a gondos szolgáltatásfejlesztéshez fűződő jogos érdek; közvetlen azonosító adatot nem kérünk, és a válaszokat nem kapcsoljuk foglaláshoz.',
-          'Az anonim, összesített látogatási statisztikát annak megértésére használjuk, hogy a látogatók milyen webhelyekről, kampányokból, országokból és belépő oldalakon keresztül találják meg a weboldalt. Látogatói profilokat nem készítünk.',
+          'Az ideiglenes munkamenet-eseményeket a weboldal fejlesztéséhez fűződő jogos érdek alapján, kizárólag összesítve használjuk annak megértésére, hogyan jutnak el a látogatók az oldalakon át a foglalásig. Személyre szabott marketingprofilokat nem készítünk, és nem használunk tartós azonosítót a látogatók későbbi felismerésére.',
         ],
       },
       {
@@ -253,7 +253,7 @@ const privacy = {
           'Az adóügyi nyilvántartás részét nem képező foglalási és kapcsolattartási adatokat főszabály szerint legkésőbb az időpont után két évvel töröljük vagy anonimizáljuk. A jogszabály alapján megőrzendő pénzügyi nyilvántartás adatait hét évig őrizhetjük meg.',
           'A technikai biztonsági és e-mail-kézbesítési adatokat csak a biztonsághoz, a hibakereséshez és a megbízható kézbesítéshez szükséges ideig tartjuk meg. Hosszabb megőrzésre csak jogi kötelezettség vagy jogvita esetén kerül sor.',
           'A kérdőív egyedi válaszait legfeljebb két évig őrizzük meg. Ezután töröljük őket, vagy kizárólag személyhez nem köthető, összesített statisztikaként tartjuk meg.',
-          'Az összesített látogatási statisztikát legfeljebb tizenhárom hónapig őrizzük meg.',
+          'A 45 napnál régebbi munkamenet-eseményeket a következő méréskor vagy statisztikai lekérdezéskor töröljük; az összesített látogatási statisztikát legfeljebb tizenhárom hónapig őrizzük meg.',
         ],
       },
       {
@@ -267,7 +267,7 @@ const privacy = {
         id: 'cookies',
         title: 'Sütik',
         paragraphs: [
-          'A nyilvános weboldal nem használ hirdetési vagy analitikai sütiket. Egy ideiglenes böngésző-munkamenetjelző megakadályozza, hogy az ugyanabban a megnyitott böngészőfülben végzett navigáció több látogatásként számítson; a fül bezárásakor törlődik, és nem azonosítja a látogatót. A védett adminfelület kizárólag a bejelentkezés fenntartásához feltétlenül szükséges munkamenet-sütit használ.',
+          'A nyilvános weboldal nem használ hirdetési vagy analitikai sütiket. Egy böngészőfül munkamenet-tárában ideiglenes, véletlenszerű azonosító kapcsolja össze az oldalbetöltéseket, a foglalási kattintásokat és a mentett foglalást. A fül bezárásakor eltűnik, és legfeljebb 24 óra után megújul; későbbi látogatáskor nem ismer fel. A védett adminfelület kizárólag a bejelentkezés fenntartásához feltétlenül szükséges munkamenet-sütit használ.',
         ],
       },
       {
