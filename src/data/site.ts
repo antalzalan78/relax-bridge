@@ -86,6 +86,13 @@ export function bookingPath(locale: Locale): string {
   return pathFor(locale, 'booking');
 }
 
+/** A háromnyelvű, összesített árlista helyi útvonala. */
+export function pricesPath(locale: Locale): string {
+  if (locale === 'nl') return '/prijzen';
+  if (locale === 'en') return '/en/prices';
+  return '/hu/arak';
+}
+
 /** A Studio Visit kezelési mód választóoldala. */
 export function studioVisitBookingPath(locale: Locale): string {
   return pathFor(locale, 'studio-visit');

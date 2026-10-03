@@ -22,6 +22,9 @@ export interface JourneySummary {
 const localizedPagePaths: Record<string, string> = {
   '/': 'home',
   '/booking': 'booking',
+  '/prijzen': 'prices',
+  '/prices': 'prices',
+  '/arak': 'prices',
   '/studio-visit': 'studio-visit',
   '/massage-creator': 'massage-creator',
   '/privacy': 'privacy',

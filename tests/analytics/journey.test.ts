@@ -11,6 +11,9 @@ test('maps localized public service pages to the same safe journey category', ()
   assert.equal(journeyPageKey('/en/massage/neck-shoulder-back-massage'), 'studio-back');
   assert.equal(journeyPageKey('/hu/masszazs/nyak-vall-hatmasszazs'), 'studio-back');
   assert.equal(journeyPageKey('/hu/booking?category=studio'), 'booking');
+  assert.equal(journeyPageKey('/prijzen'), 'prices');
+  assert.equal(journeyPageKey('/en/prices'), 'prices');
+  assert.equal(journeyPageKey('/hu/arak'), 'prices');
   assert.equal(isBookingDestination('/en/booking'), true);
   assert.equal(isBookingDestination('/en/massage-creator'), false);
 });
