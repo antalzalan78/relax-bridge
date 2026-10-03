@@ -7,6 +7,7 @@ import {
   defaultLocale,
   isSearchIndexableLocale,
   pathFor,
+  pricesPath,
 } from '../../src/data/site.ts';
 
 test('the unprefixed site always uses Dutch as its default language', async () => {
@@ -22,6 +23,9 @@ test('the unprefixed site always uses Dutch as its default language', async () =
   assert.equal(pathFor('nl'), '/');
   assert.equal(pathFor('en'), '/en');
   assert.equal(pathFor('hu'), '/hu');
+  assert.equal(pricesPath('nl'), '/prijzen');
+  assert.equal(pricesPath('en'), '/en/prices');
+  assert.equal(pricesPath('hu'), '/hu/arak');
   assert.equal(isSearchIndexableLocale('nl'), true);
   assert.equal(isSearchIndexableLocale('en'), false);
   assert.equal(isSearchIndexableLocale('hu'), false);

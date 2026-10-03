@@ -1,0 +1,189 @@
+---
+import Base from '../layouts/Base.astro';
+import PriceTable from './PriceTable.astro';
+import {
+  bookingPath,
+  massageCreatorPath,
+  pricesPath,
+  type Locale,
+} from '../data/site';
+import { t } from '../i18n';
+import { massageCreatorText } from '../i18n/massage-creator';
+import { pricesText } from '../i18n/prices';
+import { creatorAddons, creatorBases } from '../lib/booking/massage-creator';
+import { homeServiceTravelFeeEur } from '../lib/booking/home-service';
+import { getServices } from '../lib/services';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const d = t(locale);
+const copy = pricesText(locale);
+const creatorCopy = massageCreatorText(locale);
+const studio = await getServices(locale, 'studio');
+const home = await getServices(locale, 'home');
+const path = pricesPath(locale);
+const alternates = {
+  nl: pricesPath('nl'),
+  en: pricesPath('en'),
+  hu: pricesPath('hu'),
+};
+const readyBookingHref = `${bookingPath(locale)}?category=studio`;
+const homeBookingHref = `${bookingPath(locale)}?category=home`;
+const creatorHref = massageCreatorPath(locale);
+const baseRows = [
+  { label: creatorCopy.relaxTitle, priceEur: creatorBases.relax.priceEur },
+  { label: creatorCopy.relax90Title, priceEur: creatorBases.relax90.priceEur },
+  { label: creatorCopy.back30Title, priceEur: creatorBases.back30.priceEur },
+  { label: creatorCopy.backTitle, priceEur: creatorBases.back.priceEur },
+];
+const addonRows = [
+  ...Object.entries(creatorAddons.back).map(([minutes, priceEur]) => ({
+    label: creatorCopy.backAddon, minutes, priceEur,
+  })),
+  ...Object.entries(creatorAddons.face).map(([minutes, priceEur]) => ({
+    label: creatorCopy.faceAddon, minutes, priceEur,
+  })),
+  ...Object.entries(creatorAddons.foot).map(([minutes, priceEur]) => ({
+    label: creatorCopy.footAddon, minutes, priceEur,
+  })),
+];
+---
+
+<Base
+  locale={locale}
+  title={`${d.prices.heading} — Relax Bridge`}
+  description={copy.metaDescription}
+  path={path}
+  alternates={alternates}
+>
+  <section class="price-overview-hero">
+    <div class="wrap">
+      <span class="eyebrow">{copy.eyebrow}</span>
+      <h1>{copy.title}</h1>
+      <p class="lead">{copy.intro}</p>
+      <nav class="price-overview-nav" aria-label={copy.categoriesLabel}>
+        <a href="#studio">{d.options.studio.label}</a>
+        <a href="#creator">{copy.creatorHeading}</a>
+        <a href="#home">{d.options.homeService.label}</a>
+      </nav>
+    </div>
+  </section>
+
+  <div class="wrap price-overview-body">
+    <section class="price-overview-section" id="studio">
+      <header class="price-overview-heading">
+        <span class="price-overview-number" aria-hidden="true">01</span>
+        <div>
+          <span class="eyebrow">Relax Bridge</span>
+          <h2>{d.options.studio.label}</h2>
+          <p>{copy.readyIntro}</p>
+        </div>
+      </header>
+      <div class="price-overview-panel">
+        <PriceTable locale={locale} caption={copy.readyHeading} services={studio} />
+        <div class="price-overview-panel__footer">
+          <span>{d.prices.intro}</span>
+          <a class="btn btn--primary" href={readyBookingHref}>{copy.readyCta}<span aria-hidden="true">&rarr;</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="price-overview-section" id="creator">
+      <header class="price-overview-heading">
+        <span class="price-overview-number" aria-hidden="true">02</span>
+        <div>
+          <span class="eyebrow">Studio Visit</span>
+          <h2>{copy.creatorHeading}</h2>
+          <p>{copy.creatorIntro}</p>
+        </div>
+      </header>
+      <div class="price-overview-grid">
+        <article class="price-overview-panel">
+          <h3>{copy.baseHeading}</h3>
+          <ul class="price-overview-list">
+            {baseRows.map((row) => (
+              <li><span>{row.label}</span><strong>€ {row.priceEur}</strong></li>
+            ))}
+          </ul>
+        </article>
+        <article class="price-overview-panel">
+          <h3>{copy.addonsHeading}</h3>
+          <ul class="price-overview-list">
+            {addonRows.map((row) => (
+              <li><span>{row.label} · {row.minutes} {d.prices.minutes}</span><strong>+ € {row.priceEur}</strong></li>
+            ))}
+          </ul>
+        </article>
+      </div>
+      <div class="price-overview-section__footer">
+        <p>{copy.creatorRule}</p>
+        <a class="btn btn--primary" href={creatorHref}>{copy.creatorCta}<span aria-hidden="true">&rarr;</span></a>
+      </div>
+    </section>
+
+    <section class="price-overview-section" id="home">
+      <header class="price-overview-heading">
+        <span class="price-overview-number" aria-hidden="true">03</span>
+        <div>
+          <span class="eyebrow">Relax Bridge</span>
+          <h2>{d.options.homeService.label}</h2>
+          <p>{copy.homeIntro}</p>
+        </div>
+      </header>
+      <div class="price-overview-panel">
+        <PriceTable locale={locale} caption={copy.homeTreatmentsHeading} services={home} />
+        <div class="price-overview-fee">
+          <strong>{copy.travelFeeHeading}</strong>
+          <strong>€ {homeServiceTravelFeeEur}</strong>
+          <p>{copy.travelFeeNote}</p>
+        </div>
+        <p class="price-overview-rule">{copy.homeRule}</p>
+        <div class="price-overview-panel__footer">
+          <span>{d.prices.intro}</span>
+          <a class="btn btn--primary" href={homeBookingHref}>{d.options.homeService.bookingCta}<span aria-hidden="true">&rarr;</span></a>
+        </div>
+      </div>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .price-overview-hero { padding-block: clamp(3.5rem, 8vw, 6rem); border-bottom: 1px solid var(--border); }
+  .price-overview-hero h1 { max-width: 14ch; margin-block: 0.4rem 1.2rem; }
+  .price-overview-hero .lead { max-width: 42rem; }
+  .price-overview-nav { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 2rem; }
+  .price-overview-nav a { padding: 0.65rem 0.9rem; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); color: var(--pine-dark); font-size: 0.82rem; font-weight: 700; text-decoration: none; }
+  .price-overview-nav a:hover { border-color: var(--pine); background: var(--pine-soft); }
+  .price-overview-body { padding-bottom: clamp(4rem, 8vw, 7rem); }
+  .price-overview-section { scroll-margin-top: 7rem; padding-top: clamp(3.5rem, 7vw, 6rem); }
+  .price-overview-section + .price-overview-section { margin-top: clamp(3.5rem, 7vw, 6rem); border-top: 1px solid var(--border); }
+  .price-overview-heading { display: flex; gap: clamp(1rem, 3vw, 2rem); align-items: flex-start; margin-bottom: 1.5rem; }
+  .price-overview-number { padding-top: 0.25rem; color: var(--clay-dark); font-size: 0.76rem; font-weight: 800; letter-spacing: 0.12em; }
+  .price-overview-heading h2 { max-width: none; margin-block: 0.25rem 0.6rem; font-size: clamp(2.2rem, 5vw, 3.8rem); }
+  .price-overview-heading p { max-width: 43rem; margin: 0; color: var(--ink-soft); line-height: 1.65; }
+  .price-overview-panel { min-width: 0; padding: clamp(1.2rem, 4vw, 2.3rem); border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow-raised); }
+  .price-overview-panel :global(.prices) { margin-top: 0; }
+  .price-overview-panel :global(.prices caption) { padding-bottom: 0.7rem; }
+  .price-overview-panel__footer { display: flex; flex-wrap: wrap; gap: 1rem 2rem; align-items: center; justify-content: space-between; margin-top: 1.5rem; }
+  .price-overview-panel__footer > span { color: var(--ink-soft); font-size: 0.88rem; }
+  .price-overview-grid { display: grid; gap: 1rem; }
+  .price-overview-panel h3 { margin: 0 0 1rem; font-size: clamp(1.45rem, 2.5vw, 1.9rem); }
+  .price-overview-list { margin: 0; padding: 0; list-style: none; }
+  .price-overview-list li { display: flex; gap: 1rem; align-items: start; justify-content: space-between; padding-block: 0.85rem; border-top: 1px solid var(--border); }
+  .price-overview-list li span { min-width: 0; }
+  .price-overview-list li strong { flex: none; color: var(--pine-dark); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .price-overview-section__footer { display: flex; flex-wrap: wrap; gap: 1rem 2rem; align-items: center; justify-content: space-between; margin-top: 1.5rem; }
+  .price-overview-section__footer p { max-width: 42rem; margin: 0; color: var(--ink-soft); font-size: 0.88rem; line-height: 1.65; }
+  .price-overview-fee { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.35rem 1rem; margin-top: 1.5rem; padding: 1.1rem 1.2rem; border-radius: var(--radius); background: var(--pine-soft); }
+  .price-overview-fee strong { color: var(--pine-dark); }
+  .price-overview-fee p { grid-column: 1 / -1; margin: 0; color: var(--ink-soft); font-size: 0.84rem; }
+  .price-overview-rule { max-width: 47rem; margin: 1.2rem 0 0; color: var(--ink-soft); font-size: 0.88rem; line-height: 1.65; }
+  @media (min-width: 50rem) { .price-overview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 36rem) {
+    .price-overview-heading { gap: 0.7rem; }
+    .price-overview-panel__footer .btn, .price-overview-section__footer .btn { width: 100%; justify-content: center; }
+  }
+</style>
