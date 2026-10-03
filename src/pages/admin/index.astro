@@ -20,6 +20,7 @@ import {
   getGoogleCalendarStatus,
   listGoogleCalendarBusy,
   listWritableGoogleCalendars,
+  recordGoogleCalendarError,
   safelyRefreshGoogleCalendarBusy,
   safelyRemoveGoogleCalendarEntity,
   safelySyncGoogleCalendarEntity,
@@ -66,10 +67,11 @@ const currentQuery = view === 'month'
   : `week=${weekStart}${requestedMonth ? `&month=${monthKey}` : ''}`;
 
 if (Astro.request.method === 'POST') {
+  let action = '';
   try {
     assertSameOrigin(Astro.request);
     const form = Object.fromEntries(await Astro.request.formData());
-    const action = String(form.action || '');
+    action = String(form.action || '');
 
     if (action === 'add_rule') {
       const input = z.object({
@@ -139,6 +141,15 @@ if (Astro.request.method === 'POST') {
   } catch (error) {
     if (error instanceof Response) return error;
     console.error('Admin action failed', error);
+    if (action === 'sync_google_calendar' || action === 'select_google_calendar') {
+      await recordGoogleCalendarError(error);
+      return Astro.redirect(
+        action === 'sync_google_calendar'
+          ? `/admin?week=${weekStart.toString()}&google=sync-failed`
+          : `/admin?week=${weekStart.toString()}&google=calendar-selection-failed`,
+        303,
+      );
+    }
     return new Response('A módosítás nem menthető. Ellenőrizd a megadott adatokat.', { status: 400 });
   }
 }
@@ -214,8 +225,11 @@ const googleNotice = ({
   'invalid-state': 'A Google-kapcsolat időkorlátja lejárt. Indítsd el újra a csatlakoztatást.',
   'connection-failed': 'A Google Calendar csatlakoztatása nem sikerült.',
   'not-configured': 'A Google Calendar környezeti beállításai még hiányoznak.',
+  'sync-failed': 'A szinkronizálás nem sikerült. Ellenőrizd a részletes hibát lent, majd szükség esetén csatlakoztasd újra a Google-fiókot.',
+  'calendar-selection-failed': 'A naptár kiválasztása nem sikerült. Ellenőrizd a részletes hibát lent, majd szükség esetén csatlakoztasd újra a Google-fiókot.',
 } as Record<string, string>)[Astro.url.searchParams.get('google') || ''];
 let googleStatus = await getGoogleCalendarStatus();
+const googleRefreshFailed = googleStatus.lastError?.startsWith('Google access token refresh failed') ?? false;
 let googleCalendars: Awaited<ReturnType<typeof listWritableGoogleCalendars>> = [];
 if (googleStatus.configured && googleStatus.connected) {
   try {
@@ -553,12 +567,15 @@ const syncTime = (value: unknown) => value
             </a>
           ) : (
             <div class="google-calendar-controls">
-              <p class="google-state google-state--connected">
-                <strong>Google-fiók csatlakoztatva</strong>
+              <p class:list={['google-state', googleRefreshFailed ? 'google-state--error' : 'google-state--connected']}>
+                <strong>{googleRefreshFailed ? 'Google-kapcsolat hibás' : 'Google-fiók csatlakoztatva'}</strong>
                 {googleStatus.calendarSummary
                   ? ` · Kiválasztott naptár: ${googleStatus.calendarSummary}`
                   : ' · Még nincs kiválasztott naptár.'}
               </p>
+              <a class="btn btn--outline" href="/api/admin/google-calendar/connect">
+                Google-fiók újracsatlakoztatása
+              </a>
               <form class="google-calendar-form" method="post">
                 <input type="hidden" name="action" value="select_google_calendar" />
                 <label>Naptár
@@ -587,7 +604,12 @@ const syncTime = (value: unknown) => value
                 <div><dt>Google foglaltság</dt><dd>{syncTime(googleStatus.lastBusySyncAt)}</dd></div>
               </dl>
               {googleStatus.lastError && (
-                <p class="google-error">Utolsó szinkronhiba: {googleStatus.lastError}</p>
+                <p class="google-error">
+                  Utolsó szinkronhiba: {googleStatus.lastError}
+                  {googleRefreshFailed && (
+                    <span> A Google-fiók újracsatlakoztatása után próbáld újra a szinkronizálást.</span>
+                  )}
+                </p>
               )}
             </div>
           )}
@@ -706,6 +728,7 @@ const syncTime = (value: unknown) => value
   .google-notice, .google-state, .google-error { padding: 0.75rem 0.9rem; border-radius: var(--radius-sm); }
   .google-notice, .google-state--pending { background: var(--clay-soft); color: var(--clay-dark) !important; }
   .google-state--connected { background: var(--pine-soft); color: var(--pine-dark) !important; }
+  .google-state--error { background: #f8e5e2; color: #8f2f24 !important; }
   .google-error { background: #f8e5e2; color: #8f2f24 !important; overflow-wrap: anywhere; }
   .google-calendar-controls { display: grid; gap: 1rem; margin-top: 1.2rem; }
   .google-calendar-form { display: grid; grid-template-columns: minmax(15rem, 1fr) auto; gap: 0.75rem; align-items: end; max-width: 48rem; }
