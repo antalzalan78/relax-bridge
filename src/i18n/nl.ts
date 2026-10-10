@@ -35,7 +35,7 @@ export default {
   },
 
   hero: {
-    title: 'Massage in Tilburg',
+    title: 'Massage in Tilburg - Reeshof',
     intro:
       'Bijna 20 jaar massage-ervaring, met persoonlijke aandacht voor jou. Kom tot rust in mijn rustige studio in de Reeshof, of geniet van een massage bij jou thuis in Tilburg.',
     primaryCta: 'Afspraak maken',
