@@ -11,7 +11,7 @@ const privacy = {
       'Lees welke persoonsgegevens Relax Bridge verwerkt voor afspraken, waarom dat gebeurt en welke privacyrechten je hebt.',
     intro:
       'Relax Bridge gaat zorgvuldig om met je persoonsgegevens. Hier lees je welke gegevens we verwerken wanneer je een afspraak maakt, waarom we dat doen en welke keuzes en rechten je hebt.',
-    updated: 'Laatst bijgewerkt: 26 september 2026',
+    updated: 'Laatst bijgewerkt: 10 oktober 2026',
     controllerTitle: 'Wie is verantwoordelijk?',
     controllerBody:
       'Relax Bridge in Tilburg is de verwerkingsverantwoordelijke voor de persoonsgegevens die via deze website en het boekingssysteem worden verwerkt.',
@@ -30,7 +30,7 @@ const privacy = {
           'technische verzendinformatie over de bevestigingsmails;',
           'een eenrichtingshash van het netwerkadres voor beveiliging en het beperken van misbruik.',
           'bij de vragenlijst: de gekozen antwoorden, taal, verzendtijd en eventueel zelf ingevoerde tekst; de vragenlijst vraagt niet om naam of contactgegevens.',
-          'voor bezoekstatistieken: datum, verwijzende website of campagnebron, landcode, eerste bezochte pagina en paginataal; daarnaast een tijdelijk willekeurig sessienummer, bezochte publieke paginacategorieën, klikken naar de boekingspagina en het feit dat een boeking is opgeslagen. Het IP-adres en de contactgegevens uit de boeking worden niet bij deze sessiegegevens opgeslagen.',
+          'voor bezoekstatistieken: datum, verwijzende website of campagnebron, campagnemedium, campagnenaam en linklabel (utm_source, utm_medium, utm_campaign, utm_content), landcode, eerste bezochte pagina en paginataal; daarnaast een tijdelijk willekeurig sessienummer, bezochte publieke paginacategorieën, klikken naar de boekingspagina en het feit dat een boeking is opgeslagen. Het IP-adres en de contactgegevens uit de boeking worden niet bij deze sessiegegevens opgeslagen.',
         ],
         note:
           'Vul in vrije tekstvelden geen naam, contactgegevens, medische gegevens of andere gevoelige informatie in. Bespreek informatie die voor een behandeling nodig is liever rechtstreeks met Relax Bridge.',
@@ -107,7 +107,7 @@ const privacy = {
       'Learn which personal data Relax Bridge processes for appointments, why it is used and which privacy rights you have.',
     intro:
       'Relax Bridge handles your personal data with care. This notice explains which information is processed when you book an appointment, why it is needed and which choices and rights you have.',
-    updated: 'Last updated: 26 September 2026',
+    updated: 'Last updated: 10 October 2026',
     controllerTitle: 'Who is responsible?',
     controllerBody:
       'Relax Bridge in Tilburg is the data controller for personal data processed through this website and booking system.',
@@ -126,7 +126,7 @@ const privacy = {
           'technical delivery information for confirmation emails;',
           'a one-way hash of the network address for security and abuse prevention.',
           'for the questionnaire: selected answers, language, submission time and any text entered voluntarily; the questionnaire does not ask for a name or contact details.',
-          'for visit statistics: date, referring website or campaign source, country code, first page visited and page language; also a temporary random session number, categories of public pages viewed, clicks to the booking page and whether a booking was saved. The IP address and booking contact details are not stored with these session events.',
+          'for visit statistics: date, referring website or campaign source, campaign medium, campaign name and link label (utm_source, utm_medium, utm_campaign, utm_content), country code, first page visited and page language; also a temporary random session number, categories of public pages viewed, clicks to the booking page and whether a booking was saved. The IP address and booking contact details are not stored with these session events.',
         ],
         note:
           'Do not enter your name, contact details, medical information or other sensitive data in free-text fields. Please discuss information needed for a treatment directly with Relax Bridge.',
@@ -203,7 +203,7 @@ const privacy = {
       'Ismerd meg, milyen személyes adatokat kezel a Relax Bridge a foglalásokhoz, miért használja azokat, és milyen jogaid vannak.',
     intro:
       'A Relax Bridge gondosan kezeli a személyes adataidat. Itt megtudhatod, milyen adatokat kezelünk az időpontfoglalás során, miért van rájuk szükség, és milyen jogaid vannak.',
-    updated: 'Utolsó frissítés: 2026. szeptember 26.',
+    updated: 'Utolsó frissítés: 2026. október 10.',
     controllerTitle: 'Ki felel az adatkezelésért?',
     controllerBody:
       'A tilburgi Relax Bridge az adatkezelő a weboldalon és a foglalási rendszerben kezelt személyes adatok tekintetében.',
@@ -222,7 +222,7 @@ const privacy = {
           'a visszaigazoló e-mailek technikai kézbesítési adatai;',
           'a hálózati címből készült egyirányú lenyomat a biztonság és a visszaélések megelőzése érdekében.',
           'a kérdőívnél a kiválasztott válaszok, az oldal nyelve, a beküldés ideje és az esetleg önként megadott szöveg; a kérdőív nem kér nevet vagy elérhetőséget.',
-          'a látogatási statisztikához a dátum, a hivatkozó webhely vagy kampányforrás, az országkód, az elsőként megnyitott oldal és az oldal nyelve; továbbá egy ideiglenes, véletlenszerű munkamenetszám, a megnyitott nyilvános oldalak kategóriái, a foglalási kattintások és a mentett foglalás ténye. Az IP-címet és a foglalás kapcsolattartási adatait nem tároljuk ezekkel a munkamenet-eseményekkel.',
+          'a látogatási statisztikához a dátum, a hivatkozó webhely vagy kampányforrás, a kampány médiuma, neve és linkjelölése (utm_source, utm_medium, utm_campaign, utm_content), az országkód, az elsőként megnyitott oldal és az oldal nyelve; továbbá egy ideiglenes, véletlenszerű munkamenetszám, a megnyitott nyilvános oldalak kategóriái, a foglalási kattintások és a mentett foglalás ténye. Az IP-címet és a foglalás kapcsolattartási adatait nem tároljuk ezekkel a munkamenet-eseményekkel.',
         ],
         note:
           'A szabad szöveges mezőkben ne adj meg nevet, elérhetőséget, egészségügyi vagy más érzékeny adatot. A kezeléshez szükséges információt inkább közvetlenül egyeztesd a Relax Bridge-dzsel.',

@@ -1,5 +1,6 @@
 ---
 import AdminHeader from '../../components/AdminHeader.astro';
+import { campaignChannel } from '../../lib/analytics/attribution';
 import { getAdminSession } from '../../lib/server/admin-auth';
 import {
   getConfirmedBookingCountLast30Days,
@@ -76,6 +77,13 @@ const topSource = summary.sources[0];
 const visibleSources = summary.sources.slice(0, 8);
 const visibleCountries = summary.countries.slice(0, 8);
 const visiblePaths = summary.entryPaths.slice(0, 8);
+const gbpCampaigns = journey.campaigns.filter((item) => campaignChannel(item.source, item) === 'Google Cégprofil');
+const gbpSessions = gbpCampaigns.reduce((total, item) => total + item.sessions, 0);
+const gbpBookings = gbpCampaigns.reduce((total, item) => total + item.successfulBookings, 0);
+const gbpBookingPages = gbpCampaigns.reduce((total, item) => total + item.bookingPageSessions, 0);
+const campaignContentLabel = (value: string) => ({
+  website: 'Weboldallink', booking: 'Foglalási link', services: 'Szolgáltatáslink',
+}[value] || value || 'Nincs megadva');
 ---
 
 <!doctype html>
@@ -132,6 +140,41 @@ const visiblePaths = summary.entryPaths.slice(0, 8);
             </ol>
           ) : <p class="journey-empty">Még nincs útvonaladat.</p>}
         </div>
+      </section>
+
+      <section class="journey-card" aria-labelledby="campaign-title">
+        <span class="section-kicker">Csatornák és kampányok · utolsó 30 nap</span>
+        <h2 id="campaign-title">Melyik csatorna hoz foglalást?</h2>
+        <p class="card-note">A munkamenet első érkezési forrását őrizzük meg az oldalak és a nyelvek közötti váltáskor is. A részletes kampánymérés az élesítéstől gyűlik; a korábbi Google-forgalomból nem állapítható meg utólag, melyik érkezett a Cégprofilból.</p>
+        <div class="gbp-metrics">
+          <article><span>Google Cégprofil</span><strong>{gbpSessions}</strong><small>Mért munkamenet</small></article>
+          <article><span>Eljutott a foglalási oldalra</span><strong>{gbpBookingPages}</strong><small>Cégprofilból érkező munkamenet</small></article>
+          <article><span>Cégprofilból mentett foglalás</span><strong>{gbpBookings}</strong><small>Anonim munkamenethez kapcsolható</small></article>
+        </div>
+        <div class="campaign-scroll" tabindex="0" role="region" aria-label="Kampányok részletes táblázata">
+          <table class="campaign-table">
+            <thead><tr>
+              <th scope="col">Csatorna / kampány</th><th scope="col">Belépési link</th>
+              <th scope="col">Munkamenet</th><th scope="col">Foglalási oldalig</th>
+              <th scope="col">Mentett foglalás</th><th scope="col">Foglaló munkamenetek</th>
+            </tr></thead>
+            <tbody>
+              {journey.campaigns.map((item) => (
+                <tr>
+                  <th scope="row">
+                    {campaignChannel(item.source, item)}
+                    <small>{item.utmSource || sourceLabel(item.source)} · {item.utmMedium || 'Nincs médium'} · {item.utmCampaign || 'Nincs kampány'}</small>
+                  </th>
+                  <td>{campaignContentLabel(item.utmContent)}</td>
+                  <td>{item.sessions}</td><td>{item.bookingPageSessions}</td><td>{item.successfulBookings}</td>
+                  <td>{item.convertingSessions} · {(100 * item.convertingSessions / item.sessions).toLocaleString('hu-HU', { maximumFractionDigits: 1 })}%</td>
+                </tr>
+              ))}
+              {!journey.campaigns.length && <tr><td colspan="6">Még nincs kampányadat.</td></tr>}
+            </tbody>
+          </table>
+        </div>
+        <p class="journey-coverage">A százalék az adott sor mért munkameneteiből legalább egy foglalást végzők aránya. A mentett foglalások későbbi lemondását ez a mérés nem vonja le. A mérés tiltása és a tesztlátogatások miatt ez nem teljes ügyfél- vagy bevételi kimutatás. Az UTM-jelölés nélküli Google Ads és Cégprofil-forgalom nem különíthető el biztosan.</p>
       </section>
 
       <section class="legacy-heading">
@@ -256,6 +299,18 @@ const visiblePaths = summary.entryPaths.slice(0, 8);
   .journey-card { margin-bottom: 2.5rem; padding: clamp(1.25rem, 3vw, 2rem); border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); }
   .journey-card h2, .legacy-heading h2 { max-width: none; margin: 0.4rem 0 0; font-size: clamp(1.7rem, 3vw, 2.4rem); }
   .journey-card > .card-note { min-height: 0; max-width: 56rem; }
+  .gbp-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); gap: 0.75rem; margin-block: 1.5rem; }
+  .gbp-metrics article { display: flex; flex-direction: column; gap: 0.6rem; padding: 1.2rem; border-radius: var(--radius); background: var(--pine-soft); color: var(--pine-dark); }
+  .gbp-metrics span { font-weight: 700; font-size: 0.8rem; }
+  .gbp-metrics strong { font-size: 2.5rem; line-height: 1; }
+  .gbp-metrics small { color: var(--ink-soft); }
+  .campaign-scroll { overflow-x: auto; }
+  .campaign-table { width: 100%; min-width: 48rem; border-collapse: collapse; font-size: 0.8rem; }
+  .campaign-table th, .campaign-table td { padding: 0.9rem 0.7rem; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+  .campaign-table thead th { color: var(--pine-dark); }
+  .campaign-table tbody th { max-width: 21rem; overflow-wrap: anywhere; }
+  .campaign-table td { max-width: 15rem; overflow-wrap: anywhere; }
+  .campaign-table small { display: block; margin-top: 0.35rem; color: var(--ink-soft); font-weight: 400; line-height: 1.5; }
   .journey-metrics { display: grid; gap: 0.75rem; margin-top: 1.5rem; }
   .journey-metrics article { display: flex; min-height: 9rem; flex-direction: column; justify-content: space-between; gap: 0.5rem; padding: 1.15rem; border-radius: var(--radius); background: var(--pine-soft); }
   .journey-metrics article > span { color: var(--pine-dark); font-size: 0.7rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }

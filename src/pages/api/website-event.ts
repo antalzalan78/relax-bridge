@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { z } from 'zod';
 import { journeyPageKey } from '../../lib/analytics/journey';
 import { normalizeTrafficSource } from '../../lib/analytics/model';
+import { normalizeCampaign } from '../../lib/analytics/attribution';
 import { consumeRateLimit } from '../../lib/server/booking-repository';
 import { recordWebsiteJourneyEvent } from '../../lib/server/website-analytics-repository';
 import { assertSameOrigin, readJson, requestFingerprint } from '../../lib/server/security';
@@ -14,6 +15,9 @@ const eventSchema = z.object({
   pagePath: z.string().min(1).max(300),
   referrerHost: z.string().max(253).optional().default(''),
   utmSource: z.string().max(100).optional().default(''),
+  utmMedium: z.string().max(100).optional().default(''),
+  utmCampaign: z.string().max(100).optional().default(''),
+  utmContent: z.string().max(100).optional().default(''),
 });
 
 export const POST: APIRoute = async ({ request }) => {
@@ -44,6 +48,7 @@ export const POST: APIRoute = async ({ request }) => {
       sessionId: parsed.data.sessionId,
       eventType: parsed.data.eventType,
       pageKey,
+      ...normalizeCampaign(parsed.data),
       source: normalizeTrafficSource({
         utmSource: parsed.data.utmSource,
         referrerHost: parsed.data.referrerHost,

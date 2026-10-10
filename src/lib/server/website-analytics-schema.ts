@@ -37,6 +37,13 @@ async function createWebsiteAnalyticsSchema(): Promise<void> {
       ON website_journey_events (occurred_at, session_id)
     `;
     await transaction`
+      ALTER TABLE website_journey_events
+        ADD COLUMN IF NOT EXISTS utm_source text NOT NULL DEFAULT '' CHECK (char_length(utm_source) <= 100),
+        ADD COLUMN IF NOT EXISTS utm_medium text NOT NULL DEFAULT '' CHECK (char_length(utm_medium) <= 100),
+        ADD COLUMN IF NOT EXISTS utm_campaign text NOT NULL DEFAULT '' CHECK (char_length(utm_campaign) <= 100),
+        ADD COLUMN IF NOT EXISTS utm_content text NOT NULL DEFAULT '' CHECK (char_length(utm_content) <= 100)
+    `;
+    await transaction`
       CREATE INDEX IF NOT EXISTS website_journey_events_session_idx
       ON website_journey_events (session_id, occurred_at)
     `;

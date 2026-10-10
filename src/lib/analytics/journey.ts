@@ -1,11 +1,25 @@
+import { normalizeCampaign, type CampaignAttribution } from './attribution.ts';
+
 export type JourneyEventType = 'page_view' | 'booking_click' | 'booking_success';
 
 export interface JourneySessionRow {
   source: string;
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
+  utm_content?: string;
   pages: string[] | null;
   page_views: number | string;
   booking_clicks: number | string;
   bookings: number | string;
+}
+
+export interface CampaignSummary extends CampaignAttribution {
+  source: string;
+  sessions: number;
+  bookingPageSessions: number;
+  successfulBookings: number;
+  convertingSessions: number;
 }
 
 export interface JourneySummary {
@@ -17,6 +31,7 @@ export interface JourneySummary {
   clickingSessions: number;
   convertingSessions: number;
   journeys: Array<{ steps: string[]; sessions: number }>;
+  campaigns: CampaignSummary[];
 }
 
 const localizedPagePaths: Record<string, string> = {
@@ -66,6 +81,7 @@ export function isBookingDestination(value: string): boolean {
 
 export function summarizeJourneySessions(rows: JourneySessionRow[]): JourneySummary {
   const journeys = new Map<string, { steps: string[]; sessions: number }>();
+  const campaigns = new Map<string, CampaignSummary>();
   const summary: JourneySummary = {
     uniqueSessions: rows.length,
     pageViews: 0,
@@ -75,6 +91,7 @@ export function summarizeJourneySessions(rows: JourneySessionRow[]): JourneySumm
     clickingSessions: 0,
     convertingSessions: 0,
     journeys: [],
+    campaigns: [],
   };
 
   for (const row of rows) {
@@ -92,6 +109,23 @@ export function summarizeJourneySessions(rows: JourneySessionRow[]): JourneySumm
     if (clicks > 0) summary.clickingSessions += 1;
     if (bookings > 0) summary.convertingSessions += 1;
 
+    const campaign = normalizeCampaign({
+      utmSource: row.utm_source,
+      utmMedium: row.utm_medium,
+      utmCampaign: row.utm_campaign,
+      utmContent: row.utm_content,
+    });
+    const campaignKey = JSON.stringify([row.source, campaign]);
+    const campaignTotals = campaigns.get(campaignKey) ?? {
+      source: row.source, ...campaign, sessions: 0, bookingPageSessions: 0,
+      successfulBookings: 0, convertingSessions: 0,
+    };
+    campaignTotals.sessions += 1;
+    campaignTotals.bookingPageSessions += Number(sawBooking);
+    campaignTotals.successfulBookings += bookings;
+    campaignTotals.convertingSessions += Number(bookings > 0);
+    campaigns.set(campaignKey, campaignTotals);
+
     const bookingIndex = distinctPages.indexOf('booking');
     const firstPages = (bookingIndex >= 0 ? distinctPages.slice(0, bookingIndex) : distinctPages).slice(0, 2);
     const steps = [row.source || 'direct', ...firstPages];
@@ -107,5 +141,7 @@ export function summarizeJourneySessions(rows: JourneySessionRow[]): JourneySumm
   summary.journeys = [...journeys.values()]
     .sort((a, b) => b.sessions - a.sessions || a.steps.join(' → ').localeCompare(b.steps.join(' → ')))
     .slice(0, 10);
+  summary.campaigns = [...campaigns.values()].sort((a, b) => b.sessions - a.sessions
+    || JSON.stringify(a).localeCompare(JSON.stringify(b)));
   return summary;
 }

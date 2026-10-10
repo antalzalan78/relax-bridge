@@ -38,6 +38,7 @@
   "private": true,
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "@electric-sql/pglite": "^0.5.8",
     "typescript": "^6.0.3"
   },
   "overrides": {

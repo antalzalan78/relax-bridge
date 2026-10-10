@@ -1,4 +1,5 @@
 import { Temporal } from '@js-temporal/polyfill';
+import type { CampaignAttribution } from '../analytics/attribution';
 import {
   summarizeWebsiteTraffic,
   type TrafficAggregateRow,
@@ -84,7 +85,7 @@ async function deleteExpiredJourneyEvents(): Promise<void> {
   `;
 }
 
-export async function recordWebsiteJourneyEvent(input: {
+export async function recordWebsiteJourneyEvent(input: CampaignAttribution & {
   sessionId: string;
   eventType: Exclude<JourneyEventType, 'booking_success'>;
   pageKey: string;
@@ -93,8 +94,13 @@ export async function recordWebsiteJourneyEvent(input: {
   await ensureWebsiteAnalyticsSchema();
   await deleteExpiredJourneyEvents();
   await getDatabase()`
-    INSERT INTO website_journey_events (session_id, event_type, page_key, source)
-    VALUES (${input.sessionId}::uuid, ${input.eventType}, ${input.pageKey}, ${input.source})
+    INSERT INTO website_journey_events (
+      session_id, event_type, page_key, source, utm_source, utm_medium, utm_campaign, utm_content
+    )
+    VALUES (
+      ${input.sessionId}::uuid, ${input.eventType}, ${input.pageKey}, ${input.source},
+      ${input.utmSource}, ${input.utmMedium}, ${input.utmCampaign}, ${input.utmContent}
+    )
   `;
 }
 
@@ -103,18 +109,26 @@ export async function recordBookingJourneySuccess(sessionId: string): Promise<vo
   await ensureWebsiteAnalyticsSchema();
   await deleteExpiredJourneyEvents();
   await getDatabase()`
-    INSERT INTO website_journey_events (session_id, event_type, page_key, source)
-    VALUES (
+    INSERT INTO website_journey_events (
+      session_id, event_type, page_key, source, utm_source, utm_medium, utm_campaign, utm_content
+    )
+    SELECT
       ${sessionId}::uuid,
       'booking_success',
       'booking',
-      COALESCE((
-        SELECT source FROM website_journey_events
-        WHERE session_id = ${sessionId}::uuid
-        ORDER BY occurred_at, id
-        LIMIT 1
-      ), 'direct')
-    )
+      COALESCE(first_event.source, 'direct'),
+      COALESCE(first_event.utm_source, ''),
+      COALESCE(first_event.utm_medium, ''),
+      COALESCE(first_event.utm_campaign, ''),
+      COALESCE(first_event.utm_content, '')
+    FROM (SELECT 1) AS fallback
+    LEFT JOIN LATERAL (
+      SELECT source, utm_source, utm_medium, utm_campaign, utm_content
+      FROM website_journey_events
+      WHERE session_id = ${sessionId}::uuid
+      ORDER BY occurred_at, id
+      LIMIT 1
+    ) AS first_event ON true
   `;
 }
 
@@ -128,6 +142,10 @@ export async function getWebsiteJourneySummary(): Promise<JourneySummary> {
   const rows = await getDatabase()<JourneySessionRow[]>`
     SELECT
       (array_agg(source ORDER BY occurred_at, id))[1] AS source,
+      (array_agg(utm_source ORDER BY occurred_at, id))[1] AS utm_source,
+      (array_agg(utm_medium ORDER BY occurred_at, id))[1] AS utm_medium,
+      (array_agg(utm_campaign ORDER BY occurred_at, id))[1] AS utm_campaign,
+      (array_agg(utm_content ORDER BY occurred_at, id))[1] AS utm_content,
       array_agg(page_key ORDER BY occurred_at, id) FILTER (WHERE event_type = 'page_view') AS pages,
       count(*) FILTER (WHERE event_type = 'page_view') AS page_views,
       count(*) FILTER (WHERE event_type = 'booking_click') AS booking_clicks,
