@@ -1,4 +1,5 @@
 import { isBookingDestination } from '../lib/analytics/journey';
+import { normalizeCampaign, type CampaignAttribution } from '../lib/analytics/attribution';
 
 const liveDomain = /(^|\.)relaxbridge\.nl$/i;
 const visitStorageKey = 'relax-bridge-anonymous-visit-v1';
@@ -7,11 +8,10 @@ const trackingAllowed = liveDomain.test(window.location.hostname)
   && navigator.doNotTrack !== '1'
   && !(navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl;
 
-interface JourneySession {
+interface JourneySession extends CampaignAttribution {
   id: string;
   createdAt: number;
   referrerHost: string;
-  utmSource: string;
 }
 
 let journeySession: JourneySession | null = null;
@@ -36,15 +36,21 @@ function loadSession(): JourneySession {
         && Date.now() - parsed.createdAt < 24 * 60 * 60 * 1000
         && typeof parsed.referrerHost === 'string'
         && typeof parsed.utmSource === 'string'
-      ) return parsed as JourneySession;
+      ) return { ...parsed, ...normalizeCampaign(parsed) } as JourneySession;
     } catch {}
   }
 
+  const params = new URLSearchParams(window.location.search);
   const session: JourneySession = {
     id: window.crypto.randomUUID(),
     createdAt: Date.now(),
     referrerHost: referrerHost(),
-    utmSource: new URLSearchParams(window.location.search).get('utm_source') || '',
+    ...normalizeCampaign({
+      utmSource: params.get('utm_source') || '',
+      utmMedium: params.get('utm_medium') || '',
+      utmCampaign: params.get('utm_campaign') || '',
+      utmContent: params.get('utm_content') || '',
+    }),
   };
   window.sessionStorage.setItem(journeyStorageKey, JSON.stringify(session));
   return session;
@@ -62,6 +68,9 @@ function recordJourneyEvent(eventType: 'page_view' | 'booking_click', pagePath: 
       pagePath,
       referrerHost: journeySession.referrerHost,
       utmSource: journeySession.utmSource,
+      utmMedium: journeySession.utmMedium,
+      utmCampaign: journeySession.utmCampaign,
+      utmContent: journeySession.utmContent,
     }),
     keepalive: true,
   }).catch(() => {
