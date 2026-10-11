@@ -36,6 +36,14 @@ const creatorHref = massageCreatorPath(locale);
       <span class="eyebrow">{copy.eyebrow}</span>
       <h1>{copy.title}</h1>
       <p class="lead">{copy.intro}</p>
+      <div class="studio-choice-hero__actions">
+        <a class="btn btn--primary" href="#ready-treatments">
+          {copy.readyHeading}<span aria-hidden="true">&darr;</span>
+        </a>
+        <a class="btn btn--ghost" href="#massage-creator">
+          Massage Creator<span aria-hidden="true">&darr;</span>
+        </a>
+      </div>
       <div class="studio-location-note">
         <strong>{d.options.studio.location.title}</strong>
         <span>{d.options.studio.location.body}</span>
@@ -115,3 +123,17 @@ const creatorHref = massageCreatorPath(locale);
     </div>
   </section>
 </Base>
+
+<style>
+  .studio-choice-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+
+  #ready-treatments,
+  #massage-creator {
+    scroll-margin-top: 5.5rem;
+  }
+</style>

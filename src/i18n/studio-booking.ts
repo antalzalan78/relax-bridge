@@ -5,7 +5,7 @@ const studioBooking = {
     eyebrow: 'Studio Visit',
     title: 'Hoe wil je je behandeling kiezen?',
     intro:
-      'Kies een van de vaste behandelingen, of scroll verder en stel bij onderdeel 2 je eigen behandeling samen met de Massage Creator.',
+      'Kies een vaste behandeling in de studio of stel je eigen behandeling samen met de Massage Creator.',
     readyHeading: 'Vaste behandelingen',
     readyCta: 'Ik kies een vaste behandeling',
     creatorNumber: '02',
@@ -48,7 +48,7 @@ const studioBooking = {
     eyebrow: 'Studio Visit',
     title: 'How would you like to choose your treatment?',
     intro:
-      'Choose one of the ready-made treatments, or scroll down and create your own in section 2 with the Massage Creator.',
+      'Choose a ready-made treatment in the studio, or build your own with the Massage Creator.',
     readyHeading: 'Ready-made treatments',
     readyCta: 'Choose a ready-made treatment',
     creatorNumber: '02',
@@ -91,7 +91,7 @@ const studioBooking = {
     eyebrow: 'Studio Visit',
     title: 'Hogyan szeretnéd kiválasztani a kezelésedet?',
     intro:
-      'Válassz egyet a kész kezelések közül, vagy görgess lejjebb, és a 2. menüpontban alkosd meg a sajátodat a Massage Creator segítségével.',
+      'Válassz a kész stúdiókezelések közül, vagy állítsd össze a sajátodat a Massage Creator segítségével.',
     readyHeading: 'Kész kezelések',
     readyCta: 'Kész kezelést választok',
     creatorNumber: '02',
