@@ -126,7 +126,19 @@ export default {
     items: [
       {
         title: 'Időpontfoglalás',
-        body: 'A Studio Visit vagy a Házhoz megyek menüpont alatt válaszd ki a kívánt masszázstípust, és válassz egy megfelelő időpontot. Ha inkább személyesen egyeztetnél, nyugodtan írj üzenetet WhatsAppon. Mégsem jó az időpont? Csak szólj, és módosítjuk vagy lemondjuk.',
+        body: 'Az időpontfoglalás gombnál először válaszd ki, hogy Studio Visit vagy Home Service kezelést szeretnél. A stúdióban ezután kész kezelés vagy a Massage Creator közül választhatsz. Ha inkább személyesen egyeztetnél, nyugodtan írj üzenetet WhatsAppon.',
+      },
+      {
+        title: 'Módosítás és lemondás',
+        body: 'A foglalásodat a kezdés előtt legalább 24 órával díjmentesen módosíthatod vagy lemondhatod. Ha később változtatnál, kérlek, jelezd mielőbb WhatsAppon, vagy válaszolj a visszaigazoló e-mailre.',
+      },
+      {
+        title: 'A stúdió megközelítése és parkolás',
+        body: 'A stúdió Tilburg–Reeshofban található. A pontos címet a visszaigazolt foglalás után küldöm el, így megtervezheted az útvonalat. Utcai parkolás lehetséges.',
+      },
+      {
+        title: 'Mennyi hely kell az otthoni masszázshoz?',
+        body: 'A masszázságy számára legalább 2 × 3 méter szabad helyre van szükség. Más előkészületet nem kérek; a felszerelést én viszem.',
       },
       {
         title: 'Árak és fizetés',
