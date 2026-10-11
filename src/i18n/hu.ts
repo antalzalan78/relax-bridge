@@ -40,6 +40,8 @@ export default {
     title: 'Masszázs Tilburgban',
     intro:
       'Kapcsolódj ki teljesen a nyugodt tilburgi stúdiómban. Inkább a saját környezetedben maradnál? Házhoz menő szolgáltatás is elérhető.',
+    mobileIntro:
+      'Közel 20 év tapasztalat. Kapcsolódj ki a tilburgi stúdiómban, vagy válaszd a Home Service-t otthonodban.',
     primaryCta: 'Időpontfoglalás',
     secondaryCta: 'Árak megtekintése',
   },
