@@ -1,3 +1,5 @@
+import { homeServiceDurationText } from './home-service-duration';
+
 export default {
   htmlLang: 'nl-NL',
 
@@ -98,7 +100,7 @@ export default {
     homeService: {
       label: 'Home Service',
       title: 'Geniet van de massage in het comfort van je eigen huis. Ik kom met de fiets bij je thuis, in Tilburg en Reeshof.',
-      body: 'Bij Home Service kun je kiezen uit een relaxmassage en een nek-, schouder- en rugmassage. De boekbare massagetijd is minimaal 60 en maximaal 180 minuten. Eén reservering kan voor maximaal 3 personen worden gemaakt. Per persoon kan één behandeling worden gekozen. Per adres wordt eenmalig € 15 aan voorrijkosten berekend, ongeacht hoeveel personen gebruikmaken van de massage. Bij meerdere personen houd ik ook rekening met een korte voorbereidingstijd tussen de behandelingen. Tijdens het reserveren helpt het systeem je behandelingen samen te stellen die binnen de beschikbare tijd passen.',
+      body: `Bij Home Service kun je kiezen uit een relaxmassage en een nek-, schouder- en rugmassage. ${homeServiceDurationText.nl} Eén reservering kan voor maximaal 3 personen worden gemaakt. Per persoon kan één behandeling worden gekozen. Per adres wordt eenmalig € 15 aan voorrijkosten berekend, ongeacht hoeveel personen gebruikmaken van de massage. Bij meerdere personen houd ik ook rekening met een korte voorbereidingstijd tussen de behandelingen. Tijdens het reserveren helpt het systeem je behandelingen samen te stellen die binnen de beschikbare tijd passen.`,
       cta: 'Bekijk de behandelingen',
       bookingCta: 'Home service reserveren',
     },
@@ -128,7 +130,7 @@ export default {
       },
       {
         title: 'Home service',
-        body: 'Ik kom bij je thuis en neem alles mee wat nodig is — jij hoeft alleen maar te ontspannen. De prijs is inclusief reistijd, voorbereiding en de behandeling. Ik vraag je om je exacte adres en telefoonnummer, zodat ik je makkelijk kan bereiken. Let op: bij Home service zijn kortere behandelingen niet beschikbaar.',
+        body: `Ik kom bij je thuis en neem alles mee wat nodig is — jij hoeft alleen maar te ontspannen. Naast de behandelprijs betaal je per adres eenmalig € 15 aan voorrijkosten. Ik vraag je om je exacte adres en telefoonnummer, zodat ik je makkelijk kan bereiken. ${homeServiceDurationText.nl}`,
       },
       {
         title: 'Wanneer kun je een massage beter uitstellen?',

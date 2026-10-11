@@ -3,6 +3,7 @@ import { render } from 'astro:content';
 import { bookingPath, questionnairePath, site, pathFor, type Locale } from '../data/site';
 import { anchors } from '../data/routes';
 import { t } from '../i18n';
+import { homeServiceDurationText } from '../i18n/home-service-duration';
 import {
   getServices,
   servicePath,
@@ -77,6 +78,9 @@ const jsonLd = [
           services={[service]}
           linked={false}
         />
+        {category === 'home' && (
+          <p class="service-booking__rule">{homeServiceDurationText[locale]}</p>
+        )}
         <a class="btn btn--primary btn--block" href={bookingHref}>
           {d.service.bookCta}<span aria-hidden="true">&rarr;</span>
         </a>
@@ -110,3 +114,12 @@ const jsonLd = [
     </div>
   </section>
 </Base>
+
+<style>
+  .service-booking__rule {
+    margin: 1.1rem 0 0;
+    color: var(--ink-soft);
+    font-size: 0.88rem;
+    line-height: 1.55;
+  }
+</style>

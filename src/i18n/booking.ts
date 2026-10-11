@@ -1,4 +1,5 @@
 import type { Locale } from '../data/site';
+import { homeServiceDurationText } from './home-service-duration';
 
 const booking = {
   nl: {
@@ -25,7 +26,7 @@ const booking = {
     home: 'Aan huis',
     homeBuilderTitle: 'Stel je Home Service samen',
     homeBuilderIntro:
-      'Kies voor iedere persoon één behandeling. De totale massagetijd is minimaal 60 en maximaal 180 minuten.',
+      `Kies voor iedere persoon één behandeling. ${homeServiceDurationText.nl}`,
     homeGuestCount: 'Aantal personen',
     homeGuest: 'Persoon {number}',
     homeTreatment: 'Behandeling',
@@ -119,7 +120,7 @@ const booking = {
     home: 'At home',
     homeBuilderTitle: 'Build your Home Service',
     homeBuilderIntro:
-      'Choose one treatment for each person. The total massage time must be between 60 and 180 minutes.',
+      `Choose one treatment for each person. ${homeServiceDurationText.en}`,
     homeGuestCount: 'Number of people',
     homeGuest: 'Person {number}',
     homeTreatment: 'Treatment',
@@ -213,7 +214,7 @@ const booking = {
     home: 'Otthoni',
     homeBuilderTitle: 'Állítsd össze a Home Service foglalást',
     homeBuilderIntro:
-      'Személyenként válassz egy kezelést. A teljes masszázsidő minimum 60, maximum 180 perc lehet.',
+      `Személyenként válassz egy kezelést. ${homeServiceDurationText.hu}`,
     homeGuestCount: 'Személyek száma',
     homeGuest: '{number}. személy',
     homeTreatment: 'Kezelés',

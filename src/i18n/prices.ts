@@ -1,4 +1,5 @@
 import type { Locale } from '../data/site';
+import { homeServiceDurationText } from './home-service-duration';
 
 const pricePage = {
   nl: {
@@ -20,7 +21,7 @@ const pricePage = {
     homeTreatmentsHeading: 'Behandelingen',
     travelFeeHeading: 'Eenmalige voorrijkosten per adres',
     travelFeeNote: 'Deze kosten worden één keer per boeking toegevoegd, ook als meerdere personen op hetzelfde adres een behandeling krijgen.',
-    homeRule: 'Bij Home Service is de totale massagetijd per boeking minimaal 60 en maximaal 180 minuten. Een behandeling van 30 minuten kan alleen deel uitmaken van een langere boeking.',
+    homeRule: homeServiceDurationText.nl,
   },
   en: {
     eyebrow: 'Relax Bridge · Price list',
@@ -41,7 +42,7 @@ const pricePage = {
     homeTreatmentsHeading: 'Treatments',
     travelFeeHeading: 'One-time travel fee per address',
     travelFeeNote: 'This fee is added once per booking, even when several people receive a treatment at the same address.',
-    homeRule: 'For Home Service, the total massage time per booking is at least 60 and at most 180 minutes. A 30-minute treatment can only be part of a longer booking.',
+    homeRule: homeServiceDurationText.en,
   },
   hu: {
     eyebrow: 'Relax Bridge · Árlista',
@@ -62,7 +63,7 @@ const pricePage = {
     homeTreatmentsHeading: 'Kezelések',
     travelFeeHeading: 'Egyszeri kiszállási díj címenként',
     travelFeeNote: 'A díj foglalásonként egyszer kerül hozzáadásra akkor is, ha ugyanazon a címen többen kapnak kezelést.',
-    homeRule: 'Home Service esetén a foglalás teljes masszázsideje minimum 60, maximum 180 perc. Egy 30 perces kezelés csak hosszabb foglalás részeként választható.',
+    homeRule: homeServiceDurationText.hu,
   },
 } as const;
 
