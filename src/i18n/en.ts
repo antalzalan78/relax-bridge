@@ -121,10 +121,24 @@ export default {
 
   goodToKnow: {
     heading: 'Good to know',
+    practicalCta: 'Practical information',
+    practicalSummary: 'Cancellation, parking, getting to the studio and space for a massage at home.',
     items: [
       {
         title: 'Booking an appointment',
-        body: 'Choose your preferred type of massage under Studio Visit or Home service, and pick a suitable time slot. Prefer personal contact? Feel free to send me a message on WhatsApp. Does the time no longer suit you? Just let me know to reschedule or cancel.',
+        body: 'Start with the booking button and choose Studio Visit or Home Service first. In the studio, you can then pick a ready-made treatment or create your own with the Massage Creator. Prefer personal contact? Feel free to send me a message on WhatsApp.',
+      },
+      {
+        title: 'Changing or cancelling an appointment',
+        body: 'You can change or cancel your appointment free of charge up to 24 hours before it starts. If you need to make a change later, please let me know as soon as possible via WhatsApp or by replying to your confirmation email.',
+      },
+      {
+        title: 'Getting to the studio and parking',
+        body: 'The studio is in Tilburg–Reeshof. You will receive the exact address after your booking is confirmed so you can plan your route. Parking is available on the street.',
+      },
+      {
+        title: 'How much space is needed at home?',
+        body: 'Please leave at least 2 × 3 metres of clear space for the massage table. No other preparation is needed; I bring the equipment with me.',
       },
       {
         title: 'Prices and payment',

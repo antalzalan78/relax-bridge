@@ -121,10 +121,24 @@ export default {
 
   goodToKnow: {
     heading: 'Goed om te weten',
+    practicalCta: 'Praktische informatie',
+    practicalSummary: 'Annuleren, parkeren, de studio bereiken en de ruimte voor een massage aan huis.',
     items: [
       {
         title: 'Afspraak maken',
-        body: 'Kies bij Studio Visit of Home service het gewenste type massage en selecteer een geschikt tijdstip. Liever persoonlijk contact? Stuur me gerust een WhatsApp-bericht. Past het toch niet? Laat het me weten om je afspraak te wijzigen of te annuleren.',
+        body: 'Begin met de knop Afspraak maken en kies eerst Studio Visit of Home Service. In de studio kies je daarna een vaste behandeling of stel je jouw massage samen met de Massage Creator. Liever persoonlijk contact? Stuur me gerust een WhatsApp-bericht.',
+      },
+      {
+        title: 'Wijzigen of annuleren',
+        body: 'Je kunt je afspraak kosteloos wijzigen of annuleren tot 24 uur vóór de start. Wil je later iets veranderen? Laat het me dan zo snel mogelijk weten via WhatsApp of door te antwoorden op je bevestigingsmail.',
+      },
+      {
+        title: 'De studio bereiken en parkeren',
+        body: 'De studio ligt in Tilburg–Reeshof. Het exacte adres ontvang je nadat je boeking is bevestigd, zodat je je route kunt plannen. Parkeren kan op straat.',
+      },
+      {
+        title: 'Hoeveel ruimte is er thuis nodig?',
+        body: 'Zorg voor minimaal 2 × 3 meter vrije ruimte voor de massagetafel. Verder hoef je niets voor te bereiden; ik neem de benodigdheden mee.',
       },
       {
         title: 'Prijzen en betaling',
