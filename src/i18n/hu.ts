@@ -121,6 +121,8 @@ export default {
 
   goodToKnow: {
     heading: 'Jó tudni',
+    practicalCta: 'Gyakorlati tudnivalók',
+    practicalSummary: 'Lemondás, parkolás, a stúdió megközelítése és az otthoni masszázs helyigénye.',
     items: [
       {
         title: 'Időpontfoglalás',

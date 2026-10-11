@@ -121,6 +121,8 @@ export default {
 
   goodToKnow: {
     heading: 'Goed om te weten',
+    practicalCta: 'Praktische informatie',
+    practicalSummary: 'Annuleren, parkeren, de studio bereiken en de ruimte voor een massage aan huis.',
     items: [
       {
         title: 'Afspraak maken',

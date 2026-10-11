@@ -152,6 +152,9 @@ const jsonLd = [
           <a class="btn btn--primary" href={studioBookingHref}>
             {d.options.studio.bookingCta}<span aria-hidden="true">&rarr;</span>
           </a>
+          <p class="location-showcase__practical">
+            <a class="text-link" href="#practical-info">{d.goodToKnow.practicalCta} <span aria-hidden="true">&rarr;</span></a>
+          </p>
         </div>
 
         <p class="location-showcase__subtitle">{d.options.studio.personalization.intro}</p>
@@ -255,6 +258,9 @@ const jsonLd = [
           <a class="btn btn--primary" href={homeBookingHref}>
             {d.options.homeService.bookingCta}<span aria-hidden="true">&rarr;</span>
           </a>
+          <p class="location-showcase__practical">
+            <a class="text-link" href="#practical-info">{d.goodToKnow.practicalCta} <span aria-hidden="true">&rarr;</span></a>
+          </p>
         </div>
       </div>
 
@@ -297,10 +303,11 @@ const jsonLd = [
     </div>
   </section>
 
-  <section class="wrap section knowledge-grid">
+  <section class="wrap section knowledge-grid" id="practical-info">
     <div class="knowledge-grid__intro">
       <span class="eyebrow">Relax Bridge</span>
       <h2>{d.goodToKnow.heading}</h2>
+      <p class="knowledge-grid__summary">{d.goodToKnow.practicalSummary}</p>
       <a class="btn btn--ghost" href={questionnairePath(locale)}>
         {d.goodToKnow.questionnaireCta}
       </a>
@@ -375,6 +382,20 @@ const jsonLd = [
 </Base>
 
 <style>
+  .location-showcase__practical {
+    margin: 0.8rem 0 0;
+  }
+
+  #practical-info {
+    scroll-margin-top: 6rem;
+  }
+
+  .knowledge-grid__summary {
+    max-width: 22rem;
+    margin: 0 0 1rem;
+    color: var(--ink-soft);
+  }
+
   .hero__intro--mobile {
     display: none;
   }

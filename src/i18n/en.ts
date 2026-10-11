@@ -121,6 +121,8 @@ export default {
 
   goodToKnow: {
     heading: 'Good to know',
+    practicalCta: 'Practical information',
+    practicalSummary: 'Cancellation, parking, getting to the studio and space for a massage at home.',
     items: [
       {
         title: 'Booking an appointment',
