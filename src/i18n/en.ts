@@ -1,3 +1,5 @@
+import { homeServiceDurationText } from './home-service-duration';
+
 export default {
   htmlLang: 'en',
 
@@ -98,7 +100,7 @@ export default {
     homeService: {
       label: 'Home Service',
       title: 'Enjoy your massage in the comfort of your own home. I come to your home by bicycle, in Tilburg and Reeshof.',
-      body: 'With Home Service, you can choose a Relax Massage or a Neck, Shoulder & Back Massage. The bookable massage time is at least 60 and at most 180 minutes. One booking can be for up to 3 people. One treatment may be selected per person. A one-time €15 travel fee is charged per address, regardless of how many people receive a massage. For multiple people, I also allow a short preparation time between treatments. During booking, the system helps you put together treatments that fit the available time.',
+      body: `With Home Service, you can choose a Relax Massage or a Neck, Shoulder & Back Massage. ${homeServiceDurationText.en} One booking can be for up to 3 people. One treatment may be selected per person. A one-time €15 travel fee is charged per address, regardless of how many people receive a massage. For multiple people, I also allow a short preparation time between treatments. During booking, the system helps you put together treatments that fit the available time.`,
       cta: 'See the treatments',
       bookingCta: 'Book a Home Service',
     },
@@ -128,7 +130,7 @@ export default {
       },
       {
         title: 'Home service',
-        body: 'I come to your home and bring everything needed — you only need to relax. The price includes travel time, preparation and the treatment. I will ask for your exact address and phone number so I can reach you easily. Please note: shorter treatments are not available for home service.',
+        body: `I come to your home and bring everything needed — you only need to relax. A one-time €15 travel fee per address is added to the treatment price. I will ask for your exact address and phone number so I can reach you easily. ${homeServiceDurationText.en}`,
       },
       {
         title: 'When is it better to postpone a massage?',
