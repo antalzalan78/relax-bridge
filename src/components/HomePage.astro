@@ -60,7 +60,8 @@ const jsonLd = [
       <div class="hero__copy">
         <span class="eyebrow">{d.tagline}</span>
         <h1>{d.hero.title}</h1>
-        <p class="lead">{d.hero.intro}</p>
+        <p class="lead hero__intro--desktop">{d.hero.intro}</p>
+        <p class="lead hero__intro--mobile">{d.hero.mobileIntro}</p>
         <div class="hero__meta" aria-label={`${d.nav.studio}, ${d.nav.homeService}, Tilburg`}>
           <span>{d.nav.studio}</span>
           <span aria-hidden="true">&middot;</span>
@@ -372,3 +373,47 @@ const jsonLd = [
     </div>
   </section>
 </Base>
+
+<style>
+  .hero__intro--mobile {
+    display: none;
+  }
+
+  @media (max-width: 47.99rem) {
+    .hero__intro--desktop {
+      display: none;
+    }
+
+    .hero__intro--mobile {
+      display: block;
+    }
+
+    .hero--with-introduction {
+      padding-block: clamp(1.75rem, 5vw, 2.75rem) clamp(2rem, 5vw, 3rem);
+    }
+
+    .hero--with-introduction .hero__grid {
+      gap: clamp(2rem, 5vw, 3rem);
+    }
+
+    .hero--with-introduction .hero__copy h1 {
+      max-width: 20ch;
+      font-size: clamp(2.4rem, 7vw, 3.4rem);
+      line-height: 1.06;
+    }
+
+    .hero--with-introduction .hero__copy .lead {
+      margin-top: 0.75rem;
+      font-size: clamp(1rem, 2.8vw, 1.13rem);
+      line-height: 1.48;
+    }
+
+    .hero--with-introduction .hero__meta {
+      margin-top: 1rem;
+    }
+
+    .hero--with-introduction .btn-row {
+      margin-top: 1.2rem;
+    }
+  }
+</style>

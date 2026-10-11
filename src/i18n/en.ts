@@ -40,6 +40,8 @@ export default {
     title: 'Massage in Tilburg',
     intro:
       'Take some time to completely unwind in my peaceful studio in Tilburg. Prefer your own surroundings? Home service is also available.',
+    mobileIntro:
+      'Nearly 20 years of experience. Relax in my Tilburg studio or choose Home Service at your place.',
     primaryCta: 'Book an appointment',
     secondaryCta: 'See the prices',
   },
