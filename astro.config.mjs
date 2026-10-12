@@ -18,9 +18,9 @@ export default defineConfig({
   },
   integrations: [
     sitemap({
-      // Only Dutch pages are advertised to search engines. English and
-      // Hungarian remain available through direct URLs and the language switcher.
-      filter: (page) => !/^\/(?:en|hu)(?:\/|$)/.test(new URL(page).pathname),
+      // Existing static pages advertise only Dutch. Published blog translations
+      // use the separate dynamic blog sitemap. Never list admin/API routes.
+      filter: (page) => !/^\/(?:en|hu|admin|api|blog)(?:\/|$)/.test(new URL(page).pathname),
     }),
   ],
 });

@@ -1,0 +1,25 @@
+---
+import { blogArticlePath, type Locale } from '../data/site';
+import { blogText } from '../i18n/blog';
+import { blogDate, readingMinutes } from '../lib/blog';
+import type { BlogPost } from '../lib/server/blog';
+import BlogVisual from './BlogVisual.astro';
+import '../styles/blog.css';
+interface Props { locale: Locale; posts: BlogPost[]; }
+const { locale, posts } = Astro.props;
+const c = blogText(locale);
+---
+<div class="blog-grid">
+  {posts.map((post) => (
+    <a class="blog-card" href={blogArticlePath(locale, post.slug)}>
+      <BlogVisual topicId={post.topic_id} image={post.hero_image_id ? `/api/blog/media/${post.hero_image_id}` : undefined} alt={post.images.find((image) => image.id === post.hero_image_id)?.alt || ''} />
+      <div class="blog-card__content">
+        <span class="blog-card__meta">{post.topic_name || c.topicLabel}</span>
+        <h3>{post.title}</h3>
+        <p>{post.intro.length > 185 ? `${post.intro.slice(0, 182).trimEnd()}…` : post.intro}</p>
+        <span class="blog-card__link">{c.read} →</span>
+        <span class="blog-card__detail">{blogDate(post.published_at, locale)} · {readingMinutes(post.body)} {c.readTime}</span>
+      </div>
+    </a>
+  ))}
+</div>

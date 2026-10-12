@@ -2542,10 +2542,10 @@ img {
     grid-column: 1 / 4;
     grid-row: 2;
     width: 100%;
-    justify-content: space-between;
+    justify-content: flex-start;
     gap: clamp(0.3rem, 2vw, 0.65rem);
     padding-top: 0;
-    overflow: visible;
+    overflow-x: auto;
     border-top: 0;
   }
 

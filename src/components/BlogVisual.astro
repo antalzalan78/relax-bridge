@@ -1,0 +1,25 @@
+---
+interface Props {
+  topicId: string;
+  image?: string;
+  alt?: string;
+  large?: boolean;
+}
+
+const { topicId, image, alt = '', large = false } = Astro.props;
+const motif = topicId === 'massage-history' ? 'book' : topicId === 'preparing-for-massage' ? 'leaf' : topicId === 'everyday-rest' ? 'home' : 'leaf';
+---
+
+<div class:list={['blog-visual', `blog-visual--${motif}`, { 'blog-visual--large': large, 'blog-visual--image': !!image }]}>
+  {image ? <img src={image} alt={alt} loading={large ? 'eager' : 'lazy'} /> : (
+    <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+      {motif === 'book' ? (
+        <><path d="M24 37c-4-3-9-4-17-4V11c8 0 13 1 17 4 4-3 9-4 17-4v22c-8 0-13 1-17 4Z" /><path d="M24 15v22" /></>
+      ) : motif === 'home' ? (
+        <><path d="m7 22 17-14 17 14v19H7V22Z" /><path d="M18 41V27h12v14" /></>
+      ) : (
+        <><path d="M11 36c19 0 27-11 27-26-15 0-29 8-29 22 0 2 1 4 2 4Z" /><path d="M9 40c5-11 14-18 24-22" /></>
+      )}
+    </svg>
+  )}
+</div>

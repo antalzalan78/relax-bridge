@@ -1,7 +1,7 @@
 ---
 interface Props {
   email: string;
-  active: 'bookings' | 'questionnaire' | 'statistics';
+  active: 'bookings' | 'questionnaire' | 'statistics' | 'blog';
 }
 
 const { email, active } = Astro.props;
@@ -14,6 +14,7 @@ const { email, active } = Astro.props;
       <a href="/admin" aria-current={active === 'bookings' ? 'page' : undefined}>Foglalások</a>
       <a href="/admin/questionnaire" aria-current={active === 'questionnaire' ? 'page' : undefined}>Kérdőív</a>
       <a href="/admin/statistics" aria-current={active === 'statistics' ? 'page' : undefined}>Statisztika</a>
+      <a href="/admin/blog" aria-current={active === 'blog' ? 'page' : undefined}>Blog</a>
     </nav>
     <span class="admin-email">{email}</span>
     <form method="post" action="/admin/logout">
@@ -36,7 +37,7 @@ const { email, active } = Astro.props;
     .admin-header__inner { gap: 0.35rem; }
     .admin-brand { margin-right: auto; }
     .admin-email { display: none; }
-    nav { order: 3; width: 100%; margin: 0; padding-bottom: 0.55rem; }
+    nav { order: 3; width: 100%; margin: 0; padding-bottom: 0.55rem; overflow-x: auto; white-space: nowrap; }
     .admin-header__inner { flex-wrap: wrap; padding-top: 0.55rem; }
   }
 </style>

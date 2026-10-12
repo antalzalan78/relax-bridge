@@ -1,0 +1,15 @@
+---
+import BlogArticle from '../../../../components/BlogArticle.astro';
+import { getAdminSession } from '../../../../lib/server/admin-auth';
+import { getAdminPost, listTopics } from '../../../../lib/server/blog';
+import type { Locale } from '../../../../data/site';
+export const prerender = false;
+const session = await getAdminSession(Astro.cookies);
+if (!session) return Astro.redirect('/admin/login');
+const locale = Astro.url.searchParams.get('locale') as Locale;
+if (!['nl','en','hu'].includes(locale)) return new Response('Not found', { status: 404 });
+const post = await getAdminPost(Astro.params.id || '', locale);
+if (!post) return new Response('Not found', { status: 404 });
+post.topic_name = (await listTopics()).find((topic) => topic.id === post.topic_id)?.names[locale];
+---
+<BlogArticle locale={locale} post={post} preview />

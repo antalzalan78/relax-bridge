@@ -1,0 +1,52 @@
+---
+import Base from '../layouts/Base.astro';
+import BlogCards from './BlogCards.astro';
+import { blogArticlePath, blogPath, blogTopicPath, site, type Locale } from '../data/site';
+import { blogText } from '../i18n/blog';
+import { blogDate, isSafeExternalUrl, parseBlogBody, readingMinutes, youtubeEmbed } from '../lib/blog';
+import { getPublishedAlternates, getRelated, getSeries, type BlogPost } from '../lib/server/blog';
+import BlogVisual from './BlogVisual.astro';
+import '../styles/blog.css';
+interface Props { locale: Locale; post: BlogPost; preview?: boolean }
+const { locale, post, preview = false } = Astro.props;
+const c = blogText(locale);
+const path = preview ? `/admin/blog/preview/${post.id}?locale=${locale}` : blogArticlePath(locale, post.slug);
+const alternates = preview ? {} : await getPublishedAlternates(post.id);
+const related = preview ? [] : await getRelated(post);
+const series = preview ? [] : await getSeries(post);
+const seriesIndex = series.findIndex((item) => item.id === post.id);
+const image = post.hero_image_id ? `/api/blog/media/${post.hero_image_id}` : undefined;
+const articleSchema = preview ? [] : [{
+  '@context': 'https://schema.org', '@type': 'BlogPosting',
+  headline: post.title, description: post.intro,
+  author: { '@type': 'Person', name: post.author },
+  datePublished: post.published_at?.toISOString(),
+  dateModified: post.updated_at?.toISOString(),
+  image: image ? new URL(image, site.url).href : undefined,
+  mainEntityOfPage: new URL(path, site.url).href,
+}];
+const hero = post.images.find((item) => item.id === post.hero_image_id);
+const extraImages = post.images.filter((item) => item.id !== post.hero_image_id);
+const videoEmbed = post.video_url ? youtubeEmbed(post.video_url) : null;
+---
+<Base locale={locale} title={`${post.seo_title || post.title} — Relax Bridge`} description={post.seo_description || post.intro} path={path} alternates={alternates} image={image} indexAllLocales noIndex={preview} contentType="article" publishedAt={post.published_at} author={post.author} jsonLd={articleSchema} quietBackdrop>
+  {preview && <div class="blog-preview-banner">Előnézet · nem nyilvános · <a href={`/admin/blog?post=${post.id}&locale=${locale}`}>Vissza a szerkesztőbe</a></div>}
+  <article class="blog-article blog-wrap">
+    <nav class="blog-breadcrumb" aria-label="Breadcrumb"><a href={blogPath(locale)}>← {c.backToAll}</a></nav>
+    <header class="blog-article__header">
+      <a class="blog-eyebrow blog-article__topic" href={blogTopicPath(locale, post.topic_id)}>{post.topic_name || c.topicLabel}</a>
+      <h1>{post.title}</h1>
+      <div class="blog-article__meta"><span>{c.byline} {post.author}</span><span aria-hidden="true">·</span><span>Relax Bridge</span>{post.published_at && <><span aria-hidden="true">·</span><time datetime={post.published_at.toISOString()}>{blogDate(post.published_at, locale)}</time></>}<span aria-hidden="true">·</span><span>{readingMinutes(post.body)} {c.readTime}</span></div>
+    </header>
+    <figure class="blog-article__hero"><BlogVisual topicId={post.topic_id} image={image} alt={hero?.alt || ''} large />{image && (hero?.caption || hero?.credit) && <figcaption>{hero?.caption}{hero?.credit && <span> · {hero.credit}</span>}</figcaption>}</figure>
+    <p class="blog-article__intro">{post.intro}</p>
+    {post.music_url && isSafeExternalUrl(post.music_url) && <aside class="blog-note"><strong>{c.music}</strong><p>{post.music_text}</p><a href={post.music_url} target="_blank" rel="noopener noreferrer">YouTube ↗</a></aside>}
+    <div class="blog-article__body">{parseBlogBody(post.body).map((block) => block.kind === 'h2' ? <h2>{block.text}</h2> : block.kind === 'h3' ? <h3>{block.text}</h3> : block.kind === 'list' ? <ul>{block.items?.map((item) => <li>{item}</li>)}</ul> : <p>{block.text}</p>)}</div>
+    {extraImages.map((item) => <figure><img src={`/api/blog/media/${item.id}`} alt={item.alt} loading="lazy" /><figcaption>{item.caption}{item.credit && <span> · {item.credit}</span>}</figcaption></figure>)}
+    {videoEmbed && <section aria-labelledby="blog-video"><h2 id="blog-video">{c.video}</h2><iframe class="blog-video" src={videoEmbed} title={c.video} loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></section>}
+    {post.sources.length > 0 && <section aria-labelledby="blog-sources"><h2 id="blog-sources">{c.sources}</h2><ul>{post.sources.filter((source) => isSafeExternalUrl(source.url)).map((source) => <li><a href={source.url} target="_blank" rel="noopener noreferrer">{source.title || source.url}</a></li>)}</ul></section>}
+    {post.series_key && <section aria-labelledby="blog-series"><h2 id="blog-series">{c.series}: {post.series_name || post.series_key}</h2>{series.length > 0 && <ol class="blog-series-list">{series.map((item) => <li>{item.id === post.id ? <strong>{item.title}</strong> : <a href={blogArticlePath(locale, item.slug)}>{item.title}</a>}</li>)}</ol>}{seriesIndex > 0 && <a href={blogArticlePath(locale, series[seriesIndex - 1].slug)}>← {c.previous}</a>}{seriesIndex >= 0 && seriesIndex < series.length - 1 && <a href={blogArticlePath(locale, series[seriesIndex + 1].slug)}>{c.next} →</a>}</section>}
+    {post.cta_label && post.cta_url.startsWith('/') && !post.cta_url.startsWith('//') && <p><a class="blog-cta" href={post.cta_url}>{post.cta_label} →</a></p>}
+  </article>
+  {related.length > 0 && <section class="blog-section blog-wrap"><h2>{c.related}</h2><BlogCards locale={locale} posts={related} /></section>}
+</Base>

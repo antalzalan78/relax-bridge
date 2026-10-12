@@ -21,6 +21,7 @@ export default {
     studio: 'Studio Visit',
     homeService: 'Home service',
     prices: 'Prijzen',
+    blog: 'Blog',
     about: 'Over mij',
     contact: 'Contact',
     questionnaire: 'Vragenlijst',

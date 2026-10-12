@@ -1,0 +1,8 @@
+---
+import BlogTopic from '../../../components/BlogTopic.astro';
+import { listTopics } from '../../../lib/server/blog';
+export const prerender = false;
+const topic = (await listTopics()).find((item) => item.id === Astro.params.slug);
+if (!topic?.names.nl) return new Response('Not found', { status: 404 });
+---
+<BlogTopic locale="nl" topicId={topic.id} />

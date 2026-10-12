@@ -3,7 +3,7 @@ import { Image } from 'astro:assets';
 import logoMark from '../assets/logo-mark.png';
 import logoTagline from '../assets/logo-tagline.png';
 import logoWordmark from '../assets/logo-wordmark.png';
-import { bookingPath, pricesPath, questionnairePath, site, locales, pathFor, localeNames, type Locale } from '../data/site';
+import { blogPath, bookingPath, pricesPath, questionnairePath, site, locales, pathFor, localeNames, type Locale } from '../data/site';
 import { anchors } from '../data/routes';
 import { t } from '../i18n';
 
@@ -49,6 +49,7 @@ const pricesHref = pricesPath(locale);
     <nav class="nav" aria-label={d.nav.menu}>
       <a href={`${home}#${anchors.services}`}>{d.nav.services}</a>
       <a href={pricesHref} aria-current={Astro.url.pathname === pricesHref ? 'page' : undefined}>{d.nav.prices}</a>
+      <a href={blogPath(locale)} aria-current={Astro.url.pathname.startsWith(blogPath(locale)) ? 'page' : undefined}>{d.nav.blog}</a>
       <a href={`${home}#${anchors.contact}`}>{d.nav.contact}</a>
       <a href={questionnairePath(locale)}>{d.nav.questionnaire}</a>
     </nav>
