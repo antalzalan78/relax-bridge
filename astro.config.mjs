@@ -20,7 +20,7 @@ export default defineConfig({
     sitemap({
       // Existing static pages advertise only Dutch. Published blog translations
       // use the separate dynamic blog sitemap. Never list admin/API routes.
-      filter: (page) => !/^\/(?:en|hu|admin|api)(?:\/|$)/.test(new URL(page).pathname),
+      filter: (page) => !/^\/(?:en|hu|admin|api|blog)(?:\/|$)/.test(new URL(page).pathname),
     }),
   ],
 });

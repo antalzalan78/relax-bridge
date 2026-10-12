@@ -4,6 +4,7 @@ import BlogCards from './BlogCards.astro';
 import { blogPath, blogTopicPath, locales, type Locale } from '../data/site';
 import { blogText } from '../i18n/blog';
 import { listPublished, listTopics } from '../lib/server/blog';
+import '../styles/blog.css';
 interface Props { locale: Locale }
 const { locale } = Astro.props;
 const c = blogText(locale);
@@ -11,7 +12,7 @@ const [posts, topics] = await Promise.all([listPublished(locale), listTopics()])
 const visibleTopics = topics.filter((topic) => topic.names[locale] && posts.some((post) => post.topic_id === topic.id));
 const alternates = Object.fromEntries(locales.map((lang) => [lang, blogPath(lang)]));
 ---
-<Base locale={locale} title={`${c.title} — Relax Bridge`} description={c.description} path={blogPath(locale)} alternates={alternates} indexAllLocales>
+<Base locale={locale} title={`${c.title} — Relax Bridge`} description={c.description} path={blogPath(locale)} alternates={alternates} indexAllLocales noIndex={posts.length === 0}>
   <header class="blog-hero blog-wrap"><span class="blog-eyebrow">Relax Bridge</span><h1>{c.title}</h1><p class="blog-lead">{c.description}</p></header>
   <section class="blog-section blog-wrap" aria-labelledby="blog-topics"><h2 id="blog-topics">{c.topics}</h2>
     {visibleTopics.length ? <div class="blog-grid">{visibleTopics.map((topic) => <a class="blog-topic-card" href={blogTopicPath(locale, topic.id)}><h3>{topic.names[locale]}</h3><p>{topic.descriptions[locale]}</p><span class="blog-card__link">{c.read} →</span></a>)}</div> : <p class="blog-empty">{c.empty}</p>}
