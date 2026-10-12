@@ -1,0 +1,8 @@
+---
+import BlogIndex from '../../../components/BlogIndex.astro';
+import type { Locale } from '../../../data/site';
+export const prerender = false;
+const lang = Astro.params.lang;
+if (lang !== 'en' && lang !== 'hu') return new Response('Not found', { status: 404 });
+---
+<BlogIndex locale={lang as Locale} />

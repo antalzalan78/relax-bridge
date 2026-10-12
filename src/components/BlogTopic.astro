@@ -1,0 +1,18 @@
+---
+import Base from '../layouts/Base.astro';
+import BlogCards from './BlogCards.astro';
+import { blogPath, blogTopicPath, type Locale } from '../data/site';
+import { blogText } from '../i18n/blog';
+import { listPublished, listTopics } from '../lib/server/blog';
+interface Props { locale: Locale; topicId: string }
+const { locale, topicId } = Astro.props;
+const c = blogText(locale);
+// The route checks the topic before rendering this component.
+const topic = (await listTopics()).find((item) => item.id === topicId)!;
+const posts = await listPublished(locale, topicId);
+const alternates = Object.fromEntries((['nl', 'en', 'hu'] as const).filter((lang) => topic.names[lang]).map((lang) => [lang, blogTopicPath(lang, topicId)]));
+---
+<Base locale={locale} title={`${topic.names[locale]} — Relax Bridge`} description={topic.descriptions[locale] || c.description} path={blogTopicPath(locale, topicId)} alternates={alternates} indexAllLocales>
+  <header class="blog-hero blog-wrap"><a href={blogPath(locale)}>{c.title}</a><span class="blog-eyebrow"> · {c.topicLabel}</span><h1>{topic.names[locale]}</h1>{topic.descriptions[locale] && <p class="blog-lead">{topic.descriptions[locale]}</p>}</header>
+  <section class="blog-section blog-wrap" aria-label={c.latest}>{posts.length ? <BlogCards locale={locale} posts={posts} /> : <p class="blog-empty">{c.topicEmpty}</p>}</section>
+</Base>

@@ -21,6 +21,7 @@ export default {
     studio: 'Studio Visit',
     homeService: 'Házhoz megyek',
     prices: 'Árak',
+    blog: 'Blog',
     about: 'Rólam',
     contact: 'Kapcsolat',
     questionnaire: 'Kérdőív',

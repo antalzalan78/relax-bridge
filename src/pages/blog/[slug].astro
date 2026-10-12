@@ -1,0 +1,8 @@
+---
+import BlogArticle from '../../components/BlogArticle.astro';
+import { getPublished } from '../../lib/server/blog';
+export const prerender = false;
+const post = await getPublished('nl', Astro.params.slug || '');
+if (!post) return new Response('Not found', { status: 404 });
+---
+<BlogArticle locale="nl" post={post} />

@@ -93,6 +93,18 @@ export function pricesPath(locale: Locale): string {
   return '/hu/arak';
 }
 
+export function blogPath(locale: Locale): string {
+  return pathFor(locale, 'blog');
+}
+
+export function blogTopicPath(locale: Locale, id: string): string {
+  return `${blogPath(locale)}/topic/${encodeURIComponent(id)}`;
+}
+
+export function blogArticlePath(locale: Locale, slug: string): string {
+  return `${blogPath(locale)}/${encodeURIComponent(slug)}`;
+}
+
 /** A Studio Visit kezelési mód választóoldala. */
 export function studioVisitBookingPath(locale: Locale): string {
   return pathFor(locale, 'studio-visit');

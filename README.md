@@ -23,6 +23,7 @@ A fejlesztői szerver a <http://localhost:4321> címen fut.
 | `npm run preview` | a legyártott oldalt szolgálja ki, telepítés előtti ellenőrzésre |
 | `npm run test:booking` | a foglalási időpontmotor automatikus tesztjei |
 | `npm run db:migrate` | létrehozza vagy frissíti a foglalási adatbázist |
+| `npm run test:blog` | blogadatok és tartalmi segédfüggvények tesztje |
 | `npm run admin:hash` | biztonságos admin-jelszóhash készítése |
 
 ## Felépítés
@@ -46,6 +47,33 @@ src/
 **Ha elérhetőség változik**, csak a `src/data/site.ts` fájlt kell átírni. Ez
 szándékos: a régi oldalon a telefonszám szét volt szórva, és két hibás változat
 is bent maradt belőle.
+
+## Blog szerkesztése
+
+A blog az `/blog`, `/en/blog`, `/hu/blog` útvonalakon érhető el. Az admin
+bejelentkezés után az `/admin/blog` felületen hozhatók létre témák és cikkek.
+A szerkesztő nyelvi fülein egy cikk holland, angol és magyar változata ugyanahhoz
+a cikkhez kapcsolódik. Közzététel előtt előbb a holland változat szükséges.
+
+Az induló három magyar cím csak **piszkozat**; a végleges holland témanevek és a
+teljes cikkek nincsenek kitalálva vagy publikálva. A cikk mentés után admin-only
+előnézetben ellenőrizhető. A közzétett cikk azonnal megjelenik a blogon, a
+témagyűjtő oldalon, a legfrissebb három között a főoldalon és a külön
+`/blog-sitemap.xml` oldaltérképben; ehhez nem kell új build.
+
+A törzsszöveg egyszerű szerkesztési jelöléseket használ: `## Alcím`,
+`### Kisebb alcím`, `- listaelem`; üres sor választja el a bekezdéseket.
+A képek JPG/PNG/WebP formátumban tölthetők fel (egyenként legfeljebb 2 MB),
+és képleírás, képaláírás, képkredit adható hozzájuk. A források soronként
+`Forrás neve | https://...` alakban szerepelnek. A zenelink és a videólink
+YouTube-videóra mutathat; a zene nem indul automatikusan. Sorozathoz azonos
+azonosítót és részenként növekvő sorrendet kell megadni.
+
+A blog táblái a `0010_blog.sql` migrációval készülnek, vagy az első blogkéréskor
+automatikusan, tranzakciós zárolással. A piszkozat és a hozzá tartozó kép csak
+bejelentkezett admin számára érhető el. A nyilvános, lefordított blogoldalak
+kereshetőek; a webhely más nem holland oldalainak jelenlegi keresőbeállítása
+változatlan marad.
 
 ## Saját foglalórendszer
 

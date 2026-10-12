@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://www.relaxbridge.nl/sitemap-index.xml
+Sitemap: https://www.relaxbridge.nl/blog-sitemap.xml

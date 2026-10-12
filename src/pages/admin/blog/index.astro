@@ -1,0 +1,152 @@
+---
+import { randomUUID } from 'node:crypto';
+import sharp from 'sharp';
+import AdminHeader from '../../../components/AdminHeader.astro';
+import { blogArticlePath, type Locale } from '../../../data/site';
+import { getAdminSession } from '../../../lib/server/admin-auth';
+import { getAdminPost, getPostMeta, listAdminPosts, listTopics, saveImage, savePost, saveTopic, type BlogImage, type BlogPost, type BlogSource } from '../../../lib/server/blog';
+import { isSafeExternalUrl, youtubeEmbed } from '../../../lib/blog';
+import { assertSameOrigin } from '../../../lib/server/security';
+import '../../../styles/global.css';
+export const prerender = false;
+
+const session = await getAdminSession(Astro.cookies);
+if (!session) return Astro.redirect('/admin/login');
+const locale = (['nl', 'en', 'hu'].includes(Astro.url.searchParams.get('locale') || '') ? Astro.url.searchParams.get('locale') : 'hu') as Locale;
+const postId = Astro.url.searchParams.get('post');
+let error = '';
+let success = Astro.url.searchParams.get('saved') === '1' ? 'Mentve.' : '';
+
+const str = (form: FormData, key: string) => String(form.get(key) || '').trim();
+const slugify = (value: string) => value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 100);
+const upload = async (file: FormDataEntryValue | null): Promise<string | null> => {
+  if (!(file instanceof File) || !file.size) return null;
+  if (file.size > 2_000_000 || !['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) throw new Error('A kép JPG, PNG vagy WebP legyen, legfeljebb 2 MB.');
+  const bytes = await sharp(Buffer.from(await file.arrayBuffer())).rotate().resize({ width: 1600, height: 1200, fit: 'inside', withoutEnlargement: true }).webp({ quality: 78 }).toBuffer();
+  if (bytes.length > 1_500_000) throw new Error('A feldolgozott kép túl nagy.');
+  return saveImage(bytes);
+};
+
+if (Astro.request.method === 'POST') {
+  try {
+    assertSameOrigin(Astro.request);
+    const form = await Astro.request.formData();
+    const intent = str(form, 'intent');
+    if (intent === 'topic') {
+      const id = str(form, 'topic_id') || null;
+      const names = Object.fromEntries((['nl', 'en', 'hu'] as const).map((lang) => [lang, str(form, `name_${lang}`).slice(0, 120)])) as Record<Locale, string>;
+      const descriptions = Object.fromEntries((['nl', 'en', 'hu'] as const).map((lang) => [lang, str(form, `description_${lang}`).slice(0, 400)])) as Record<Locale, string>;
+      if (!Object.values(names).some(Boolean)) throw new Error('Adj meg legalább egy témanevet.');
+      const topicKey = slugify(str(form, 'topic_slug') || names.nl || names.hu);
+      if (!id && (!topicKey || (await listTopics()).some((topic) => topic.id === topicKey))) throw new Error('Adj egyedi webcím-részletet az új témának.');
+      await saveTopic(id, topicKey, names, descriptions);
+      return Astro.redirect('/admin/blog?saved=1', 303);
+    }
+    if (intent !== 'post') throw new Error('Ismeretlen művelet.');
+    const id = str(form, 'post_id') || randomUUID();
+    const lang = str(form, 'locale') as Locale;
+    if (!['nl', 'en', 'hu'].includes(lang)) throw new Error('Érvénytelen nyelv.');
+    const title = str(form, 'title').slice(0, 200);
+    const slug = slugify(str(form, 'slug') || title);
+    const topicId = str(form, 'topic_id');
+    const availableTopics = await listTopics();
+    if (!title || !slug || !availableTopics.some((topic) => topic.id === topicId)) throw new Error('Cím, webcím és téma megadása kötelező.');
+    const old = await getAdminPost(id, lang);
+    const status = str(form, 'status') === 'published' ? 'published' : 'draft';
+    const intro = str(form, 'intro').slice(0, 800);
+    const body = str(form, 'body').slice(0, 60_000);
+    const author = str(form, 'author').slice(0, 120) || 'Brigitta';
+    if (status === 'published') {
+      if (!intro || !body || !author || !availableTopics.find((topic) => topic.id === topicId)?.names[lang]) throw new Error('Közzétételhez bevezető, szöveg, szerző és az adott nyelven megnevezett téma szükséges.');
+      if (lang !== 'nl' && !(await getAdminPost(id, 'nl'))?.status?.includes('published')) throw new Error('Először a holland változatot tedd közzé.');
+    }
+    const musicUrl = str(form, 'music_url');
+    const videoUrl = str(form, 'video_url');
+    if (musicUrl && !youtubeEmbed(musicUrl)) throw new Error('A zene linkje érvényes YouTube-link legyen.');
+    if (videoUrl && !youtubeEmbed(videoUrl)) throw new Error('A videó linkje érvényes YouTube-link legyen.');
+    const ctaUrl = str(form, 'cta_url');
+    if (ctaUrl && (!ctaUrl.startsWith('/') || ctaUrl.startsWith('//'))) throw new Error('A foglalási/kezelési gomb belső útvonalra mutasson (például /booking).');
+    const sources: BlogSource[] = str(form, 'sources').split('\n').map((line) => line.trim()).filter(Boolean).map((line) => {
+      const [title, url] = line.split('|').map((part) => part?.trim());
+      if (!url || !isSafeExternalUrl(url)) throw new Error('A forrásokat „Név | https://...” formában add meg.');
+      return { title: title || url, url };
+    });
+    const images: BlogImage[] = (form.getAll('image_id').map(String)).filter((imageId) => /^[a-f0-9-]{36}$/.test(imageId) && !form.has(`remove_${imageId}`)).map((imageId) => ({
+      id: imageId, alt: str(form, `alt_${imageId}`).slice(0, 250), caption: str(form, `caption_${imageId}`).slice(0, 500), credit: str(form, `credit_${imageId}`).slice(0, 250),
+    }));
+    let heroId = str(form, 'hero_image_id') || null;
+    const newHero = await upload(form.get('hero_upload'));
+    if (newHero) {
+      heroId = newHero;
+      images.push({ id: newHero, alt: str(form, 'hero_alt').slice(0, 250), caption: str(form, 'hero_caption').slice(0, 500), credit: str(form, 'hero_credit').slice(0, 250) });
+    }
+    const newExtra = await upload(form.get('additional_upload'));
+    if (newExtra) images.push({ id: newExtra, alt: str(form, 'additional_alt').slice(0, 250), caption: str(form, 'additional_caption').slice(0, 500), credit: str(form, 'additional_credit').slice(0, 250) });
+    if (heroId && !images.some((image) => image.id === heroId)) heroId = null;
+    if (status === 'published' && images.some((image) => !image.alt)) throw new Error('Minden közzétett képhez adj képleírást.');
+    const dateInput = str(form, 'published_at');
+    const publishedAt = status === 'published' ? dateInput ? new Date(`${dateInput}T12:00:00Z`) : old?.published_at || new Date() : old?.published_at || null;
+    if (publishedAt && Number.isNaN(publishedAt.getTime())) throw new Error('Érvénytelen dátum.');
+    const orderRaw = str(form, 'series_order');
+    const seriesOrder = orderRaw ? Number(orderRaw) : null;
+    const seriesKey = slugify(str(form, 'series_key')) || null;
+    if (seriesKey && (!seriesOrder || seriesOrder < 1)) throw new Error('Sorozathoz pozitív olvasási sorrend kell.');
+    const post: BlogPost = {
+      id, topic_id: topicId, series_key: seriesKey, series_order: seriesKey ? seriesOrder : null,
+      locale: lang, slug, title, intro, body, author, status, published_at: publishedAt,
+      seo_title: str(form, 'seo_title').slice(0, 200), seo_description: str(form, 'seo_description').slice(0, 320),
+      hero_image_id: heroId, images, sources, music_text: str(form, 'music_text').slice(0, 500), music_url: musicUrl,
+      video_url: videoUrl, series_name: str(form, 'series_name').slice(0, 120),
+      cta_label: str(form, 'cta_label').slice(0, 120), cta_url: ctaUrl, updated_at: new Date(),
+    };
+    await savePost(post);
+    return Astro.redirect(`/admin/blog?post=${encodeURIComponent(id)}&locale=${lang}&saved=1`, 303);
+  } catch (cause) {
+    error = cause instanceof Error ? cause.message : 'Nem sikerült menteni.';
+  }
+}
+
+const [topics, posts] = await Promise.all([listTopics(), listAdminPosts()]);
+const selected = postId ? await getAdminPost(postId, locale) : null;
+const meta = postId ? await getPostMeta(postId) : null;
+const editing = Boolean(postId || Astro.url.searchParams.has('new'));
+const selectedTopic = selected?.topic_id || meta?.topic_id || topics[0]?.id || '';
+const selectedImages = selected?.images || [];
+const currentTopic = Astro.url.searchParams.get('topic');
+const topicEdit = topics.find((topic) => topic.id === currentTopic);
+---
+<!doctype html><html lang="hu"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="robots" content="noindex, nofollow" /><title>Blog szerkesztő — Relax Bridge</title></head>
+<body class="admin-page"><AdminHeader email={session.email} active="blog" />
+<main class="blog-admin">
+  <header class="blog-admin__head"><div><span class="eyebrow">Relax Bridge</span><h1>Blog szerkesztő</h1><p>A piszkozatok és az előnézet nem nyilvánosak. A holland változatot publikáld először.</p></div><a class="admin-button" href="/admin/blog?new=1&locale=nl">+ Új cikk</a></header>
+  {error && <p class="admin-alert" role="alert">{error}</p>}{success && <p class="admin-success" role="status">{success}</p>}
+  <div class="blog-admin__layout"><aside class="blog-admin__side"><h2>Cikkek</h2>{posts.length ? <ul>{posts.map((post) => <li><a href={`/admin/blog?post=${post.id}&locale=${post.locale}`}><strong>{post.title}</strong><small>{post.locale.toUpperCase()} · {post.status === 'published' ? 'közzétéve' : 'piszkozat'}</small></a></li>)}</ul> : <p>Még nincs cikk.</p>}</aside>
+  <div class="blog-admin__main">
+    {editing && <section class="admin-panel"><div class="blog-admin__tabs"><strong>{postId ? 'Cikk szerkesztése' : 'Új cikk'}</strong>{postId && <nav aria-label="Fordítások">{(['nl','en','hu'] as const).map((lang) => <a aria-current={lang === locale ? 'page' : undefined} href={`/admin/blog?post=${postId}&locale=${lang}`}>{lang.toUpperCase()}</a>)}</nav>}</div>
+      {postId && selected && <p><a href={`/admin/blog/preview/${postId}?locale=${locale}`} target="_blank" rel="noopener">Előnézet új lapon ↗</a>{selected.status === 'published' && <span> · <a href={blogArticlePath(locale, selected.slug)} target="_blank" rel="noopener">Nyilvános cikk ↗</a></span>}</p>}
+      {postId && !selected && <p>Ehhez a cikkhez még nincs {locale.toUpperCase()} változat. Az alábbi mezőkkel létrehozhatod.</p>}
+      <form method="post" enctype="multipart/form-data" class="admin-form"><input type="hidden" name="intent" value="post" /><input type="hidden" name="post_id" value={postId || ''} /><input type="hidden" name="locale" value={locale} />
+        <div class="admin-form__row"><label>Cím *<input name="title" required maxlength="200" value={selected?.title || ''} /></label><label>Webcím-részlet *<input name="slug" maxlength="100" value={selected?.slug || ''} placeholder="automatikus a címből" /></label></div>
+        <div class="admin-form__row"><label>Téma *<select name="topic_id" required>{topics.map((topic) => <option value={topic.id} selected={topic.id === selectedTopic}>{topic.names[locale] || topic.names.hu || topic.names.nl || topic.id}</option>)}</select></label><label>Szerző *<input name="author" required value={selected?.author || 'Brigitta'} /></label></div>
+        <label>Rövid bevezető<textarea name="intro" rows="3" maxlength="800">{selected?.intro || ''}</textarea></label>
+        <label>Teljes szöveg <span class="field-hint">Alcím: ## Alcím · kisebb alcím: ### Alcím · felsorolás: - elem · üres sor választja el a bekezdéseket.</span><textarea name="body" rows="18">{selected?.body || ''}</textarea></label>
+        <details><summary>Képek és képadatok</summary><label>Új nyitókép (JPG/PNG/WebP, max. 2 MB)<input type="file" name="hero_upload" accept="image/jpeg,image/png,image/webp" /></label><div class="admin-form__row"><label>Képleírás (alt)<input name="hero_alt" /></label><label>Képaláírás<input name="hero_caption" /></label><label>Képkredit<input name="hero_credit" /></label></div>
+          <input type="hidden" name="hero_image_id" value={selected?.hero_image_id || ''} />
+          {selectedImages.map((image) => <fieldset><legend>{image.id === selected?.hero_image_id ? 'Nyitókép' : 'További kép'}</legend><input type="hidden" name="image_id" value={image.id} /><img class="admin-thumb" src={`/api/blog/media/${image.id}`} alt="" /><div class="admin-form__row"><label>Képleírás<input name={`alt_${image.id}`} value={image.alt} /></label><label>Képaláírás<input name={`caption_${image.id}`} value={image.caption} /></label><label>Képkredit<input name={`credit_${image.id}`} value={image.credit} /></label></div><label class="admin-check"><input type="checkbox" name={`remove_${image.id}`} /> Kép eltávolítása a cikkből</label></fieldset>)}
+          <label>Új további kép<input type="file" name="additional_upload" accept="image/jpeg,image/png,image/webp" /></label><div class="admin-form__row"><label>Képleírás (alt)<input name="additional_alt" /></label><label>Képaláírás<input name="additional_caption" /></label><label>Képkredit<input name="additional_credit" /></label></div></details>
+        <details><summary>Források és opcionális elemek</summary><label>Források <span class="field-hint">Soronként: Forrás neve | https://...</span><textarea name="sources" rows="4">{selected?.sources.map((source) => `${source.title} | ${source.url}`).join('\n') || ''}</textarea></label>
+          <div class="admin-form__row"><label>Zeneajánló szövege<input name="music_text" value={selected?.music_text || ''} /></label><label>YouTube zene linkje<input name="music_url" type="url" value={selected?.music_url || ''} /></label></div><label>Kapcsolódó YouTube-videó<input name="video_url" type="url" value={selected?.video_url || ''} /></label>
+          <div class="admin-form__row"><label>Sorozat azonosítója (azonos minden résznél)<input name="series_key" value={selected?.series_key || ''} placeholder="pl. masszazstortenet" /></label><label>Sorozat neve<input name="series_name" value={selected?.series_name || ''} /></label><label>Sorrend<input name="series_order" type="number" min="1" value={selected?.series_order || ''} /></label></div>
+          <div class="admin-form__row"><label>Foglalási/kezelési link felirata<input name="cta_label" value={selected?.cta_label || ''} /></label><label>Belső útvonal<input name="cta_url" value={selected?.cta_url || ''} placeholder="/booking" /></label></div></details>
+        <details><summary>Keresőoptimalizálás</summary><div class="admin-form__row"><label>Keresőben megjelenő cím<input name="seo_title" maxlength="200" value={selected?.seo_title || ''} /></label><label>Rövid leírás<input name="seo_description" maxlength="320" value={selected?.seo_description || ''} /></label></div></details>
+        <div class="admin-form__row"><label>Állapot<select name="status"><option value="draft" selected={selected?.status !== 'published'}>Piszkozat</option><option value="published" selected={selected?.status === 'published'}>Közzétéve</option></select></label><label>Megjelenési dátum<input type="date" name="published_at" value={selected?.published_at?.toISOString().slice(0,10) || ''} /></label></div><button class="admin-button" type="submit">Cikk mentése</button>
+      </form></section>}
+    <section class="admin-panel"><h2>Témák</h2><p>Az induló témák magyar munkanevei adottak. A végleges holland és angol nevet itt adhatod meg. Nyilvánosan csak olyan téma jelenik meg, amelyhez az adott nyelven közzétett cikk tartozik.</p><div class="topic-links">{topics.map((topic) => <a href={`/admin/blog?topic=${topic.id}`}>{topic.names.hu || topic.names.nl || topic.id}</a>)}<a href="/admin/blog?topic=new">+ Új téma</a></div>
+      {currentTopic && <form method="post" class="admin-form"><input type="hidden" name="intent" value="topic" /><input type="hidden" name="topic_id" value={topicEdit?.id || ''} />{topicEdit ? <p>Webcím-részlet: <code>{topicEdit.id}</code> (változatlan marad)</p> : <label>Új téma webcím-részlete<input name="topic_slug" placeholder="automatikus a holland vagy magyar névből" /></label>}{(['nl','en','hu'] as const).map((lang) => <div class="admin-form__row"><label>{lang.toUpperCase()} témaneve<input name={`name_${lang}`} value={topicEdit?.names[lang] || ''} maxlength="120" /></label><label>{lang.toUpperCase()} leírása<input name={`description_${lang}`} value={topicEdit?.descriptions[lang] || ''} maxlength="400" /></label></div>)}<button class="admin-button" type="submit">Téma mentése</button></form>}
+    </section>
+  </div></div>
+</main></body></html>
+
+<style>
+.blog-admin{width:min(94vw,85rem);margin:2.5rem auto 5rem}.blog-admin__head{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:2rem}.blog-admin h1{font-family:Georgia,serif;font-size:clamp(2.5rem,5vw,4rem);margin:.2rem 0}.blog-admin p{color:var(--ink-soft);line-height:1.55}.blog-admin__layout{display:grid;grid-template-columns:minmax(13rem,20rem) minmax(0,1fr);gap:1.5rem}.blog-admin__side,.admin-panel{border:1px solid var(--border);border-radius:1.5rem;background:var(--surface);padding:1.5rem}.blog-admin__side h2,.admin-panel h2{font-family:Georgia,serif;margin-top:0}.blog-admin__side ul{list-style:none;margin:0;padding:0}.blog-admin__side li{border-top:1px solid var(--border)}.blog-admin__side a{display:block;padding:.7rem 0;color:var(--ink);text-decoration:none}.blog-admin__side a:hover{color:var(--clay-dark)}.blog-admin__side small{display:block;color:var(--ink-soft);margin-top:.25rem}.blog-admin__main{display:grid;gap:1.5rem}.blog-admin__tabs{display:flex;justify-content:space-between;gap:1rem;align-items:center}.blog-admin__tabs nav,.topic-links{display:flex;flex-wrap:wrap;gap:.6rem}.blog-admin__tabs a,.topic-links a{display:inline-block;border:1px solid var(--border);border-radius:999px;padding:.35rem .7rem;text-decoration:none;color:var(--pine-dark)}.blog-admin__tabs a[aria-current=page]{background:var(--pine-soft)}.admin-form{display:grid;gap:1.1rem;margin-top:1.5rem}.admin-form__row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.admin-form label{display:grid;gap:.4rem;color:var(--pine-dark);font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em}.admin-form input,.admin-form textarea,.admin-form select{width:100%;border:1px solid var(--border);border-radius:.5rem;padding:.7rem;background:white;color:var(--ink);font:inherit;font-size:1rem;letter-spacing:normal;text-transform:none}.admin-form textarea{resize:vertical}.admin-form details{border:1px solid var(--border);border-radius:.75rem;padding:1rem}.admin-form details[open]{display:grid;gap:1rem}.admin-form summary{color:var(--ink);font-weight:750;cursor:pointer}.field-hint{color:var(--ink-soft);font-size:.75rem;letter-spacing:normal;text-transform:none;font-weight:400}.admin-button{display:inline-block;width:fit-content;border:0;border-radius:999px;background:var(--clay);color:white;padding:.8rem 1.25rem;text-decoration:none;cursor:pointer;font:inherit;font-weight:750}.admin-alert,.admin-success{padding:1rem;border-radius:.6rem}.admin-alert{background:#f8ded9;color:#7b2717!important}.admin-success{background:var(--pine-soft);color:var(--pine-dark)!important}.admin-thumb{max-width:12rem;max-height:8rem;object-fit:cover;border-radius:.4rem}.admin-form .admin-check{display:flex;align-items:center;flex-direction:row;text-transform:none;letter-spacing:normal}.admin-check input{width:auto}@media(max-width:48rem){.blog-admin__layout{grid-template-columns:1fr}.admin-form__row{grid-template-columns:1fr}.blog-admin__head{align-items:start}.blog-admin__side{max-height:17rem;overflow:auto}}
+</style>

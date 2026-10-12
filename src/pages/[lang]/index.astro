@@ -1,15 +1,11 @@
 ---
-import type { GetStaticPaths } from 'astro';
 import type { Locale } from '../../data/site';
 import HomePage from '../../components/HomePage.astro';
 
-// A holland a fooldal (/), ezert csak a masik ket nyelv kap eloteget.
-export const getStaticPaths = (() => [
-  { params: { lang: 'en' } },
-  { params: { lang: 'hu' } },
-]) satisfies GetStaticPaths;
+export const prerender = false;
 
 const { lang } = Astro.params;
+if (lang !== 'en' && lang !== 'hu') return new Response('Not found', { status: 404 });
 ---
 
 <HomePage locale={lang as Locale} />
