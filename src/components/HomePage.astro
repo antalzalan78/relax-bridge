@@ -133,6 +133,18 @@ const blogCopy = blogText(locale);
     <WaveDivider />
   </div>
 
+  {latestPosts.length > 0 && <section class="blog-home blog-wrap" aria-labelledby="home-blog-heading">
+    <div class="blog-home__heading">
+      <div>
+        <span class="blog-eyebrow">{blogCopy.homeEyebrow}</span>
+        <h2 id="home-blog-heading">{blogCopy.homeTitle}</h2>
+      </div>
+      <a class="blog-home__all" href={blogPath(locale)}>{blogCopy.homeLink} →</a>
+    </div>
+    <p class="blog-home__intro">{blogCopy.homeIntro}</p>
+    <BlogCards locale={locale} posts={latestPosts} />
+  </section>}
+
   <section class="section location-section location-section--studio" id={anchors.services}>
     <div class="wrap">
       <div class="section-heading section-heading--wide services-heading">
@@ -335,13 +347,6 @@ const blogCopy = blogText(locale);
       }
     </div>
   </section>
-
-  {latestPosts.length > 0 && <section class="blog-home blog-wrap" aria-labelledby="home-blog-heading">
-    <span class="blog-eyebrow">Relax Bridge</span>
-    <div class="blog-home-heading"><h2 id="home-blog-heading">{blogCopy.homeTitle}</h2><a href={blogPath(locale)}>{blogCopy.homeLink} →</a></div>
-    <p>{blogCopy.homeIntro}</p>
-    <BlogCards locale={locale} posts={latestPosts} />
-  </section>}
 
   <section class="booking-section" id={anchors.contact}>
     <Image

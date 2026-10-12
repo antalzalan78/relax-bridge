@@ -57,8 +57,11 @@ export async function listAdminPosts(): Promise<BlogPost[]> {
 export async function getAdminPost(id: string, locale: Locale): Promise<BlogPost | null> {
   await ensureBlogSchema();
   const rows = await getDatabase()`
-    SELECT p.id, p.topic_id, p.series_key, p.series_order, t.*
-    FROM blog_posts p JOIN blog_translations t ON t.post_id = p.id
+    SELECT p.id, p.topic_id, p.series_key, p.series_order, t.*,
+      topic.names ->> ${locale} AS topic_name
+    FROM blog_posts p
+    JOIN blog_translations t ON t.post_id = p.id
+    JOIN blog_topics topic ON topic.id = p.topic_id
     WHERE p.id = ${id} AND t.locale = ${locale}
   `;
   return rows[0] ? castPost(rows[0]) : null;

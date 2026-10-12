@@ -5,6 +5,7 @@ import { blogArticlePath, blogPath, blogTopicPath, site, type Locale } from '../
 import { blogText } from '../i18n/blog';
 import { blogDate, isSafeExternalUrl, parseBlogBody, readingMinutes, youtubeEmbed } from '../lib/blog';
 import { getPublishedAlternates, getRelated, getSeries, type BlogPost } from '../lib/server/blog';
+import BlogVisual from './BlogVisual.astro';
 import '../styles/blog.css';
 interface Props { locale: Locale; post: BlogPost; preview?: boolean }
 const { locale, post, preview = false } = Astro.props;
@@ -31,12 +32,15 @@ const videoEmbed = post.video_url ? youtubeEmbed(post.video_url) : null;
 <Base locale={locale} title={`${post.seo_title || post.title} — Relax Bridge`} description={post.seo_description || post.intro} path={path} alternates={alternates} image={image} indexAllLocales noIndex={preview} contentType="article" publishedAt={post.published_at} author={post.author} jsonLd={articleSchema}>
   {preview && <div class="blog-preview-banner">Előnézet · nem nyilvános · <a href={`/admin/blog?post=${post.id}&locale=${locale}`}>Vissza a szerkesztőbe</a></div>}
   <article class="blog-article blog-wrap">
-    <nav class="blog-breadcrumb" aria-label="Breadcrumb"><a href={blogPath(locale)}>{c.title}</a><span>›</span><a href={blogTopicPath(locale, post.topic_id)}>{post.topic_name || c.topicLabel}</a></nav>
-    <header><h1>{post.title}</h1><p class="blog-article__intro">{post.intro}</p>
-      <div class="blog-article__meta"><span>{post.author}</span><time datetime={post.published_at?.toISOString()}>{blogDate(post.published_at, locale)}</time><span>{readingMinutes(post.body)} {c.readTime}</span></div>
+    <nav class="blog-breadcrumb" aria-label="Breadcrumb"><a href={blogPath(locale)}>← {c.backToAll}</a></nav>
+    <header class="blog-article__header">
+      <a class="blog-eyebrow blog-article__topic" href={blogTopicPath(locale, post.topic_id)}>{post.topic_name || c.topicLabel}</a>
+      <h1>{post.title}</h1>
+      <div class="blog-article__meta"><span>{c.byline} {post.author}</span><span aria-hidden="true">·</span><span>Relax Bridge</span>{post.published_at && <><span aria-hidden="true">·</span><time datetime={post.published_at.toISOString()}>{blogDate(post.published_at, locale)}</time></>}<span aria-hidden="true">·</span><span>{readingMinutes(post.body)} {c.readTime}</span></div>
     </header>
+    <figure class="blog-article__hero"><BlogVisual topicId={post.topic_id} image={image} alt={hero?.alt || ''} large />{image && (hero?.caption || hero?.credit) && <figcaption>{hero?.caption}{hero?.credit && <span> · {hero.credit}</span>}</figcaption>}</figure>
+    <p class="blog-article__intro">{post.intro}</p>
     {post.music_url && isSafeExternalUrl(post.music_url) && <aside class="blog-note"><strong>{c.music}</strong><p>{post.music_text}</p><a href={post.music_url} target="_blank" rel="noopener noreferrer">YouTube ↗</a></aside>}
-    {image && <figure><img src={image} alt={hero?.alt || ''} /><figcaption>{hero?.caption}{hero?.credit && <span> · {hero.credit}</span>}</figcaption></figure>}
     <div class="blog-article__body">{parseBlogBody(post.body).map((block) => block.kind === 'h2' ? <h2>{block.text}</h2> : block.kind === 'h3' ? <h3>{block.text}</h3> : block.kind === 'list' ? <ul>{block.items?.map((item) => <li>{item}</li>)}</ul> : <p>{block.text}</p>)}</div>
     {extraImages.map((item) => <figure><img src={`/api/blog/media/${item.id}`} alt={item.alt} loading="lazy" /><figcaption>{item.caption}{item.credit && <span> · {item.credit}</span>}</figcaption></figure>)}
     {videoEmbed && <section aria-labelledby="blog-video"><h2 id="blog-video">{c.video}</h2><iframe class="blog-video" src={videoEmbed} title={c.video} loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></section>}

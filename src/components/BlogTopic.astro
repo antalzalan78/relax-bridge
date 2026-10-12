@@ -14,6 +14,8 @@ const posts = await listPublished(locale, topicId);
 const alternates = Object.fromEntries((['nl', 'en', 'hu'] as const).filter((lang) => topic.names[lang]).map((lang) => [lang, blogTopicPath(lang, topicId)]));
 ---
 <Base locale={locale} title={`${topic.names[locale]} — Relax Bridge`} description={topic.descriptions[locale] || c.description} path={blogTopicPath(locale, topicId)} alternates={alternates} indexAllLocales noIndex={posts.length === 0}>
-  <header class="blog-hero blog-wrap"><a href={blogPath(locale)}>{c.title}</a><span class="blog-eyebrow"> · {c.topicLabel}</span><h1>{topic.names[locale]}</h1>{topic.descriptions[locale] && <p class="blog-lead">{topic.descriptions[locale]}</p>}</header>
-  <section class="blog-section blog-wrap" aria-label={c.latest}>{posts.length ? <BlogCards locale={locale} posts={posts} /> : <p class="blog-empty">{c.topicEmpty}</p>}</section>
+  <div class="blog-page">
+    <header class="blog-hero blog-wrap"><nav class="blog-breadcrumb" aria-label="Breadcrumb"><a href={blogPath(locale)}>← {c.backToAll}</a></nav><span class="blog-eyebrow">{c.topicLabel}</span><h1>{topic.names[locale]}</h1>{topic.descriptions[locale] && <p class="blog-lead">{topic.descriptions[locale]}</p>}</header>
+    <section class="blog-section blog-wrap" aria-label={c.latest}>{posts.length ? <BlogCards locale={locale} posts={posts} /> : <div class="blog-empty"><p>{c.topicEmpty}</p></div>}</section>
+  </div>
 </Base>
