@@ -14,7 +14,7 @@ const c = blogText(locale);
       {post.hero_image_id && <img src={`/api/blog/media/${post.hero_image_id}`} alt={post.images.find((image) => image.id === post.hero_image_id)?.alt || ''} loading="lazy" />}
       <span class="blog-card__meta">{post.topic_name || c.topicLabel} · {blogDate(post.published_at, locale)} · {readingMinutes(post.body)} {c.readTime}</span>
       <h3>{post.title}</h3>
-      <p>{post.intro}</p>
+      <p>{post.intro.length > 185 ? `${post.intro.slice(0, 182).trimEnd()}…` : post.intro}</p>
       <span class="blog-card__link">{c.read} →</span>
     </a>
   ))}
