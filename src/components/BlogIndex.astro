@@ -12,7 +12,7 @@ const [posts, topics] = await Promise.all([listPublished(locale), listTopics()])
 const visibleTopics = topics.filter((topic) => topic.names[locale]);
 const alternates = Object.fromEntries(locales.map((lang) => [lang, blogPath(lang)]));
 ---
-<Base locale={locale} title={`${c.title} — Relax Bridge`} description={c.description} path={blogPath(locale)} alternates={alternates} indexAllLocales noIndex={posts.length === 0}>
+<Base locale={locale} title={`${c.title} — Relax Bridge`} description={c.description} path={blogPath(locale)} alternates={alternates} indexAllLocales noIndex={posts.length === 0} quietBackdrop>
   <div class="blog-page">
     <header class="blog-hero blog-wrap">
       <span class="blog-eyebrow">{c.indexEyebrow}</span>

@@ -21,9 +21,10 @@ interface Props {
   contentType?: 'article' | 'website';
   publishedAt?: Date | null;
   author?: string;
+  quietBackdrop?: boolean;
 }
 
-const { locale, title, description, path, alternates, jsonLd, showMobileBooking = true, image, indexAllLocales, noIndex, contentType, publishedAt, author } = Astro.props;
+const { locale, title, description, path, alternates, jsonLd, showMobileBooking = true, image, indexAllLocales, noIndex, contentType, publishedAt, author, quietBackdrop = false } = Astro.props;
 const d = t(locale);
 const bookingHref = bookingPath(locale);
 ---
@@ -53,7 +54,7 @@ const bookingHref = bookingPath(locale);
   <body class:list={{ 'has-mobile-booking': showMobileBooking && path !== bookingHref }}>
     <a class="skip-link" href="#main">{d.accessibility.skipToContent}</a>
     <Header locale={locale} alternates={alternates} />
-    <BotanicalBackdrop />
+    {!quietBackdrop && <BotanicalBackdrop />}
     <main id="main">
       <slot />
     </main>

@@ -29,7 +29,7 @@ const hero = post.images.find((item) => item.id === post.hero_image_id);
 const extraImages = post.images.filter((item) => item.id !== post.hero_image_id);
 const videoEmbed = post.video_url ? youtubeEmbed(post.video_url) : null;
 ---
-<Base locale={locale} title={`${post.seo_title || post.title} — Relax Bridge`} description={post.seo_description || post.intro} path={path} alternates={alternates} image={image} indexAllLocales noIndex={preview} contentType="article" publishedAt={post.published_at} author={post.author} jsonLd={articleSchema}>
+<Base locale={locale} title={`${post.seo_title || post.title} — Relax Bridge`} description={post.seo_description || post.intro} path={path} alternates={alternates} image={image} indexAllLocales noIndex={preview} contentType="article" publishedAt={post.published_at} author={post.author} jsonLd={articleSchema} quietBackdrop>
   {preview && <div class="blog-preview-banner">Előnézet · nem nyilvános · <a href={`/admin/blog?post=${post.id}&locale=${locale}`}>Vissza a szerkesztőbe</a></div>}
   <article class="blog-article blog-wrap">
     <nav class="blog-breadcrumb" aria-label="Breadcrumb"><a href={blogPath(locale)}>← {c.backToAll}</a></nav>

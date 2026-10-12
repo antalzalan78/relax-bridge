@@ -51,7 +51,7 @@
 .blog-empty p{margin:0}
 .blog-preview-banner{padding:.75rem;background:var(--pine-dark);color:white;font-weight:700;text-align:center}
 .blog-preview-banner a{color:white}
-.blog-home{padding-block:clamp(3rem,6vw,5rem);border-top:1px solid var(--border)}
+.blog-home{padding-block:clamp(3rem,6vw,5rem);border-top:1px solid var(--border);border-radius:1rem;background:var(--paper)}
 .blog-home__heading{display:flex;align-items:end;justify-content:space-between;gap:1rem}
 .blog-home h2{margin:1rem 0 0;font-size:clamp(2.2rem,4vw,3.3rem)}
 .blog-home__all{display:inline-flex;flex:none;padding:.8rem 1.2rem;border:1px solid var(--pine-dark);border-radius:.8rem;color:var(--pine-dark);text-decoration:none}
