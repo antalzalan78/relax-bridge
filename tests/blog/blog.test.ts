@@ -3,6 +3,18 @@ import { readFile } from 'node:fs/promises';
 import { test } from 'node:test';
 import { PGlite } from '@electric-sql/pglite';
 import { parseBlogBody, readingMinutes, youtubeEmbed } from '../../src/lib/blog.ts';
+import { readBlogJsonArray, readBlogJsonObject } from '../../src/lib/server/blog-json.ts';
+
+test('blog JSON reader restores legacy encoded metadata without silently dropping it', () => {
+  const images = [{ id: 'image-1', alt: 'History', caption: '', credit: '' }];
+  const sources = [{ title: 'Museum', url: 'https://example.com' }];
+  assert.deepEqual(readBlogJsonArray(images), images);
+  assert.deepEqual(readBlogJsonArray(JSON.stringify(images)), images);
+  assert.deepEqual(readBlogJsonArray(JSON.stringify(JSON.stringify(sources))), sources);
+  assert.deepEqual(readBlogJsonObject(JSON.stringify({ hu: 'Masszázstörténet' })), { hu: 'Masszázstörténet' });
+  assert.throws(() => readBlogJsonArray('{bad json'), /Invalid stored blog JSON/);
+  assert.throws(() => readBlogJsonArray('{}'), /Invalid stored blog list/);
+});
 
 test('blog migration creates three unpublished title drafts and remains idempotent', async () => {
   const db = new PGlite();
