@@ -1,7 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import type { Locale } from '../../data/site';
-import { getDatabase } from './db';
+import { getDatabase, type Database } from './db';
+import { readBlogJsonArray, readBlogJsonObject } from './blog-json';
 import schema from '../../../db/migrations/0010_blog.sql?raw';
+
+type JsonParameter = Parameters<Database['json']>[0];
 
 export type BlogTopic = { id: string; names: Record<Locale, string>; descriptions: Record<Locale, string> };
 export type BlogImage = { id: string; alt: string; caption: string; credit: string };
@@ -34,10 +37,14 @@ export function ensureBlogSchema(): Promise<void> {
 }
 
 const castTopic = (row: any): BlogTopic => ({
-  id: row.id, names: row.names || {}, descriptions: row.descriptions || {},
+  id: row.id,
+  names: readBlogJsonObject<Record<Locale, string>>(row.names),
+  descriptions: readBlogJsonObject<Record<Locale, string>>(row.descriptions),
 });
 const castPost = (row: any): BlogPost => ({
-  ...row, images: row.images || [], sources: row.sources || [],
+  ...row,
+  images: readBlogJsonArray<BlogImage>(row.images),
+  sources: readBlogJsonArray<BlogSource>(row.sources),
 });
 
 export async function listTopics(): Promise<BlogTopic[]> {
@@ -133,9 +140,10 @@ export async function getSeries(post: BlogPost): Promise<BlogPost[]> {
 export async function saveTopic(id: string | null, newKey: string, names: Record<Locale, string>, descriptions: Record<Locale, string>) {
   await ensureBlogSchema();
   const topicId = id || newKey;
-  await getDatabase()`
+  const db = getDatabase();
+  await db`
     INSERT INTO blog_topics (id, names, descriptions) VALUES
-      (${topicId}, ${JSON.stringify(names)}::jsonb, ${JSON.stringify(descriptions)}::jsonb)
+      (${topicId}, ${db.json(names as JsonParameter)}, ${db.json(descriptions as JsonParameter)})
     ON CONFLICT (id) DO UPDATE SET names = EXCLUDED.names,
       descriptions = EXCLUDED.descriptions, updated_at = now()
   `;
@@ -160,8 +168,8 @@ export async function savePost(post: BlogPost): Promise<void> {
       ) VALUES (
         ${post.id}, ${post.locale}, ${post.slug}, ${post.title}, ${post.intro}, ${post.body},
         ${post.author}, ${post.status}, ${post.published_at}, ${post.seo_title}, ${post.seo_description},
-        ${post.hero_image_id}, ${JSON.stringify(post.images)}::jsonb,
-        ${JSON.stringify(post.sources)}::jsonb, ${post.music_text}, ${post.music_url},
+        ${post.hero_image_id}, ${tx.json(post.images as JsonParameter)},
+        ${tx.json(post.sources as JsonParameter)}, ${post.music_text}, ${post.music_url},
         ${post.video_url}, ${post.series_name}, ${post.cta_label}, ${post.cta_url}
       ) ON CONFLICT (post_id, locale) DO UPDATE SET
         slug = EXCLUDED.slug, title = EXCLUDED.title, intro = EXCLUDED.intro,
@@ -191,10 +199,13 @@ export async function getImage(id: string): Promise<{ mime_type: string; bytes: 
 
 export async function isImagePublic(id: string): Promise<boolean> {
   await ensureBlogSchema();
-  const rows = await getDatabase()`
+  const db = getDatabase();
+  const rows = await db`
     SELECT 1 FROM blog_translations
     WHERE status = 'published' AND published_at <= now()
-      AND (hero_image_id = ${id} OR images @> ${JSON.stringify([{ id }])}::jsonb)
+      AND (hero_image_id = ${id} OR
+        (CASE WHEN jsonb_typeof(images) = 'string' THEN (images #>> '{}')::jsonb ELSE images END)
+          @> ${db.json([{ id }])})
     LIMIT 1
   `;
   return rows.length > 0;
