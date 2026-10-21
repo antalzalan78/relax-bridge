@@ -1,6 +1,5 @@
 ---
 import Base from '../layouts/Base.astro';
-import BlogCards from './BlogCards.astro';
 import BlogVisual from './BlogVisual.astro';
 import { blogPath, blogTopicPath, locales, type Locale } from '../data/site';
 import { blogText } from '../i18n/blog';
@@ -9,7 +8,7 @@ import '../styles/blog.css';
 interface Props { locale: Locale }
 const { locale } = Astro.props;
 const c = blogText(locale);
-const [posts, topics] = await Promise.all([listPublished(locale), listTopics()]);
+const [publishedPosts, topics] = await Promise.all([listPublished(locale, undefined, 1), listTopics()]);
 const starterTopicOrder = ['massage-history', 'everyday-rest', 'preparing-for-massage'];
 const visibleTopics = topics.filter((topic) => topic.names[locale]).sort((a, b) => {
   const aOrder = starterTopicOrder.indexOf(a.id);
@@ -18,7 +17,7 @@ const visibleTopics = topics.filter((topic) => topic.names[locale]).sort((a, b) 
 });
 const alternates = Object.fromEntries(locales.map((lang) => [lang, blogPath(lang)]));
 ---
-<Base locale={locale} title={`${c.title} — Relax Bridge`} description={c.description} path={blogPath(locale)} alternates={alternates} indexAllLocales noIndex={posts.length === 0} quietBackdrop>
+<Base locale={locale} title={`${c.title} — Relax Bridge`} description={c.description} path={blogPath(locale)} alternates={alternates} indexAllLocales noIndex={publishedPosts.length === 0} quietBackdrop>
   <div class="blog-page">
     <header class="blog-hero blog-wrap">
       <span class="blog-eyebrow">{c.indexEyebrow}</span>
@@ -34,8 +33,5 @@ const alternates = Object.fromEntries(locales.map((lang) => [lang, blogPath(lang
         </a>)}
       </div>
     </nav>}
-    <section class="blog-section blog-wrap" aria-label={c.latest}>
-      {posts.length ? <BlogCards locale={locale} posts={posts} /> : <div class="blog-empty"><p>{c.empty}</p></div>}
-    </section>
   </div>
 </Base>
