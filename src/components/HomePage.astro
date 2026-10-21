@@ -1,7 +1,6 @@
 ---
 import {
   bookingPath,
-  blogPath,
   massageCreatorPath,
   questionnairePath,
   site,
@@ -22,10 +21,6 @@ import greenTowelTexture from '../assets/towel-green-section.png';
 import approvedLogoWatermark from '../assets/logo-watermark-approved.png';
 import Base from '../layouts/Base.astro';
 import WaveDivider from './WaveDivider.astro';
-import BlogCards from './BlogCards.astro';
-import { blogText } from '../i18n/blog';
-import { listPublished, type BlogPost } from '../lib/server/blog';
-import '../styles/blog.css';
 
 interface Props {
   locale: Locale;
@@ -50,13 +45,6 @@ const jsonLd = [
   localBusinessSchema(locale, d.meta.description),
   faqSchema(d.goodToKnow.items),
 ];
-let latestPosts: BlogPost[] = [];
-try {
-  latestPosts = await listPublished(locale, undefined, 3);
-} catch (error) {
-  console.error('Blog teaser unavailable:', error);
-}
-const blogCopy = blogText(locale);
 ---
 
 <Base
@@ -132,18 +120,6 @@ const blogCopy = blogText(locale);
   <div class="wrap">
     <WaveDivider />
   </div>
-
-  {latestPosts.length > 0 && <section class="blog-home blog-wrap" aria-labelledby="home-blog-heading">
-    <div class="blog-home__heading">
-      <div>
-        <span class="blog-eyebrow">{blogCopy.homeEyebrow}</span>
-        <h2 id="home-blog-heading">{blogCopy.homeTitle}</h2>
-      </div>
-      <a class="blog-home__all" href={blogPath(locale)}>{blogCopy.homeLink} →</a>
-    </div>
-    <p class="blog-home__intro">{blogCopy.homeIntro}</p>
-    <BlogCards locale={locale} posts={latestPosts} />
-  </section>}
 
   <section class="section location-section location-section--studio" id={anchors.services}>
     <div class="wrap">
