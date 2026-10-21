@@ -20,8 +20,13 @@ test('blog migration creates three unpublished title drafts and remains idempote
   const db = new PGlite();
   try {
     const migration = await readFile(new URL('../../db/migrations/0010_blog.sql', import.meta.url), 'utf8');
+    const coversMigration = await readFile(new URL('../../db/migrations/0011_blog_topic_covers.sql', import.meta.url), 'utf8');
     await db.exec(migration);
     await db.exec(migration);
+    await db.exec(coversMigration);
+    await db.exec(coversMigration);
+    const covers = await db.query<{ cover_image_id: string | null }>("SELECT cover_image_id FROM blog_topics WHERE id = 'massage-history'");
+    assert.equal(covers.rows[0]?.cover_image_id, null);
     const posts = await db.query<{ status: string; locale: string; title: string }>('SELECT status, locale, title FROM blog_translations ORDER BY post_id');
     assert.equal(posts.rows.length, 3);
     assert.ok(posts.rows.every((row) => row.status === 'draft' && row.locale === 'hu'));

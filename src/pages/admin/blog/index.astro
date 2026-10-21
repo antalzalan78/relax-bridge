@@ -4,7 +4,7 @@ import sharp from 'sharp';
 import AdminHeader from '../../../components/AdminHeader.astro';
 import { blogArticlePath, type Locale } from '../../../data/site';
 import { getAdminSession } from '../../../lib/server/admin-auth';
-import { getAdminPost, getPostMeta, listAdminPosts, listTopics, saveImage, savePost, saveTopic, type BlogImage, type BlogPost, type BlogSource } from '../../../lib/server/blog';
+import { getAdminPost, getPostMeta, listAdminPosts, listTopics, saveImage, savePost, saveTopic, topicCoverUrl, type BlogImage, type BlogPost, type BlogSource } from '../../../lib/server/blog';
 import { isSafeExternalUrl, youtubeEmbed } from '../../../lib/blog';
 import { assertSameOrigin } from '../../../lib/server/security';
 import '../../../styles/global.css';
@@ -19,10 +19,10 @@ let success = Astro.url.searchParams.get('saved') === '1' ? 'Mentve.' : '';
 
 const str = (form: FormData, key: string) => String(form.get(key) || '').trim();
 const slugify = (value: string) => value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 100);
-const upload = async (file: FormDataEntryValue | null): Promise<string | null> => {
+const upload = async (file: FormDataEntryValue | null, topicCover = false): Promise<string | null> => {
   if (!(file instanceof File) || !file.size) return null;
   if (file.size > 2_000_000 || !['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) throw new Error('A kép JPG, PNG vagy WebP legyen, legfeljebb 2 MB.');
-  const bytes = await sharp(Buffer.from(await file.arrayBuffer())).rotate().resize({ width: 1600, height: 1200, fit: 'inside', withoutEnlargement: true }).webp({ quality: 78 }).toBuffer();
+  const bytes = await sharp(Buffer.from(await file.arrayBuffer())).rotate().resize(topicCover ? { width: 1800, height: 600, fit: 'cover' } : { width: 1600, height: 1200, fit: 'inside', withoutEnlargement: true }).webp({ quality: 78 }).toBuffer();
   if (bytes.length > 1_500_000) throw new Error('A feldolgozott kép túl nagy.');
   return saveImage(bytes);
 };
@@ -39,7 +39,11 @@ if (Astro.request.method === 'POST') {
       if (!Object.values(names).some(Boolean)) throw new Error('Adj meg legalább egy témanevet.');
       const topicKey = slugify(str(form, 'topic_slug') || names.nl || names.hu);
       if (!id && (!topicKey || (await listTopics()).some((topic) => topic.id === topicKey))) throw new Error('Adj egyedi webcím-részletet az új témának.');
-      await saveTopic(id, topicKey, names, descriptions);
+      const existingTopic = id ? (await listTopics()).find((topic) => topic.id === id) : null;
+      if (id && !existingTopic) throw new Error('A téma nem található.');
+      const uploadedCover = await upload(form.get('topic_cover_upload'), true);
+      const coverImageId = uploadedCover || (form.has('remove_topic_cover') ? null : existingTopic?.cover_image_id || null);
+      await saveTopic(id, topicKey, names, descriptions, coverImageId);
       return Astro.redirect('/admin/blog?saved=1', 303);
     }
     if (intent !== 'post') throw new Error('Ismeretlen művelet.');
@@ -143,11 +147,12 @@ const topicEdit = topics.find((topic) => topic.id === currentTopic);
         <div class="admin-form__row"><label>Állapot<select name="status"><option value="draft" selected={selected?.status !== 'published'}>Piszkozat</option><option value="published" selected={selected?.status === 'published'}>Közzétéve</option></select></label><label>Megjelenési dátum<input type="date" name="published_at" value={selected?.published_at?.toISOString().slice(0,10) || ''} /></label></div><button class="admin-button" type="submit">Cikk mentése</button>
       </form></section>}
     <section class="admin-panel"><h2>Témák</h2><p>Az induló témák magyar munkanevei adottak. A végleges holland és angol nevet itt adhatod meg. Nyilvánosan csak olyan téma jelenik meg, amelyhez az adott nyelven közzétett cikk tartozik.</p><div class="topic-links">{topics.map((topic) => <a href={`/admin/blog?topic=${topic.id}`}>{topic.names.hu || topic.names.nl || topic.id}</a>)}<a href="/admin/blog?topic=new">+ Új téma</a></div>
-      {currentTopic && <form method="post" class="admin-form"><input type="hidden" name="intent" value="topic" /><input type="hidden" name="topic_id" value={topicEdit?.id || ''} />{topicEdit ? <p>Webcím-részlet: <code>{topicEdit.id}</code> (változatlan marad)</p> : <label>Új téma webcím-részlete<input name="topic_slug" placeholder="automatikus a holland vagy magyar névből" /></label>}{(['nl','en','hu'] as const).map((lang) => <div class="admin-form__row"><label>{lang.toUpperCase()} témaneve<input name={`name_${lang}`} value={topicEdit?.names[lang] || ''} maxlength="120" /></label><label>{lang.toUpperCase()} leírása<input name={`description_${lang}`} value={topicEdit?.descriptions[lang] || ''} maxlength="400" /></label></div>)}<button class="admin-button" type="submit">Téma mentése</button></form>}
+      {currentTopic && <form method="post" enctype="multipart/form-data" class="admin-form"><input type="hidden" name="intent" value="topic" /><input type="hidden" name="topic_id" value={topicEdit?.id || ''} />{topicEdit ? <p>Webcím-részlet: <code>{topicEdit.id}</code> (változatlan marad)</p> : <label>Új téma webcím-részlete<input name="topic_slug" placeholder="automatikus a holland vagy magyar névből" /></label>}{(['nl','en','hu'] as const).map((lang) => <div class="admin-form__row"><label>{lang.toUpperCase()} témaneve<input name={`name_${lang}`} value={topicEdit?.names[lang] || ''} maxlength="120" /></label><label>{lang.toUpperCase()} leírása<input name={`description_${lang}`} value={topicEdit?.descriptions[lang] || ''} maxlength="400" /></label></div>)}<label>Közös témakép (JPG/PNG/WebP, max. 2 MB, 3:1 arány)<input type="file" name="topic_cover_upload" accept="image/jpeg,image/png,image/webp" /></label>{topicEdit && topicCoverUrl(topicEdit) && <><img class="admin-topic-cover" src={topicCoverUrl(topicEdit)} alt="" />{topicEdit.cover_image_id && <label class="admin-check"><input type="checkbox" name="remove_topic_cover" /> Feltöltött témakép eltávolítása</label>}</>}<p>Ugyanez a kép látszik a témaoldalon és minden nyelvi változat témakártyáján.</p><button class="admin-button" type="submit">Téma mentése</button></form>}
     </section>
   </div></div>
 </main></body></html>
 
 <style>
+.admin-topic-cover{display:block;width:min(100%,36rem);aspect-ratio:3/1;object-fit:cover;border:1px solid var(--border);border-radius:.6rem}
 .blog-admin{width:min(94vw,85rem);margin:2.5rem auto 5rem}.blog-admin__head{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:2rem}.blog-admin h1{font-family:Georgia,serif;font-size:clamp(2.5rem,5vw,4rem);margin:.2rem 0}.blog-admin p{color:var(--ink-soft);line-height:1.55}.blog-admin__layout{display:grid;grid-template-columns:minmax(13rem,20rem) minmax(0,1fr);gap:1.5rem}.blog-admin__side,.admin-panel{border:1px solid var(--border);border-radius:1.5rem;background:var(--surface);padding:1.5rem}.blog-admin__side h2,.admin-panel h2{font-family:Georgia,serif;margin-top:0}.blog-admin__side ul{list-style:none;margin:0;padding:0}.blog-admin__side li{border-top:1px solid var(--border)}.blog-admin__side a{display:block;padding:.7rem 0;color:var(--ink);text-decoration:none}.blog-admin__side a:hover{color:var(--clay-dark)}.blog-admin__side small{display:block;color:var(--ink-soft);margin-top:.25rem}.blog-admin__main{display:grid;gap:1.5rem}.blog-admin__tabs{display:flex;justify-content:space-between;gap:1rem;align-items:center}.blog-admin__tabs nav,.topic-links{display:flex;flex-wrap:wrap;gap:.6rem}.blog-admin__tabs a,.topic-links a{display:inline-block;border:1px solid var(--border);border-radius:999px;padding:.35rem .7rem;text-decoration:none;color:var(--pine-dark)}.blog-admin__tabs a[aria-current=page]{background:var(--pine-soft)}.admin-form{display:grid;gap:1.1rem;margin-top:1.5rem}.admin-form__row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.admin-form label{display:grid;gap:.4rem;color:var(--pine-dark);font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em}.admin-form input,.admin-form textarea,.admin-form select{width:100%;border:1px solid var(--border);border-radius:.5rem;padding:.7rem;background:white;color:var(--ink);font:inherit;font-size:1rem;letter-spacing:normal;text-transform:none}.admin-form textarea{resize:vertical}.admin-form details{border:1px solid var(--border);border-radius:.75rem;padding:1rem}.admin-form details[open]{display:grid;gap:1rem}.admin-form summary{color:var(--ink);font-weight:750;cursor:pointer}.field-hint{color:var(--ink-soft);font-size:.75rem;letter-spacing:normal;text-transform:none;font-weight:400}.admin-button{display:inline-block;width:fit-content;border:0;border-radius:999px;background:var(--clay);color:white;padding:.8rem 1.25rem;text-decoration:none;cursor:pointer;font:inherit;font-weight:750}.admin-alert,.admin-success{padding:1rem;border-radius:.6rem}.admin-alert{background:#f8ded9;color:#7b2717!important}.admin-success{background:var(--pine-soft);color:var(--pine-dark)!important}.admin-thumb{max-width:12rem;max-height:8rem;object-fit:cover;border-radius:.4rem}.admin-form .admin-check{display:flex;align-items:center;flex-direction:row;text-transform:none;letter-spacing:normal}.admin-check input{width:auto}@media(max-width:48rem){.blog-admin__layout{grid-template-columns:1fr}.admin-form__row{grid-template-columns:1fr}.blog-admin__head{align-items:start}.blog-admin__side{max-height:17rem;overflow:auto}}
 </style>

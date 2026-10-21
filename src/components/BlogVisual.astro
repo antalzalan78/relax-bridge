@@ -4,13 +4,14 @@ interface Props {
   image?: string;
   alt?: string;
   large?: boolean;
+  topicCover?: boolean;
 }
 
-const { topicId, image, alt = '', large = false } = Astro.props;
+const { topicId, image, alt = '', large = false, topicCover = false } = Astro.props;
 const motif = topicId === 'massage-history' ? 'book' : topicId === 'preparing-for-massage' ? 'leaf' : topicId === 'everyday-rest' ? 'home' : 'leaf';
 ---
 
-<div class:list={['blog-visual', `blog-visual--${motif}`, { 'blog-visual--large': large, 'blog-visual--image': !!image }]}>
+<div class:list={['blog-visual', `blog-visual--${motif}`, { 'blog-visual--large': large, 'blog-visual--image': !!image, 'blog-visual--topic-cover': topicCover }]}>
   {image ? <img src={image} alt={alt} loading={large ? 'eager' : 'lazy'} /> : (
     <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
       {motif === 'book' ? (

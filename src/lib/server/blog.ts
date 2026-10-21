@@ -3,10 +3,37 @@ import type { Locale } from '../../data/site';
 import { getDatabase, type Database } from './db';
 import { readBlogJsonArray, readBlogJsonObject } from './blog-json';
 import schema from '../../../db/migrations/0010_blog.sql?raw';
+import topicCoverSchema from '../../../db/migrations/0011_blog_topic_covers.sql?raw';
 
 type JsonParameter = Parameters<Database['json']>[0];
 
-export type BlogTopic = { id: string; names: Record<Locale, string>; descriptions: Record<Locale, string> };
+export type BlogTopic = { id: string; names: Record<Locale, string>; descriptions: Record<Locale, string>; cover_image_id: string | null };
+const starterTopicCovers: Record<string, string> = {
+  'massage-history': '/blog/topics/massage-history.jpg',
+  'everyday-rest': '/blog/topics/everyday-rest.jpg',
+  'preparing-for-massage': '/blog/topics/preparing-for-massage.jpg',
+};
+export const topicCoverUrl = (topic: BlogTopic): string | undefined =>
+  topic.cover_image_id ? `/api/blog/media/${topic.cover_image_id}` : starterTopicCovers[topic.id];
+const starterTopicDescriptions: Record<string, Record<Locale, string>> = {
+  'massage-history': {
+    hu: 'Régi ábrázolások, írott emlékek és érdekes történetek nyomán fedezzük fel a masszázs múltját. Ismerd meg, mit mesélnek a fennmaradt források!',
+    nl: 'Aan de hand van oude afbeeldingen, geschreven bronnen en bijzondere verhalen ontdekken we de geschiedenis van massage. Lees wat bewaard gebleven bronnen ons vertellen.',
+    en: 'Explore the history of massage through ancient images, written records and fascinating stories. Discover what the surviving sources tell us.',
+  },
+  'everyday-rest': {
+    hu: 'Zene, illatok és apró szokások, amelyek helyet adhatnak a pihenésnek. Kutatási érdekességek és ötletek a nyugodtabb hétköznapokhoz.',
+    nl: 'Muziek, geuren en kleine gewoontes die ruimte kunnen maken voor rust. Interessante inzichten uit onderzoek en ideeën voor ontspannen dagen.',
+    en: 'Music, scents and small habits that can make room for rest. Research insights and ideas for calmer everyday life.',
+  },
+  'preparing-for-massage': {
+    hu: 'Egyszerű tudnivalók a kezelés kiválasztásától az érkezésig. Hasznos tanácsok, hogy felkészülten és nyugodtan érkezhess a masszázsra.',
+    nl: 'Van het kiezen van een behandeling tot je aankomst: eenvoudige informatie en praktische tips om goed voorbereid en ontspannen naar je massage te komen.',
+    en: 'From choosing a treatment to arriving for your appointment: simple information and practical tips to help you feel prepared and at ease.',
+  },
+};
+export const topicDescription = (topic: BlogTopic, locale: Locale): string =>
+  topic.descriptions[locale] || starterTopicDescriptions[topic.id]?.[locale] || '';
 export type BlogImage = { id: string; alt: string; caption: string; credit: string };
 export type BlogSource = { title: string; url: string };
 export type BlogPost = {
@@ -24,12 +51,17 @@ export function ensureBlogSchema(): Promise<void> {
   if (!initialized) {
     initialized = (async () => {
       const db = getDatabase();
-      const check = await db`SELECT to_regclass('public.blog_topics') AS existing`;
-      if (check[0]?.existing) return;
+      const check = await db`
+        SELECT to_regclass('public.blog_topics') AS existing,
+          EXISTS (SELECT 1 FROM information_schema.columns
+            WHERE table_schema = 'public' AND table_name = 'blog_topics' AND column_name = 'cover_image_id') AS has_cover
+      `;
+      if (check[0]?.existing && check[0]?.has_cover) return;
       await db.begin(async (tx) => {
         await tx`SELECT pg_advisory_xact_lock(793431036)`;
         const second = await tx`SELECT to_regclass('public.blog_topics') AS existing`;
         if (!second[0]?.existing) await tx.unsafe(schema);
+        await tx.unsafe(topicCoverSchema);
       });
     })().catch((error) => { initialized = undefined; throw error; });
   }
@@ -40,6 +72,7 @@ const castTopic = (row: any): BlogTopic => ({
   id: row.id,
   names: readBlogJsonObject<Record<Locale, string>>(row.names),
   descriptions: readBlogJsonObject<Record<Locale, string>>(row.descriptions),
+  cover_image_id: row.cover_image_id || null,
 });
 const castPost = (row: any): BlogPost => ({
   ...row,
@@ -137,15 +170,15 @@ export async function getSeries(post: BlogPost): Promise<BlogPost[]> {
   return rows.map(castPost);
 }
 
-export async function saveTopic(id: string | null, newKey: string, names: Record<Locale, string>, descriptions: Record<Locale, string>) {
+export async function saveTopic(id: string | null, newKey: string, names: Record<Locale, string>, descriptions: Record<Locale, string>, coverImageId: string | null) {
   await ensureBlogSchema();
   const topicId = id || newKey;
   const db = getDatabase();
   await db`
-    INSERT INTO blog_topics (id, names, descriptions) VALUES
-      (${topicId}, ${db.json(names as JsonParameter)}, ${db.json(descriptions as JsonParameter)})
+    INSERT INTO blog_topics (id, names, descriptions, cover_image_id) VALUES
+      (${topicId}, ${db.json(names as JsonParameter)}, ${db.json(descriptions as JsonParameter)}, ${coverImageId})
     ON CONFLICT (id) DO UPDATE SET names = EXCLUDED.names,
-      descriptions = EXCLUDED.descriptions, updated_at = now()
+      descriptions = EXCLUDED.descriptions, cover_image_id = EXCLUDED.cover_image_id, updated_at = now()
   `;
   return topicId;
 }
@@ -200,6 +233,12 @@ export async function getImage(id: string): Promise<{ mime_type: string; bytes: 
 export async function isImagePublic(id: string): Promise<boolean> {
   await ensureBlogSchema();
   const db = getDatabase();
+  const topicRows = await db`
+    SELECT 1 FROM blog_topics topic
+    WHERE topic.cover_image_id = ${id} AND topic.names <> '{}'::jsonb
+    LIMIT 1
+  `;
+  if (topicRows.length) return true;
   const rows = await db`
     SELECT 1 FROM blog_translations
     WHERE status = 'published' AND published_at <= now()

@@ -1,15 +1,21 @@
 ---
 import Base from '../layouts/Base.astro';
 import BlogCards from './BlogCards.astro';
+import BlogVisual from './BlogVisual.astro';
 import { blogPath, blogTopicPath, locales, type Locale } from '../data/site';
 import { blogText } from '../i18n/blog';
-import { listPublished, listTopics } from '../lib/server/blog';
+import { listPublished, listTopics, topicCoverUrl, topicDescription } from '../lib/server/blog';
 import '../styles/blog.css';
 interface Props { locale: Locale }
 const { locale } = Astro.props;
 const c = blogText(locale);
 const [posts, topics] = await Promise.all([listPublished(locale), listTopics()]);
-const visibleTopics = topics.filter((topic) => topic.names[locale]);
+const starterTopicOrder = ['massage-history', 'everyday-rest', 'preparing-for-massage'];
+const visibleTopics = topics.filter((topic) => topic.names[locale]).sort((a, b) => {
+  const aOrder = starterTopicOrder.indexOf(a.id);
+  const bOrder = starterTopicOrder.indexOf(b.id);
+  return (aOrder < 0 ? starterTopicOrder.length : aOrder) - (bOrder < 0 ? starterTopicOrder.length : bOrder);
+});
 const alternates = Object.fromEntries(locales.map((lang) => [lang, blogPath(lang)]));
 ---
 <Base locale={locale} title={`${c.title} — Relax Bridge`} description={c.description} path={blogPath(locale)} alternates={alternates} indexAllLocales noIndex={posts.length === 0} quietBackdrop>
@@ -20,8 +26,13 @@ const alternates = Object.fromEntries(locales.map((lang) => [lang, blogPath(lang
       <p class="blog-lead">{c.description}</p>
     </header>
     {visibleTopics.length > 0 && <nav class="blog-topics blog-wrap" aria-label={c.topics}>
-      <span class="blog-topics__label">{c.topics}</span>
-      {visibleTopics.map((topic) => <a href={blogTopicPath(locale, topic.id)}>{topic.names[locale]} →</a>)}
+      <h2 class="blog-topics__label">{c.topics}</h2>
+      <div class="blog-topics__grid">
+        {visibleTopics.map((topic) => <a class="blog-topic-card" href={blogTopicPath(locale, topic.id)}>
+          <BlogVisual topicId={topic.id} image={topicCoverUrl(topic)} topicCover />
+          <span class="blog-topic-card__body"><strong>{topic.names[locale]}</strong>{topicDescription(topic, locale) && <span>{topicDescription(topic, locale)}</span>}<span class="blog-topic-card__arrow" aria-hidden="true">→</span></span>
+        </a>)}
+      </div>
     </nav>}
     <section class="blog-section blog-wrap" aria-label={c.latest}>
       {posts.length ? <BlogCards locale={locale} posts={posts} /> : <div class="blog-empty"><p>{c.empty}</p></div>}
