@@ -3,6 +3,7 @@ import AdminHeader from '../../components/AdminHeader.astro';
 import { campaignChannel } from '../../lib/analytics/attribution';
 import { getAdminSession } from '../../lib/server/admin-auth';
 import {
+  getBlogArticleTrafficSummary,
   getConfirmedBookingCountLast30Days,
   getWebsiteJourneySummary,
   getWebsiteTrafficSummary,
@@ -14,11 +15,13 @@ export const prerender = false;
 const session = await getAdminSession(Astro.cookies);
 if (!session) return Astro.redirect('/admin/login');
 
-const [summary, journey, confirmedBookings] = await Promise.all([
+const [summary, journey, confirmedBookings, blogArticles] = await Promise.all([
   getWebsiteTrafficSummary(),
   getWebsiteJourneySummary(),
   getConfirmedBookingCountLast30Days(),
+  getBlogArticleTrafficSummary(),
 ]);
+const blogPageViews = blogArticles.reduce((total, article) => total + article.pageViews30, 0);
 const maxDaily = Math.max(1, ...summary.daily.map((item) => item.count));
 const percentage = (count: number) => summary.last30Days
   ? Math.round((count / summary.last30Days) * 100)
@@ -54,6 +57,8 @@ const journeyPageNames: Record<string, string> = {
   'booking-success': 'Sikeres foglalás',
   'studio-visit': 'Studio Visit',
   'massage-creator': 'Massage Creator',
+  blog: 'Blog',
+  'blog-article': 'Blogcikk',
   'studio-relax': 'Relaxmasszázs',
   'studio-back': 'Nyak–váll–hátmasszázs',
   'studio-face': 'Arcmasszázs',
@@ -140,6 +145,35 @@ const campaignContentLabel = (value: string) => ({
             </ol>
           ) : <p class="journey-empty">Még nincs útvonaladat.</p>}
         </div>
+      </section>
+
+      <section class="journey-card" id="blog-articles" aria-labelledby="blog-articles-title">
+        <span class="section-kicker">Blogcikkek · utolsó 30 nap</span>
+        <h2 id="blog-articles-title">Mely cikkeket nyitják meg?</h2>
+        <p class="card-note">A három nyelvi változat egy cikkként szerepel; a nyelvenkénti megnyitások külön is látszanak. Csak a közzétett cikkoldalak megnyitásait számoljuk, a témák és a blog főoldala nélkül.</p>
+        <div class="blog-traffic-total"><strong>{blogPageViews}</strong><span>mért cikkoldal-megnyitás az elmúlt 30 napban</span></div>
+        <div class="campaign-scroll" tabindex="0" role="region" aria-label="Cikkek látogatottsága">
+          <table class="campaign-table blog-traffic-table">
+            <thead><tr>
+              <th scope="col">Cikk</th><th scope="col">Megnyitás · 30 nap</th>
+              <th scope="col">Munkamenet · 30 nap</th><th scope="col">Megnyitás · 7 nap</th>
+              <th scope="col">Nyelvek · 30 nap</th>
+            </tr></thead>
+            <tbody>
+              {blogArticles.map((article) => (
+                <tr>
+                  <th scope="row"><a href={`/admin/blog?post=${encodeURIComponent(article.id)}&locale=${article.editorLocale}`}>{article.title}</a></th>
+                  <td>{article.pageViews30}</td>
+                  <td>{article.sessions30}</td>
+                  <td>{article.pageViews7}</td>
+                  <td><span class="blog-language-count">NL {article.locales.nl}</span><span class="blog-language-count">EN {article.locales.en}</span><span class="blog-language-count">HU {article.locales.hu}</span></td>
+                </tr>
+              ))}
+              {!blogArticles.length && <tr><td colspan="5">Még nincs cikk az adminban.</td></tr>}
+            </tbody>
+          </table>
+        </div>
+        <p class="journey-coverage">A megnyitás minden betöltést számol, az anonim munkamenet ugyanazon cikk többszöri megnyitását egyszer. Nem azonosít külön embereket. A mérés csak az élesítéstől gyűlik, legfeljebb az elmúlt 30 napra; a követés tiltása és a technikai blokkolás miatt a számok nem feltétlenül teljesek.</p>
       </section>
 
       <section class="journey-card" aria-labelledby="campaign-title">
@@ -311,6 +345,12 @@ const campaignContentLabel = (value: string) => ({
   .campaign-table tbody th { max-width: 21rem; overflow-wrap: anywhere; }
   .campaign-table td { max-width: 15rem; overflow-wrap: anywhere; }
   .campaign-table small { display: block; margin-top: 0.35rem; color: var(--ink-soft); font-weight: 400; line-height: 1.5; }
+  .blog-traffic-total { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.6rem; margin: 1.1rem 0 1.4rem; color: var(--pine-dark); }
+  .blog-traffic-total strong { font-family: 'Iowan Old Style', Georgia, serif; font-size: 2.7rem; line-height: 1; }
+  .blog-traffic-total span { color: var(--ink-soft); font-size: 0.8rem; }
+  .blog-traffic-table th:first-child { min-width: 16rem; }
+  .blog-traffic-table th a { color: var(--pine-dark); text-decoration: underline; text-underline-offset: 0.2rem; }
+  .blog-language-count { display: inline-block; margin-right: 0.55rem; white-space: nowrap; }
   .journey-metrics { display: grid; gap: 0.75rem; margin-top: 1.5rem; }
   .journey-metrics article { display: flex; min-height: 9rem; flex-direction: column; justify-content: space-between; gap: 0.5rem; padding: 1.15rem; border-radius: var(--radius); background: var(--pine-soft); }
   .journey-metrics article > span { color: var(--pine-dark); font-size: 0.7rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }

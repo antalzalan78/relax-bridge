@@ -1,9 +1,10 @@
 import type { APIRoute } from 'astro';
 import { z } from 'zod';
-import { journeyPageKey } from '../../lib/analytics/journey';
+import { blogArticleRoute, journeyPageKey } from '../../lib/analytics/journey';
 import { normalizeTrafficSource } from '../../lib/analytics/model';
 import { normalizeCampaign } from '../../lib/analytics/attribution';
 import { consumeRateLimit } from '../../lib/server/booking-repository';
+import { getPublishedArticleId } from '../../lib/server/blog';
 import { recordWebsiteJourneyEvent } from '../../lib/server/website-analytics-repository';
 import { assertSameOrigin, readJson, requestFingerprint } from '../../lib/server/security';
 
@@ -34,8 +35,9 @@ export const POST: APIRoute = async ({ request }) => {
     if (!parsed.success) {
       return Response.json({ error: 'invalid_request' }, { status: 400 });
     }
-    const pageKey = journeyPageKey(parsed.data.pagePath);
-    if (!pageKey) return new Response(null, { status: 204 });
+    const knownPageKey = journeyPageKey(parsed.data.pagePath);
+    const articleRoute = knownPageKey ? null : blogArticleRoute(parsed.data.pagePath);
+    if (!knownPageKey && !articleRoute) return new Response(null, { status: 204 });
 
     const allowed = await consumeRateLimit({
       key: requestFingerprint(request, 'website-journey'),
@@ -44,10 +46,17 @@ export const POST: APIRoute = async ({ request }) => {
     });
     if (!allowed) return new Response(null, { status: 204 });
 
+    const articleId = articleRoute
+      ? await getPublishedArticleId(articleRoute.locale, articleRoute.slug)
+      : null;
+    if (articleRoute && !articleId) return new Response(null, { status: 204 });
+
     await recordWebsiteJourneyEvent({
       sessionId: parsed.data.sessionId,
       eventType: parsed.data.eventType,
-      pageKey,
+      pageKey: articleId ? 'blog-article' : knownPageKey!,
+      articleId,
+      articleLocale: articleId ? articleRoute?.locale : null,
       ...normalizeCampaign(parsed.data),
       source: normalizeTrafficSource({
         utmSource: parsed.data.utmSource,

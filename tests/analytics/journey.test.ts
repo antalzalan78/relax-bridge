@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
+  blogArticleRoute,
   isBookingDestination,
   journeyPageKey,
   summarizeJourneySessions,
@@ -23,6 +24,17 @@ test('does not retain arbitrary or administrative paths', () => {
   assert.equal(journeyPageKey('/api/bookings'), null);
   assert.equal(journeyPageKey('/customer/private-value'), null);
   assert.equal(journeyPageKey('//external.example/path'), null);
+});
+
+test('recognizes only localized article URLs, not topic, admin or arbitrary routes', () => {
+  assert.deepEqual(blogArticleRoute('/blog/geschiedenis-van-massage'), { locale: 'nl', slug: 'geschiedenis-van-massage' });
+  assert.deepEqual(blogArticleRoute('/en/blog/history-of-massage/'), { locale: 'en', slug: 'history-of-massage' });
+  assert.deepEqual(blogArticleRoute('/hu/blog/ki-talalta-fel'), { locale: 'hu', slug: 'ki-talalta-fel' });
+  assert.equal(blogArticleRoute('/blog/topic/massage-history'), null);
+  assert.equal(blogArticleRoute('/admin/blog/preview/secret'), null);
+  assert.equal(blogArticleRoute('/blog/Bad-Slug'), null);
+  assert.equal(blogArticleRoute('//blog/geschiedenis'), null);
+  assert.equal(blogArticleRoute(`/blog/${'a'.repeat(101)}`), null);
 });
 
 test('separates unique sessions, page loads, booking clicks and confirmed bookings', () => {
