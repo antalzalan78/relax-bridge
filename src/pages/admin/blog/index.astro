@@ -48,7 +48,6 @@ if (Astro.request.method === 'POST') {
     if (intent === 'trash_post') {
       const id = str(form, 'post_id');
       const scope = str(form, 'scope');
-      if (str(form, 'confirmation') !== id) throw new Error('A törléshez pontosan írd be a cikk azonosítóját.');
       if (!['all', 'nl', 'en', 'hu'].includes(scope)) throw new Error('Válassz érvényes törlési módot.');
       await trashPost(id, scope as Locale | 'all');
       return Astro.redirect('/admin/blog?trash=1&saved=1', 303);
@@ -179,15 +178,14 @@ const activeLocales = postId ? posts.filter((post) => post.id === postId) : [];
         <details><summary>Keresőoptimalizálás</summary><div class="admin-form__row"><label>Keresőben megjelenő cím<input name="seo_title" maxlength="200" value={selected?.seo_title || ''} /></label><label>Rövid leírás<input name="seo_description" maxlength="320" value={selected?.seo_description || ''} /></label></div></details>
         <div class="admin-form__row"><label>Állapot<select name="status"><option value="draft" selected={selected?.status !== 'published'}>Piszkozat</option><option value="published" selected={selected?.status === 'published'}>Közzétéve</option></select></label><label>Megjelenési dátum<input type="date" name="published_at" value={selected?.published_at?.toISOString().slice(0,10) || ''} /></label></div><button class="admin-button" type="submit">Cikk mentése</button>
       </form>
-      {postId && activeLocales.length > 0 && <details class="danger-zone"><summary>Cikk vagy fordítás lomtárba helyezése</summary>
-        <p><strong>{selected?.title || activeLocales[0].title}</strong> · Érintett nyelvi változatok: {activeLocales.map((post) => post.locale.toUpperCase()).join(', ')}.</p>
-        <p>A lomtárból visszaállítható. A nyilvános cikk addig nem lesz elérhető.</p>
-        <form method="post" class="admin-form"><input type="hidden" name="intent" value="trash_post" /><input type="hidden" name="post_id" value={postId} />
+      {postId && activeLocales.length > 0 && <div class="danger-zone"><h3>Cikk vagy fordítás törlése</h3>
+        <p><strong>{selected?.title || activeLocales[0].title}</strong> · Elérhető nyelvi változatok: {activeLocales.map((post) => post.locale.toUpperCase()).join(', ')}.</p>
+        <p>A lomtárból visszaállítható. A törölt változat addig nem lesz nyilvánosan elérhető.</p>
+        <form method="post" class="admin-form" data-post-title={selected?.title || activeLocales[0].title} onsubmit="return confirm('Biztosan lomtárba helyezed?\n' + this.dataset.postTitle + '\n' + this.elements.namedItem('scope').selectedOptions[0].text)"><input type="hidden" name="intent" value="trash_post" /><input type="hidden" name="post_id" value={postId} />
           <label>Mit helyezzünk a lomtárba?<select name="scope" required>{activeLocales.map((post) => <option value={post.locale} selected={post.locale === locale}>Csak a {post.locale.toUpperCase()} változat: {post.title}</option>)}<option value="all">Teljes cikk — {activeLocales.map((post) => post.locale.toUpperCase()).join(', ')}</option></select></label>
-          <label>Megerősítés: írd be a cikk azonosítóját ({postId})<input name="confirmation" required autocomplete="off" /></label>
           <button class="admin-button admin-button--danger" type="submit">Lomtárba helyezés</button>
         </form>
-      </details>}</section>}
+      </div>}</section>}
     <section class="admin-panel"><h2>Témák sorrendje</h2><p>A sorrend közös a magyar, holland és angol oldalon.</p>
       <ol class="order-list">{topics.map((topic, index) => <li><a href={`/admin/blog?topic=${encodeURIComponent(topic.id)}`}>{topic.names.hu || topic.names.nl || topic.id}</a><span class="order-list__actions">
         <form method="post"><input type="hidden" name="intent" value="move_topic" /><input type="hidden" name="topic_id" value={topic.id} /><input type="hidden" name="direction" value="up" /><button type="submit" aria-label={`${topic.names.hu || topic.id} feljebb`} disabled={index === 0}>↑</button></form>
