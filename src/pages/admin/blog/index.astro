@@ -42,7 +42,6 @@ if (Astro.request.method === 'POST') {
     }
     if (intent === 'delete_topic') {
       const id = str(form, 'topic_id');
-      if (str(form, 'confirmation') !== id) throw new Error('A törléshez pontosan írd be a téma webcím-részletét.');
       await deleteTopic(id, str(form, 'successor_id') || null);
       return Astro.redirect('/admin/blog?saved=1', 303);
     }
@@ -202,12 +201,12 @@ const activeLocales = postId ? posts.filter((post) => post.id === postId) : [];
           <form method="post"><input type="hidden" name="intent" value="move_post" /><input type="hidden" name="post_id" value={post.id} /><input type="hidden" name="direction" value="up" /><button type="submit" aria-label={`${post.title} feljebb`} disabled={index === 0}>↑</button></form>
           <form method="post"><input type="hidden" name="intent" value="move_post" /><input type="hidden" name="post_id" value={post.id} /><input type="hidden" name="direction" value="down" /><button type="submit" aria-label={`${post.title} lejjebb`} disabled={index === topicPosts.length - 1}>↓</button></form>
         </span></li>)}</ol> : <p>Még nincs cikk ebben a témában.</p>}
-        <details class="danger-zone"><summary>Téma törlése mindhárom nyelven</summary><p>„{topicEdit.names.hu || topicEdit.names.nl || topicEdit.id}” törlése. {topicPostCount} cikk tartozik hozzá. A cikkek, fordításaik, képeik és webcímeik megmaradnak.</p>
-          <form method="post" class="admin-form"><input type="hidden" name="intent" value="delete_topic" /><input type="hidden" name="topic_id" value={topicEdit.id} />
+        <div class="danger-zone"><h3>Téma törlése</h3><p>„{topicEdit.names.hu || topicEdit.names.nl || topicEdit.id}” mindhárom nyelven törlődik. {topicPostCount > 0 ? `${topicPostCount} cikk tartozik hozzá; a cikkek, fordításaik, képeik és webcímeik megmaradnak.` : 'Nem tartozik hozzá cikk.'}</p>
+          <form method="post" class="admin-form" onsubmit="return confirm('Biztosan törlöd ezt a témát mindhárom nyelven? A cikkek megmaradnak.')"><input type="hidden" name="intent" value="delete_topic" /><input type="hidden" name="topic_id" value={topicEdit.id} />
             {topicPostCount > 0 ? <label>Kötelező utódtéma<select name="successor_id" required><option value="">Válassz másik témát</option>{topics.filter((topic) => topic.id !== topicEdit.id).map((topic) => <option value={topic.id}>{topic.names.hu || topic.names.nl || topic.id}</option>)}</select></label> : <label>Átirányítás (opcionális)<select name="successor_id"><option value="">Blog főoldalára</option>{topics.filter((topic) => topic.id !== topicEdit.id).map((topic) => <option value={topic.id}>{topic.names.hu || topic.names.nl || topic.id}</option>)}</select></label>}
-            <label>Megerősítés: írd be a téma webcím-részletét ({topicEdit.id})<input name="confirmation" required autocomplete="off" /></label><button class="admin-button admin-button--danger" type="submit">Téma törlése</button>
+            <button class="admin-button admin-button--danger" type="submit">Téma törlése</button>
           </form>
-        </details></>}
+        </div></>}
     </section>
     <section class="admin-panel"><h2>Lomtár</h2><p>A törölt cikkek és fordítások innen visszaállíthatók. A képek és webcímek megmaradnak.</p>
       {trash.posts.length === 0 && trash.translations.length === 0 ? <p>A lomtár üres.</p> : <ul class="trash-list">
