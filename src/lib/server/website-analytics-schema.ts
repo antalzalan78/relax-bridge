@@ -41,11 +41,18 @@ async function createWebsiteAnalyticsSchema(): Promise<void> {
         ADD COLUMN IF NOT EXISTS utm_source text NOT NULL DEFAULT '' CHECK (char_length(utm_source) <= 100),
         ADD COLUMN IF NOT EXISTS utm_medium text NOT NULL DEFAULT '' CHECK (char_length(utm_medium) <= 100),
         ADD COLUMN IF NOT EXISTS utm_campaign text NOT NULL DEFAULT '' CHECK (char_length(utm_campaign) <= 100),
-        ADD COLUMN IF NOT EXISTS utm_content text NOT NULL DEFAULT '' CHECK (char_length(utm_content) <= 100)
+        ADD COLUMN IF NOT EXISTS utm_content text NOT NULL DEFAULT '' CHECK (char_length(utm_content) <= 100),
+        ADD COLUMN IF NOT EXISTS article_id text,
+        ADD COLUMN IF NOT EXISTS article_locale text
     `;
     await transaction`
       CREATE INDEX IF NOT EXISTS website_journey_events_session_idx
       ON website_journey_events (session_id, occurred_at)
+    `;
+    await transaction`
+      CREATE INDEX IF NOT EXISTS website_journey_events_article_idx
+      ON website_journey_events (article_id, occurred_at)
+      WHERE article_id IS NOT NULL AND event_type = 'page_view'
     `;
   });
 }

@@ -156,6 +156,19 @@ export async function getPublished(locale: Locale, slug: string): Promise<BlogPo
   return rows[0] ? castPost(rows[0]) : null;
 }
 
+/** Resolve a public URL to a stable article ID without loading its body or media. */
+export async function getPublishedArticleId(locale: Locale, slug: string): Promise<string | null> {
+  await ensureBlogSchema();
+  const rows = await getDatabase()`
+    SELECT p.id FROM blog_posts p
+    JOIN blog_translations t ON t.post_id = p.id
+    WHERE t.locale = ${locale} AND t.slug = ${slug} AND t.status = 'published'
+      AND t.published_at <= now() AND p.deleted_at IS NULL AND t.deleted_at IS NULL
+    LIMIT 1
+  `;
+  return rows[0]?.id as string || null;
+}
+
 export async function getPublishedAlternates(id: string): Promise<Partial<Record<Locale, string>>> {
   await ensureBlogSchema();
   const rows = await getDatabase()`

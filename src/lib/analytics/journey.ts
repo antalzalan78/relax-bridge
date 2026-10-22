@@ -1,4 +1,5 @@
 import { normalizeCampaign, type CampaignAttribution } from './attribution.ts';
+import type { Locale } from '../../data/site';
 
 export type JourneyEventType = 'page_view' | 'booking_click' | 'booking_success';
 
@@ -40,6 +41,7 @@ const localizedPagePaths: Record<string, string> = {
   '/prijzen': 'prices',
   '/prices': 'prices',
   '/arak': 'prices',
+  '/blog': 'blog',
   '/studio-visit': 'studio-visit',
   '/massage-creator': 'massage-creator',
   '/privacy': 'privacy',
@@ -73,6 +75,14 @@ export function journeyPageKey(value: string): string | null {
   if (!path.startsWith('/') || path.includes('//')) return null;
   const withoutLocale = path.replace(/^\/(en|hu)(?=\/|$)/, '') || '/';
   return localizedPagePaths[withoutLocale] ?? null;
+}
+
+/** Recognize only public article routes; the database verifies publication before recording. */
+export function blogArticleRoute(value: string): { locale: Locale; slug: string } | null {
+  const path = value.trim().split(/[?#]/, 1)[0];
+  const match = /^\/(?:(en|hu)\/)?blog\/([a-z0-9]+(?:-[a-z0-9]+)*)\/?$/.exec(path);
+  if (!match || match[2].length > 100) return null;
+  return { locale: (match[1] || 'nl') as Locale, slug: match[2] };
 }
 
 export function isBookingDestination(value: string): boolean {

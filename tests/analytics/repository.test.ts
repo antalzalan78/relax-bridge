@@ -43,12 +43,19 @@ test('real PostgreSQL migration preserves historical rows and success inherits t
     const migration = readFileSync(new URL('../../db/migrations/0009_journey_campaigns.sql', import.meta.url), 'utf8');
     await pg.exec(migration);
     await pg.exec(migration);
+    const articleMigration = readFileSync(new URL('../../db/migrations/0013_blog_article_analytics.sql', import.meta.url), 'utf8');
+    await pg.exec(articleMigration);
+    await pg.exec(articleMigration);
+    await pg.exec(readFileSync(new URL('../../db/migrations/0010_blog.sql', import.meta.url), 'utf8'));
+    await pg.exec(readFileSync(new URL('../../db/migrations/0011_blog_topic_covers.sql', import.meta.url), 'utf8'));
+    await pg.exec(readFileSync(new URL('../../db/migrations/0012_blog_order_and_trash.sql', import.meta.url), 'utf8'));
     const historical = await pg.query<{ source: string; utm_campaign: string }>('SELECT source, utm_campaign FROM website_journey_events WHERE session_id = $1', [oldId]);
     assert.deepEqual(historical.rows, [{ source: 'google', utm_campaign: '' }]);
 
     const repository = loadModule('src/lib/server/website-analytics-repository.ts', {
       '@js-temporal/polyfill': { Temporal }, '../analytics/model': model, '../analytics/journey': journey,
       './db': { getDatabase: () => database }, './website-analytics-schema': schema,
+      './blog': { ensureBlogSchema: async () => {} },
     });
     const event = { sessionId: campaignId, eventType: 'page_view', pageKey: 'home', source: 'utm:google', utmSource: 'google', utmMedium: 'organic', utmCampaign: 'gbp', utmContent: 'website' };
     await repository.recordWebsiteJourneyEvent(event);
@@ -70,5 +77,21 @@ test('real PostgreSQL migration preserves historical rows and success inherits t
     assert.equal(gbp.bookingPageSessions, 1);
     assert.equal(gbp.successfulBookings, 1);
     assert.equal(summary.campaigns.find((item: journey.CampaignSummary) => item.source === 'direct').utmCampaign, '');
+
+    await pg.query("UPDATE blog_translations SET status = 'published', published_at = now() WHERE post_id = 'seed-massage-history' AND locale = 'hu'");
+    await pg.query(`INSERT INTO blog_translations (post_id, locale, slug, title, status, published_at)
+      VALUES ('seed-massage-history', 'nl', 'massage-history', 'Geschiedenis van massage', 'published', now())`);
+    await repository.recordWebsiteJourneyEvent({ ...event, pageKey: 'blog-article', articleId: 'seed-massage-history', articleLocale: 'nl' });
+    await repository.recordWebsiteJourneyEvent({ ...event, pageKey: 'blog-article', articleId: 'seed-massage-history', articleLocale: 'hu' });
+    await repository.recordWebsiteJourneyEvent({ ...event, sessionId: orphanId, pageKey: 'blog-article', articleId: 'seed-massage-history', articleLocale: 'nl' });
+    await repository.recordWebsiteJourneyEvent({ ...event, eventType: 'booking_click', pageKey: 'blog-article', articleId: 'seed-massage-history', articleLocale: 'nl' });
+    const articleRows = await repository.getBlogArticleTrafficSummary();
+    assert.equal(articleRows[0].id, 'seed-massage-history');
+    assert.equal(articleRows[0].title, 'Ki találta fel a masszázst? – A kezdetek nyomában');
+    assert.equal(articleRows[0].pageViews30, 3);
+    assert.equal(articleRows[0].sessions30, 2);
+    assert.equal(articleRows[0].pageViews7, 3);
+    assert.deepEqual({ ...articleRows[0].locales }, { nl: 2, en: 0, hu: 1 });
+    assert.equal(articleRows.find((item: { id: string }) => item.id === 'seed-first-massage').pageViews30, 0);
   } finally { await pg.close(); }
 });
