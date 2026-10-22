@@ -9,12 +9,7 @@ interface Props { locale: Locale }
 const { locale } = Astro.props;
 const c = blogText(locale);
 const [publishedPosts, topics] = await Promise.all([listPublished(locale, undefined, 1), listTopics()]);
-const starterTopicOrder = ['massage-history', 'everyday-rest', 'preparing-for-massage'];
-const visibleTopics = topics.filter((topic) => topic.names[locale]).sort((a, b) => {
-  const aOrder = starterTopicOrder.indexOf(a.id);
-  const bOrder = starterTopicOrder.indexOf(b.id);
-  return (aOrder < 0 ? starterTopicOrder.length : aOrder) - (bOrder < 0 ? starterTopicOrder.length : bOrder);
-});
+const visibleTopics = topics.filter((topic) => topic.names[locale]);
 const alternates = Object.fromEntries(locales.map((lang) => [lang, blogPath(lang)]));
 ---
 <Base locale={locale} title={`${c.title} — Relax Bridge`} description={c.description} path={blogPath(locale)} alternates={alternates} indexAllLocales noIndex={publishedPosts.length === 0} quietBackdrop>

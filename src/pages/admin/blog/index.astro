@@ -4,7 +4,7 @@ import sharp from 'sharp';
 import AdminHeader from '../../../components/AdminHeader.astro';
 import { blogArticlePath, type Locale } from '../../../data/site';
 import { getAdminSession } from '../../../lib/server/admin-auth';
-import { getAdminPost, getPostMeta, listAdminPosts, listTopics, saveImage, savePost, saveTopic, topicCoverUrl, type BlogImage, type BlogPost, type BlogSource } from '../../../lib/server/blog';
+import { deleteTopic, getAdminPost, getPostMeta, getTopicPostCount, listAdminPosts, listBlogTrash, listTopicPosts, listTopics, movePost, moveTopic, restorePost, saveImage, savePost, saveTopic, topicCoverUrl, trashPost, type BlogImage, type BlogPost, type BlogSource } from '../../../lib/server/blog';
 import { isSafeExternalUrl, youtubeEmbed } from '../../../lib/blog';
 import { assertSameOrigin } from '../../../lib/server/security';
 import '../../../styles/global.css';
@@ -15,7 +15,7 @@ if (!session) return Astro.redirect('/admin/login');
 const locale = (['nl', 'en', 'hu'].includes(Astro.url.searchParams.get('locale') || '') ? Astro.url.searchParams.get('locale') : 'hu') as Locale;
 const postId = Astro.url.searchParams.get('post');
 let error = '';
-let success = Astro.url.searchParams.get('saved') === '1' ? 'Mentve.' : '';
+let success = Astro.url.searchParams.get('saved') === '1' ? 'A módosítás sikerült.' : '';
 
 const str = (form: FormData, key: string) => String(form.get(key) || '').trim();
 const slugify = (value: string) => value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 100);
@@ -32,6 +32,34 @@ if (Astro.request.method === 'POST') {
     assertSameOrigin(Astro.request);
     const form = await Astro.request.formData();
     const intent = str(form, 'intent');
+    if (intent === 'move_topic') {
+      await moveTopic(str(form, 'topic_id'), str(form, 'direction') === 'up' ? 'up' : 'down');
+      return Astro.redirect(`/admin/blog?topic=${encodeURIComponent(str(form, 'topic_id'))}&saved=1`, 303);
+    }
+    if (intent === 'move_post') {
+      const topicId = await movePost(str(form, 'post_id'), str(form, 'direction') === 'up' ? 'up' : 'down');
+      return Astro.redirect(`/admin/blog?topic=${encodeURIComponent(topicId)}&saved=1`, 303);
+    }
+    if (intent === 'delete_topic') {
+      const id = str(form, 'topic_id');
+      if (str(form, 'confirmation') !== id) throw new Error('A törléshez pontosan írd be a téma webcím-részletét.');
+      await deleteTopic(id, str(form, 'successor_id') || null);
+      return Astro.redirect('/admin/blog?saved=1', 303);
+    }
+    if (intent === 'trash_post') {
+      const id = str(form, 'post_id');
+      const scope = str(form, 'scope');
+      if (str(form, 'confirmation') !== id) throw new Error('A törléshez pontosan írd be a cikk azonosítóját.');
+      if (!['all', 'nl', 'en', 'hu'].includes(scope)) throw new Error('Válassz érvényes törlési módot.');
+      await trashPost(id, scope as Locale | 'all');
+      return Astro.redirect('/admin/blog?trash=1&saved=1', 303);
+    }
+    if (intent === 'restore_post') {
+      const scope = str(form, 'scope');
+      if (!['all', 'nl', 'en', 'hu'].includes(scope)) throw new Error('Érvénytelen visszaállítási mód.');
+      await restorePost(str(form, 'post_id'), scope as Locale | 'all');
+      return Astro.redirect('/admin/blog?trash=1&saved=1', 303);
+    }
     if (intent === 'topic') {
       const id = str(form, 'topic_id') || null;
       const names = Object.fromEntries((['nl', 'en', 'hu'] as const).map((lang) => [lang, str(form, `name_${lang}`).slice(0, 120)])) as Record<Locale, string>;
@@ -118,6 +146,12 @@ const selectedTopic = selected?.topic_id || meta?.topic_id || topics[0]?.id || '
 const selectedImages = selected?.images || [];
 const currentTopic = Astro.url.searchParams.get('topic');
 const topicEdit = topics.find((topic) => topic.id === currentTopic);
+const [topicPosts, topicPostCount, trash] = await Promise.all([
+  topicEdit ? listTopicPosts(topicEdit.id) : Promise.resolve([]),
+  topicEdit ? getTopicPostCount(topicEdit.id) : Promise.resolve(0),
+  listBlogTrash(),
+]);
+const activeLocales = postId ? posts.filter((post) => post.id === postId) : [];
 ---
 <!doctype html><html lang="hu"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="robots" content="noindex, nofollow" /><title>Blog szerkesztő — Relax Bridge</title></head>
 <body class="admin-page"><AdminHeader email={session.email} active="blog" />
@@ -145,9 +179,41 @@ const topicEdit = topics.find((topic) => topic.id === currentTopic);
           <div class="admin-form__row"><label>Foglalási/kezelési link felirata<input name="cta_label" value={selected?.cta_label || ''} /></label><label>Belső útvonal<input name="cta_url" value={selected?.cta_url || ''} placeholder="/booking" /></label></div></details>
         <details><summary>Keresőoptimalizálás</summary><div class="admin-form__row"><label>Keresőben megjelenő cím<input name="seo_title" maxlength="200" value={selected?.seo_title || ''} /></label><label>Rövid leírás<input name="seo_description" maxlength="320" value={selected?.seo_description || ''} /></label></div></details>
         <div class="admin-form__row"><label>Állapot<select name="status"><option value="draft" selected={selected?.status !== 'published'}>Piszkozat</option><option value="published" selected={selected?.status === 'published'}>Közzétéve</option></select></label><label>Megjelenési dátum<input type="date" name="published_at" value={selected?.published_at?.toISOString().slice(0,10) || ''} /></label></div><button class="admin-button" type="submit">Cikk mentése</button>
-      </form></section>}
-    <section class="admin-panel"><h2>Témák</h2><p>Az induló témák magyar munkanevei adottak. A végleges holland és angol nevet itt adhatod meg. Nyilvánosan csak olyan téma jelenik meg, amelyhez az adott nyelven közzétett cikk tartozik.</p><div class="topic-links">{topics.map((topic) => <a href={`/admin/blog?topic=${topic.id}`}>{topic.names.hu || topic.names.nl || topic.id}</a>)}<a href="/admin/blog?topic=new">+ Új téma</a></div>
+      </form>
+      {postId && activeLocales.length > 0 && <details class="danger-zone"><summary>Cikk vagy fordítás lomtárba helyezése</summary>
+        <p><strong>{selected?.title || activeLocales[0].title}</strong> · Érintett nyelvi változatok: {activeLocales.map((post) => post.locale.toUpperCase()).join(', ')}.</p>
+        <p>A lomtárból visszaállítható. A nyilvános cikk addig nem lesz elérhető.</p>
+        <form method="post" class="admin-form"><input type="hidden" name="intent" value="trash_post" /><input type="hidden" name="post_id" value={postId} />
+          <label>Mit helyezzünk a lomtárba?<select name="scope" required>{activeLocales.map((post) => <option value={post.locale} selected={post.locale === locale}>Csak a {post.locale.toUpperCase()} változat: {post.title}</option>)}<option value="all">Teljes cikk — {activeLocales.map((post) => post.locale.toUpperCase()).join(', ')}</option></select></label>
+          <label>Megerősítés: írd be a cikk azonosítóját ({postId})<input name="confirmation" required autocomplete="off" /></label>
+          <button class="admin-button admin-button--danger" type="submit">Lomtárba helyezés</button>
+        </form>
+      </details>}</section>}
+    <section class="admin-panel"><h2>Témák sorrendje</h2><p>A sorrend közös a magyar, holland és angol oldalon.</p>
+      <ol class="order-list">{topics.map((topic, index) => <li><a href={`/admin/blog?topic=${encodeURIComponent(topic.id)}`}>{topic.names.hu || topic.names.nl || topic.id}</a><span class="order-list__actions">
+        <form method="post"><input type="hidden" name="intent" value="move_topic" /><input type="hidden" name="topic_id" value={topic.id} /><input type="hidden" name="direction" value="up" /><button type="submit" aria-label={`${topic.names.hu || topic.id} feljebb`} disabled={index === 0}>↑</button></form>
+        <form method="post"><input type="hidden" name="intent" value="move_topic" /><input type="hidden" name="topic_id" value={topic.id} /><input type="hidden" name="direction" value="down" /><button type="submit" aria-label={`${topic.names.hu || topic.id} lejjebb`} disabled={index === topics.length - 1}>↓</button></form>
+      </span></li>)}</ol><a href="/admin/blog?topic=new">+ Új téma</a>
+    </section>
+    <section class="admin-panel"><h2>Témák szerkesztése</h2><p>Nyilvánosan csak az adott nyelven megnevezett témák jelennek meg.</p><div class="topic-links">{topics.map((topic) => <a href={`/admin/blog?topic=${encodeURIComponent(topic.id)}`}>{topic.names.hu || topic.names.nl || topic.id}</a>)}<a href="/admin/blog?topic=new">+ Új téma</a></div>
       {currentTopic && <form method="post" enctype="multipart/form-data" class="admin-form"><input type="hidden" name="intent" value="topic" /><input type="hidden" name="topic_id" value={topicEdit?.id || ''} />{topicEdit ? <p>Webcím-részlet: <code>{topicEdit.id}</code> (változatlan marad)</p> : <label>Új téma webcím-részlete<input name="topic_slug" placeholder="automatikus a holland vagy magyar névből" /></label>}{(['nl','en','hu'] as const).map((lang) => <div class="admin-form__row"><label>{lang.toUpperCase()} témaneve<input name={`name_${lang}`} value={topicEdit?.names[lang] || ''} maxlength="120" /></label><label>{lang.toUpperCase()} leírása<input name={`description_${lang}`} value={topicEdit?.descriptions[lang] || ''} maxlength="400" /></label></div>)}<label>Közös témakép (JPG/PNG/WebP, max. 2 MB, 3:1 arány)<input type="file" name="topic_cover_upload" accept="image/jpeg,image/png,image/webp" /></label>{topicEdit && topicCoverUrl(topicEdit) && <><img class="admin-topic-cover" src={topicCoverUrl(topicEdit)} alt="" />{topicEdit.cover_image_id && <label class="admin-check"><input type="checkbox" name="remove_topic_cover" /> Feltöltött témakép eltávolítása</label>}</>}<p>Ugyanez a kép látszik a témaoldalon és minden nyelvi változat témakártyáján.</p><button class="admin-button" type="submit">Téma mentése</button></form>}
+      {topicEdit && <><h3>Cikkek sorrendje ebben a témában</h3><p>Az új cikk előre kerül; itt utólag áthelyezhető. A beállítás mindhárom nyelvre érvényes.</p>
+        {topicPosts.length ? <ol class="order-list">{topicPosts.map((post, index) => <li><span>{post.title} <small>({post.locales.map((lang) => lang.toUpperCase()).join(', ') || 'nincs aktív fordítás'})</small></span><span class="order-list__actions">
+          <form method="post"><input type="hidden" name="intent" value="move_post" /><input type="hidden" name="post_id" value={post.id} /><input type="hidden" name="direction" value="up" /><button type="submit" aria-label={`${post.title} feljebb`} disabled={index === 0}>↑</button></form>
+          <form method="post"><input type="hidden" name="intent" value="move_post" /><input type="hidden" name="post_id" value={post.id} /><input type="hidden" name="direction" value="down" /><button type="submit" aria-label={`${post.title} lejjebb`} disabled={index === topicPosts.length - 1}>↓</button></form>
+        </span></li>)}</ol> : <p>Még nincs cikk ebben a témában.</p>}
+        <details class="danger-zone"><summary>Téma törlése mindhárom nyelven</summary><p>„{topicEdit.names.hu || topicEdit.names.nl || topicEdit.id}” törlése. {topicPostCount} cikk tartozik hozzá. A cikkek, fordításaik, képeik és webcímeik megmaradnak.</p>
+          <form method="post" class="admin-form"><input type="hidden" name="intent" value="delete_topic" /><input type="hidden" name="topic_id" value={topicEdit.id} />
+            {topicPostCount > 0 ? <label>Kötelező utódtéma<select name="successor_id" required><option value="">Válassz másik témát</option>{topics.filter((topic) => topic.id !== topicEdit.id).map((topic) => <option value={topic.id}>{topic.names.hu || topic.names.nl || topic.id}</option>)}</select></label> : <label>Átirányítás (opcionális)<select name="successor_id"><option value="">Blog főoldalára</option>{topics.filter((topic) => topic.id !== topicEdit.id).map((topic) => <option value={topic.id}>{topic.names.hu || topic.names.nl || topic.id}</option>)}</select></label>}
+            <label>Megerősítés: írd be a téma webcím-részletét ({topicEdit.id})<input name="confirmation" required autocomplete="off" /></label><button class="admin-button admin-button--danger" type="submit">Téma törlése</button>
+          </form>
+        </details></>}
+    </section>
+    <section class="admin-panel"><h2>Lomtár</h2><p>A törölt cikkek és fordítások innen visszaállíthatók. A képek és webcímek megmaradnak.</p>
+      {trash.posts.length === 0 && trash.translations.length === 0 ? <p>A lomtár üres.</p> : <ul class="trash-list">
+        {trash.posts.map((post) => <li><span><strong>{post.title}</strong> · Teljes cikk ({post.locales.map((lang) => lang.toUpperCase()).join(', ') || 'nincs aktív fordítás'})</span><form method="post"><input type="hidden" name="intent" value="restore_post" /><input type="hidden" name="post_id" value={post.id} /><input type="hidden" name="scope" value="all" /><button type="submit">Visszaállítás</button></form></li>)}
+        {trash.translations.map((post) => <li><span><strong>{post.title}</strong> · {post.locale.toUpperCase()} fordítás</span><form method="post"><input type="hidden" name="intent" value="restore_post" /><input type="hidden" name="post_id" value={post.post_id} /><input type="hidden" name="scope" value={post.locale} /><button type="submit">Visszaállítás</button></form></li>)}
+      </ul>}
     </section>
   </div></div>
 </main></body></html>
@@ -155,4 +221,5 @@ const topicEdit = topics.find((topic) => topic.id === currentTopic);
 <style>
 .admin-topic-cover{display:block;width:min(100%,36rem);aspect-ratio:3/1;object-fit:cover;border:1px solid var(--border);border-radius:.6rem}
 .blog-admin{width:min(94vw,85rem);margin:2.5rem auto 5rem}.blog-admin__head{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:2rem}.blog-admin h1{font-family:Georgia,serif;font-size:clamp(2.5rem,5vw,4rem);margin:.2rem 0}.blog-admin p{color:var(--ink-soft);line-height:1.55}.blog-admin__layout{display:grid;grid-template-columns:minmax(13rem,20rem) minmax(0,1fr);gap:1.5rem}.blog-admin__side,.admin-panel{border:1px solid var(--border);border-radius:1.5rem;background:var(--surface);padding:1.5rem}.blog-admin__side h2,.admin-panel h2{font-family:Georgia,serif;margin-top:0}.blog-admin__side ul{list-style:none;margin:0;padding:0}.blog-admin__side li{border-top:1px solid var(--border)}.blog-admin__side a{display:block;padding:.7rem 0;color:var(--ink);text-decoration:none}.blog-admin__side a:hover{color:var(--clay-dark)}.blog-admin__side small{display:block;color:var(--ink-soft);margin-top:.25rem}.blog-admin__main{display:grid;gap:1.5rem}.blog-admin__tabs{display:flex;justify-content:space-between;gap:1rem;align-items:center}.blog-admin__tabs nav,.topic-links{display:flex;flex-wrap:wrap;gap:.6rem}.blog-admin__tabs a,.topic-links a{display:inline-block;border:1px solid var(--border);border-radius:999px;padding:.35rem .7rem;text-decoration:none;color:var(--pine-dark)}.blog-admin__tabs a[aria-current=page]{background:var(--pine-soft)}.admin-form{display:grid;gap:1.1rem;margin-top:1.5rem}.admin-form__row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.admin-form label{display:grid;gap:.4rem;color:var(--pine-dark);font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em}.admin-form input,.admin-form textarea,.admin-form select{width:100%;border:1px solid var(--border);border-radius:.5rem;padding:.7rem;background:white;color:var(--ink);font:inherit;font-size:1rem;letter-spacing:normal;text-transform:none}.admin-form textarea{resize:vertical}.admin-form details{border:1px solid var(--border);border-radius:.75rem;padding:1rem}.admin-form details[open]{display:grid;gap:1rem}.admin-form summary{color:var(--ink);font-weight:750;cursor:pointer}.field-hint{color:var(--ink-soft);font-size:.75rem;letter-spacing:normal;text-transform:none;font-weight:400}.admin-button{display:inline-block;width:fit-content;border:0;border-radius:999px;background:var(--clay);color:white;padding:.8rem 1.25rem;text-decoration:none;cursor:pointer;font:inherit;font-weight:750}.admin-alert,.admin-success{padding:1rem;border-radius:.6rem}.admin-alert{background:#f8ded9;color:#7b2717!important}.admin-success{background:var(--pine-soft);color:var(--pine-dark)!important}.admin-thumb{max-width:12rem;max-height:8rem;object-fit:cover;border-radius:.4rem}.admin-form .admin-check{display:flex;align-items:center;flex-direction:row;text-transform:none;letter-spacing:normal}.admin-check input{width:auto}@media(max-width:48rem){.blog-admin__layout{grid-template-columns:1fr}.admin-form__row{grid-template-columns:1fr}.blog-admin__head{align-items:start}.blog-admin__side{max-height:17rem;overflow:auto}}
+.order-list{padding-left:1.5rem}.order-list li,.trash-list li{display:flex;align-items:center;justify-content:space-between;gap:1rem;border-bottom:1px solid var(--border);padding:.55rem 0}.order-list__actions{display:flex;gap:.35rem;flex-shrink:0}.order-list button,.trash-list button{border:1px solid var(--border);border-radius:.5rem;background:white;color:var(--pine-dark);padding:.4rem .7rem;cursor:pointer;font:inherit}.order-list button:disabled{opacity:.35;cursor:not-allowed}.danger-zone{margin-top:1.5rem;padding:1rem;border:1px solid #b76554;border-radius:.8rem}.danger-zone summary{cursor:pointer;color:#8a3529;font-weight:700}.admin-button--danger{background:#8a3529}.trash-list{list-style:none;padding:0}
 </style>

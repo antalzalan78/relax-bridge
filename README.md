@@ -57,9 +57,16 @@ a cikkhez kapcsolódik. Közzététel előtt előbb a holland változat szüksé
 
 Az induló három magyar cím csak **piszkozat**; a végleges holland témanevek és a
 teljes cikkek nincsenek kitalálva vagy publikálva. A cikk mentés után admin-only
-előnézetben ellenőrizhető. A közzétett cikk azonnal megjelenik a blogon, a
-témagyűjtő oldalon, a legfrissebb három között a főoldalon és a külön
+előnézetben ellenőrizhető. A közzétett cikk azonnal megjelenik a blog
+témagyűjtő oldalán és a külön
 `/blog-sitemap.xml` oldaltérképben; ehhez nem kell új build.
+
+Az adminban a témák és az egyes témák cikkei fel/le gombokkal rendezhetők.
+A sorrend közös minden nyelven; új cikk a témája elejére kerül. A téma törlése
+előtt a hozzá tartozó cikkeknek utódtémát kell választani. A cikkek és
+fordításaik adatai, képei és webcímei megmaradnak, a régi téma-URL-ek az
+utódtémára (vagy üres téma esetén a blog főoldalára) irányítanak. Cikket
+vagy egyetlen fordítást az admin lomtárba lehet helyezni, majd visszaállítani.
 
 A törzsszöveg egyszerű szerkesztési jelöléseket használ: `## Alcím`,
 `### Kisebb alcím`, `- listaelem`; üres sor választja el a bekezdéseket.
@@ -69,7 +76,7 @@ A képek JPG/PNG/WebP formátumban tölthetők fel (egyenként legfeljebb 2 MB),
 YouTube-videóra mutathat; a zene nem indul automatikusan. Sorozathoz azonos
 azonosítót és részenként növekvő sorrendet kell megadni.
 
-A blog táblái a `0010_blog.sql` migrációval készülnek, vagy az első blogkéréskor
+A blog táblái a `0010_blog.sql`–`0012_blog_order_and_trash.sql` migrációkkal készülnek, vagy az első blogkéréskor
 automatikusan, tranzakciós zárolással. A piszkozat és a hozzá tartozó kép csak
 bejelentkezett admin számára érhető el. A nyilvános, lefordított blogoldalak
 kereshetőek; a webhely más nem holland oldalainak jelenlegi keresőbeállítása

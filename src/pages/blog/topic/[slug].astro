@@ -1,8 +1,17 @@
 ---
 import BlogTopic from '../../../components/BlogTopic.astro';
-import { listTopics } from '../../../lib/server/blog';
+import { listTopics, resolveTopicRedirect } from '../../../lib/server/blog';
+import { blogPath, blogTopicPath } from '../../../data/site';
 export const prerender = false;
 const topic = (await listTopics()).find((item) => item.id === Astro.params.slug);
+if (!topic) {
+  const successor = await resolveTopicRedirect(Astro.params.slug || '');
+  if (successor !== undefined) {
+    const next = successor && (await listTopics()).find((item) => item.id === successor)?.names.nl
+      ? blogTopicPath('nl', successor) : blogPath('nl');
+    return Astro.redirect(next, 308);
+  }
+}
 if (!topic?.names.nl) return new Response('Not found', { status: 404 });
 ---
 <BlogTopic locale="nl" topicId={topic.id} />
