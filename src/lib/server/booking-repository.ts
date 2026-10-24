@@ -6,6 +6,7 @@ import {
   localTimeWindowInstantRange,
 } from '../booking/availability';
 import { bookingMinimumStart } from '../booking/booking-window';
+import { manualBlockWindows } from '../booking/manual-blocks';
 import {
   homeServiceBufferMinutes,
   studioVisitBufferMinutes,
@@ -23,12 +24,19 @@ import type {
 import { ensureBookingEmailDeliverySchema } from './booking-email-schema';
 import { getDatabase } from './db';
 import { ensureGoogleCalendarSchema } from './google-calendar-schema';
+import { ensureManualBlocksSchema } from './manual-blocks-schema';
 
 type Queryable = any;
 
 export class SlotUnavailableError extends Error {
   constructor() {
     super('The selected appointment is no longer available.');
+  }
+}
+
+export class ManualBlockConflictError extends Error {
+  constructor() {
+    super('Az időszak ütközik egy meglévő foglalással vagy blokkal.');
   }
 }
 
@@ -125,6 +133,17 @@ function expandedBookingQueryRange(
   };
 }
 
+async function getManualBlockRows(query: Queryable, range: InstantWindow) {
+  await ensureManualBlocksSchema();
+  return query`
+    SELECT starts_at, ends_at, service_category, buffer_minutes
+    FROM manual_calendar_blocks
+    WHERE cancelled_at IS NULL
+      AND starts_at < ${range.end}::timestamptz + interval '3 hours'
+      AND occupied_ends_at > ${range.start}::timestamptz
+  `;
+}
+
 async function getOpenAndBlockedWindows(
   query: Queryable,
   date: string,
@@ -174,6 +193,11 @@ async function getOpenAndBlockedWindows(
     }
   }
 
+  const manual = manualBlockWindows(await getManualBlockRows(
+    query, localDayInstantRange(date, settings.timeZone),
+  ));
+  blocked.push(...manual.blocked);
+
   return { open, blocked };
 }
 
@@ -198,17 +222,18 @@ async function getBusyWindows(
       AND ends_at > ${range.start}::timestamptz
   `;
 
-  return rows.map((row: any) => busyWindowFromRow(row, settings));
+  const manual = manualBlockWindows(await getManualBlockRows(query, range));
+  return [...rows.map((row: any) => busyWindowFromRow(row, settings)), ...manual.busy];
 }
 
-async function getAvailableSlotsWithQuery(input: {
+async function getSlotChoicesWithQuery(input: {
   query: Queryable;
   date: string;
   category: BookingCategory;
   durationMinutes: number;
   settings?: BookingSettings;
   now?: string;
-}): Promise<AvailableSlot[]> {
+}): Promise<{ available: AvailableSlot[]; unavailable: AvailableSlot[] }> {
   const settings = input.settings ?? (await getBookingSettings(input.query));
   const minimumStart = bookingMinimumStart({
     date: input.date,
@@ -216,7 +241,7 @@ async function getAvailableSlotsWithQuery(input: {
     now: input.now ?? Temporal.Now.instant(),
     settings,
   });
-  if (!minimumStart) return [];
+  if (!minimumStart) return { available: [], unavailable: [] };
   const { open, blocked } = await getOpenAndBlockedWindows(
     input.query,
     input.date,
@@ -225,12 +250,10 @@ async function getAvailableSlotsWithQuery(input: {
   const busy = await getBusyWindows(input.query, input.date, settings);
   const isHome = input.category === 'home';
 
-  return buildAvailableSlots({
+  const candidateInput = {
     date: input.date,
     timeZone: settings.timeZone,
     openWindows: open,
-    blockedWindows: blocked,
-    busyWindows: busy,
     durationMinutes: input.durationMinutes,
     bufferBeforeMinutes: isHome
       ? settings.homeBufferBeforeMinutes
@@ -240,7 +263,23 @@ async function getAvailableSlotsWithQuery(input: {
       : settings.studioBufferAfterMinutes,
     stepMinutes: settings.slotIntervalMinutes,
     minStart: minimumStart,
+  };
+  const available = buildAvailableSlots({
+    ...candidateInput,
+    blockedWindows: blocked,
+    busyWindows: busy,
   });
+  const availableStarts = new Set(available.map((slot) => slot.start));
+  const unavailable = buildAvailableSlots({
+    ...candidateInput,
+    blockedWindows: [],
+    busyWindows: [],
+  }).filter((slot) => !availableStarts.has(slot.start));
+  return { available, unavailable };
+}
+
+async function getAvailableSlotsWithQuery(input: Parameters<typeof getSlotChoicesWithQuery>[0]): Promise<AvailableSlot[]> {
+  return (await getSlotChoicesWithQuery(input)).available;
 }
 
 export async function getAvailableSlots(input: {
@@ -255,6 +294,15 @@ export async function getAvailableSlots(input: {
   });
 }
 
+export async function getDaySlotChoices(input: {
+  date: string;
+  category: BookingCategory;
+  durationMinutes: number;
+  now?: string;
+}): Promise<{ available: AvailableSlot[]; unavailable: AvailableSlot[] }> {
+  return getSlotChoicesWithQuery({ query: getDatabase(), ...input });
+}
+
 export async function getAvailableDates(input: {
   from: string;
   to: string;
@@ -267,7 +315,7 @@ export async function getAvailableDates(input: {
   lastDay: string;
   timeZone: string;
 }> {
-  await ensureGoogleCalendarSchema();
+  await Promise.all([ensureGoogleCalendarSchema(), ensureManualBlocksSchema()]);
   const query = getDatabase();
   const settings = await getBookingSettings(query);
   const now = Temporal.Instant.from(
@@ -301,7 +349,7 @@ export async function getAvailableDates(input: {
     { start: rangeStart, end: rangeEnd },
     settings,
   );
-  const [rules, exceptions, busyRows] = await Promise.all([
+  const [rules, exceptions, busyRows, manualRows] = await Promise.all([
     query`
       SELECT weekday, start_time::text AS start_time, end_time::text AS end_time,
         valid_from::text AS valid_from, valid_until::text AS valid_until
@@ -330,6 +378,7 @@ export async function getAvailableDates(input: {
       WHERE starts_at < ${rangeEnd}::timestamptz
         AND ends_at > ${rangeStart}::timestamptz
     `,
+    getManualBlockRows(query, { start: rangeStart, end: rangeEnd }),
   ]);
 
   const exceptionsByDay = new Map<string, any[]>();
@@ -340,9 +389,11 @@ export async function getAvailableDates(input: {
     exceptionsByDay.set(day, current);
   }
 
-  const busyWindows: InstantWindow[] = busyRows.map((row: any) =>
-    busyWindowFromRow(row, settings),
-  );
+  const manual = manualBlockWindows(manualRows);
+  const busyWindows: InstantWindow[] = [
+    ...busyRows.map((row: any) => busyWindowFromRow(row, settings)),
+    ...manual.busy,
+  ];
   const dates: string[] = [];
 
   for (
@@ -369,7 +420,7 @@ export async function getAvailableDates(input: {
         start: shortTime(rule.start_time),
         end: shortTime(rule.end_time),
       }));
-    const blocked: InstantWindow[] = [];
+    const blocked: InstantWindow[] = [...manual.blocked];
 
     for (const exception of exceptionsByDay.get(date) ?? []) {
       if (exception.kind === 'open' && exception.start_time && exception.end_time) {
@@ -430,7 +481,7 @@ export async function getNextAvailableSlot(input: {
   timeZone: string;
   category: BookingCategory;
 } | null> {
-  await ensureGoogleCalendarSchema();
+  await Promise.all([ensureGoogleCalendarSchema(), ensureManualBlocksSchema()]);
   const query = getDatabase();
   const settings = await getBookingSettings(query);
   const now = Temporal.Instant.from(
@@ -447,7 +498,7 @@ export async function getNextAvailableSlot(input: {
     settings,
   );
 
-  const [rules, exceptions, busyRows] = await Promise.all([
+  const [rules, exceptions, busyRows, manualRows] = await Promise.all([
     query`
       SELECT weekday, start_time::text AS start_time, end_time::text AS end_time,
         valid_from::text AS valid_from, valid_until::text AS valid_until
@@ -476,6 +527,7 @@ export async function getNextAvailableSlot(input: {
       WHERE starts_at < ${rangeEnd}::timestamptz
         AND ends_at > ${rangeStart}::timestamptz
     `,
+    getManualBlockRows(query, { start: rangeStart, end: rangeEnd }),
   ]);
 
   const exceptionsByDay = new Map<string, any[]>();
@@ -486,9 +538,11 @@ export async function getNextAvailableSlot(input: {
     exceptionsByDay.set(day, current);
   }
 
-  const busyWindows: InstantWindow[] = busyRows.map((row: any) =>
-    busyWindowFromRow(row, settings),
-  );
+  const manual = manualBlockWindows(manualRows);
+  const busyWindows: InstantWindow[] = [
+    ...busyRows.map((row: any) => busyWindowFromRow(row, settings)),
+    ...manual.busy,
+  ];
   for (let offset = 0; offset <= settings.bookingHorizonDays; offset += 1) {
     const day = today.add({ days: offset });
     const date = day.toString();
@@ -503,7 +557,7 @@ export async function getNextAvailableSlot(input: {
         start: shortTime(rule.start_time),
         end: shortTime(rule.end_time),
       }));
-    const blocked: InstantWindow[] = [];
+    const blocked: InstantWindow[] = [...manual.blocked];
 
     for (const exception of exceptionsByDay.get(date) ?? []) {
       if (exception.kind === 'open' && exception.start_time && exception.end_time) {
@@ -583,6 +637,7 @@ export async function createConfirmedBooking(
   input: ConfirmedBookingInput,
 ): Promise<{ id: string; reference: string; start: string; end: string }> {
   await ensureBookingEmailDeliverySchema();
+  await ensureManualBlocksSchema();
   const database = getDatabase();
 
   try {
@@ -717,6 +772,108 @@ export async function listBookings(from: string, to: string) {
       AND booking.starts_at < ${to}::timestamptz
     ORDER BY booking.starts_at
   `;
+}
+
+export async function listManualCalendarBlocks(from: string, to: string) {
+  await ensureManualBlocksSchema();
+  return getDatabase()`
+    SELECT id, service_category, starts_at, ends_at, occupied_starts_at,
+      occupied_ends_at, duration_minutes, buffer_minutes, guest_name, note
+    FROM manual_calendar_blocks
+    WHERE cancelled_at IS NULL
+      AND occupied_starts_at < ${to}::timestamptz
+      AND occupied_ends_at > ${from}::timestamptz
+    ORDER BY starts_at
+  `;
+}
+
+export async function addManualCalendarBlock(input: {
+  day: string;
+  startTime: string;
+  durationMinutes: number;
+  category: BookingCategory;
+  guestName?: string;
+  note?: string;
+  applyStandardBuffer: boolean;
+  now?: string;
+}): Promise<string> {
+  await ensureManualBlocksSchema();
+  try {
+    return await getDatabase().begin(async (transaction) => {
+      await transaction`SELECT pg_advisory_xact_lock(734052024)`;
+      const settings = await getBookingSettings(transaction);
+      const day = Temporal.PlainDate.from(input.day);
+      const time = Temporal.PlainTime.from(input.startTime);
+      if (
+        !['studio', 'home'].includes(input.category) ||
+        !Number.isInteger(input.durationMinutes) ||
+        input.durationMinutes < 15 || input.durationMinutes > 240 ||
+        input.durationMinutes % settings.slotIntervalMinutes !== 0 ||
+        time.minute % settings.slotIntervalMinutes !== 0 ||
+        time.second !== 0
+      ) throw new Error('A kezdés és az időtartam a foglalási időközhöz igazodjon.');
+
+      const start = day.toZonedDateTime({ timeZone: settings.timeZone, plainTime: time }).toInstant();
+      const now = Temporal.Instant.from(input.now ?? Temporal.Now.instant().toString());
+      if (Temporal.Instant.compare(start, now) <= 0) throw new Error('Múltbeli időpont nem rögzíthető.');
+      const end = start.add({ minutes: input.durationMinutes });
+      const bufferMinutes = input.applyStandardBuffer
+        ? input.category === 'home' ? settings.homeBufferBeforeMinutes : settings.studioBufferBeforeMinutes
+        : 0;
+      const occupiedStart = start.subtract({ minutes: bufferMinutes });
+      const occupiedEnd = end.add({ minutes: bufferMinutes });
+      const [bookingConflict] = await transaction`
+        SELECT 1 FROM bookings
+        WHERE status = 'confirmed'
+          AND tstzrange(busy_starts_at, busy_ends_at, '[)') &&
+            tstzrange(${occupiedStart.toString()}::timestamptz, ${occupiedEnd.toString()}::timestamptz, '[)')
+        LIMIT 1
+      `;
+      const [googleConflict] = await transaction`
+        SELECT 1 FROM google_calendar_busy
+        WHERE starts_at < ${occupiedEnd.toString()}::timestamptz
+          AND ends_at > ${occupiedStart.toString()}::timestamptz
+        LIMIT 1
+      `;
+      const [manualConflict] = await transaction`
+        SELECT 1 FROM manual_calendar_blocks
+        WHERE cancelled_at IS NULL
+          AND occupied_starts_at < ${occupiedEnd.toString()}::timestamptz
+          AND occupied_ends_at > ${occupiedStart.toString()}::timestamptz
+        LIMIT 1
+      `;
+      if (bookingConflict || googleConflict || manualConflict) throw new ManualBlockConflictError();
+
+      const id = randomUUID();
+      await transaction`
+        INSERT INTO manual_calendar_blocks (
+          id, service_category, starts_at, ends_at, occupied_starts_at,
+          occupied_ends_at, duration_minutes, buffer_minutes, guest_name, note
+        ) VALUES (
+          ${id}, ${input.category}, ${start.toString()}::timestamptz,
+          ${end.toString()}::timestamptz, ${occupiedStart.toString()}::timestamptz,
+          ${occupiedEnd.toString()}::timestamptz, ${input.durationMinutes},
+          ${bufferMinutes}, ${input.guestName?.trim() || null}, ${input.note?.trim() || null}
+        )
+      `;
+      return id;
+    });
+  } catch (error: any) {
+    if (error instanceof ManualBlockConflictError || error?.code === '23P01') {
+      throw new ManualBlockConflictError();
+    }
+    throw error;
+  }
+}
+
+export async function cancelManualCalendarBlock(id: string): Promise<boolean> {
+  await ensureManualBlocksSchema();
+  const [row] = await getDatabase()`
+    UPDATE manual_calendar_blocks SET cancelled_at = now()
+    WHERE id = ${id}::uuid AND cancelled_at IS NULL
+    RETURNING id
+  `;
+  return Boolean(row);
 }
 
 export async function addAvailabilityRule(input: {

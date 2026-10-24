@@ -5,17 +5,21 @@ import { getAdminSession } from '../../lib/server/admin-auth';
 import {
   addAvailabilityException,
   addAvailabilityRule,
+  addManualCalendarBlock,
   cancelBooking,
+  cancelManualCalendarBlock,
   deleteAvailabilityException,
   deleteAvailabilityRule,
   getBookingSettings,
   listAvailabilityExceptions,
   listAvailabilityRules,
   listBookings,
+  listManualCalendarBlocks,
+  ManualBlockConflictError,
 } from '../../lib/server/booking-repository';
 import { assertSameOrigin } from '../../lib/server/security';
 import { dispatchPendingBookingEmails, retryBookingEmails } from '../../lib/server/booking-email';
-import { resolveOpenWindows } from '../../lib/booking/availability';
+import { localDayInstantRange, resolveOpenWindows } from '../../lib/booking/availability';
 import {
   getGoogleCalendarStatus,
   listGoogleCalendarBusy,
@@ -64,12 +68,16 @@ const periodEnd = view === 'month' ? monthGridEnd : weekEnd;
 const currentQuery = view === 'month'
   ? `view=month&month=${monthKey}`
   : `week=${weekStart}${requestedMonth ? `&month=${monthKey}` : ''}`;
+let manualBlockError: string | null = null;
+let manualDraft: Record<string, string> = {};
+let submittedAction = '';
 
 if (Astro.request.method === 'POST') {
   try {
     assertSameOrigin(Astro.request);
     const form = Object.fromEntries(await Astro.request.formData());
     const action = String(form.action || '');
+    submittedAction = action;
 
     if (action === 'add_rule') {
       const input = z.object({
@@ -121,6 +129,33 @@ if (Astro.request.method === 'POST') {
     } else if (action === 'retry_booking_emails') {
       const { id } = z.object({ id: z.uuid() }).parse(form);
       await retryBookingEmails(id);
+    } else if (action === 'add_manual_block') {
+      manualDraft = Object.fromEntries(Object.entries(form).map(([key, value]) => [key, String(value)]));
+      const input = z.object({
+        day: z.iso.date(),
+        startTime: z.string().regex(/^\d{2}:\d{2}$/),
+        durationMinutes: z.coerce.number().int().min(15).max(240),
+        category: z.enum(['studio', 'home']),
+        guestName: z.string().trim().max(120).optional(),
+        note: z.string().trim().max(500).optional(),
+        applyStandardBuffer: z.string().optional(),
+      }).parse(form);
+      const startRange = localDayInstantRange(input.day, settings.timeZone);
+      const nextRange = localDayInstantRange(
+        Temporal.PlainDate.from(input.day).add({ days: 1 }).toString(), settings.timeZone,
+      );
+      await safelyRefreshGoogleCalendarBusy({ start: startRange.start, end: nextRange.end });
+      const id = await addManualCalendarBlock({
+        day: input.day, startTime: input.startTime, durationMinutes: input.durationMinutes,
+        category: input.category, guestName: input.guestName, note: input.note,
+        applyStandardBuffer: input.applyStandardBuffer === 'on',
+      });
+      await safelySyncGoogleCalendarEntity('manual_block', id);
+    } else if (action === 'cancel_manual_block') {
+      const { id } = z.object({ id: z.uuid() }).parse(form);
+      if (await cancelManualCalendarBlock(id)) {
+        await safelyRemoveGoogleCalendarEntity('manual_block', id);
+      }
     } else if (action === 'select_google_calendar') {
       const { calendarId } = z.object({
         calendarId: z.string().trim().min(1).max(500),
@@ -135,11 +170,20 @@ if (Astro.request.method === 'POST') {
     } else if (action === 'sync_google_calendar') {
       await syncAllToGoogleCalendar();
     }
-    return Astro.redirect(`/admin?${currentQuery}`, 303);
+    return Astro.redirect(`/admin?${currentQuery}${action === 'add_manual_block' ? '&manual=saved' : ''}`, 303);
   } catch (error) {
     if (error instanceof Response) return error;
     console.error('Admin action failed', error);
-    return new Response('A módosítás nem menthető. Ellenőrizd a megadott adatokat.', { status: 400 });
+    if (submittedAction === 'add_manual_block') {
+      manualBlockError = error instanceof ManualBlockConflictError
+        ? error.message
+        : error instanceof Error && (
+          error.message === 'Múltbeli időpont nem rögzíthető.' ||
+          error.message === 'A kezdés és az időtartam a foglalási időközhöz igazodjon.'
+        ) ? error.message : 'A blokk nem menthető. Ellenőrizd a megadott dátumot és időtartamot.';
+    } else {
+      return new Response('A módosítás nem menthető. Ellenőrizd a megadott adatokat.', { status: 400 });
+    }
   }
 }
 
@@ -153,11 +197,12 @@ const endInstant = periodEnd.toZonedDateTime({
 }).toInstant().toString();
 
 await safelyRefreshGoogleCalendarBusy({ start: startInstant, end: endInstant });
-const [rules, exceptions, bookings, googleBusy] = await Promise.all([
+const [rules, exceptions, bookings, googleBusy, manualBlocks] = await Promise.all([
   listAvailabilityRules(),
   listAvailabilityExceptions(periodStart.toString(), periodEnd.subtract({ days: 1 }).toString()),
   listBookings(startInstant, endInstant),
   listGoogleCalendarBusy({ start: startInstant, end: endInstant }),
+  listManualCalendarBlocks(startInstant, endInstant),
 ]);
 
 const weekdays = ['Hétfő', 'Kedd', 'Szerda', 'Csütörtök', 'Péntek', 'Szombat', 'Vasárnap'];
@@ -238,6 +283,24 @@ const googleBusyByDay = new Map(days.map((day) => {
     new Date(busy.ends_at).getTime() > dayStart
   )] as const;
 }));
+const manualBlocksByDay = new Map(days.map((day) => {
+  const range = localDayInstantRange(day.toString(), settings.timeZone);
+  const start = Temporal.Instant.from(range.start).epochMilliseconds;
+  const end = Temporal.Instant.from(range.end).epochMilliseconds;
+  return [day.toString(), manualBlocks.filter((block) =>
+    new Date(block.starts_at).getTime() < end &&
+    new Date(block.occupied_ends_at).getTime() > start
+  )] as const;
+}));
+const manualStartTimes = (start: string, end: string) => {
+  const minutes = (value: string) => Number(value.slice(0, 2)) * 60 + Number(value.slice(3, 5));
+  const labels: string[] = [];
+  const first = Math.ceil(minutes(start) / settings.slotIntervalMinutes) * settings.slotIntervalMinutes;
+  for (let value = first; value < minutes(end); value += settings.slotIntervalMinutes) {
+    labels.push(`${String(Math.floor(value / 60)).padStart(2, '0')}:${String(value % 60).padStart(2, '0')}`);
+  }
+  return labels;
+};
 const busyTimeOnDay = (value: unknown, day: Temporal.PlainDate, edge: 'start' | 'end') => {
   const local = localBooking(value);
   const localDay = local.toPlainDate().toString();
@@ -274,6 +337,7 @@ const syncTime = (value: unknown) => value
             <span><i class="booking-legend__swatch booking-legend__swatch--open"></i>Foglalható idősáv</span>
             <span><i class="booking-legend__swatch booking-legend__swatch--studio"></i>Stúdió</span>
             <span><i class="booking-legend__swatch booking-legend__swatch--home"></i>Home service</span>
+            <span><i class="booking-legend__swatch booking-legend__swatch--manual"></i>Manuális blokk</span>
             <span><i class="booking-legend__swatch booking-legend__swatch--google"></i>Google Naptárban foglalt</span>
           </div>
         </div>
@@ -298,6 +362,8 @@ const syncTime = (value: unknown) => value
         </div>
       </section>
 
+      {Astro.url.searchParams.get('manual') === 'saved' && <p class="manual-notice" role="status">A manuális időpontot rögzítettem; az érintett időszak nem foglalható online.</p>}
+
       {view === 'week' ? (
       <section class="calendar-grid" aria-label="Heti foglalások">
         {days.map((day, index) => {
@@ -305,6 +371,7 @@ const syncTime = (value: unknown) => value
           const dayExceptions = exceptionsByDay.get(day.toString()) || [];
           const openWindows = openWindowsByDay.get(day.toString()) || [];
           const googleBusyWindows = googleBusyByDay.get(day.toString()) || [];
+          const dayManualBlocks = manualBlocksByDay.get(day.toString()) || [];
           return (
             <article class:list={['calendar-day', { 'calendar-day--today': day.equals(today) }]}>
               <header>
@@ -321,6 +388,15 @@ const syncTime = (value: unknown) => value
                   ))}
                 </div>
               )}
+              <details class="manual-start-picker">
+                <summary>+ Manuális időpont / blokk</summary>
+                <div class="manual-start-picker__times">
+                  {openWindows.flatMap((window) => manualStartTimes(window.start, window.end)).map((time) => (
+                    <button type="button" data-manual-date={day.toString()} data-manual-time={time}>{time}</button>
+                  ))}
+                  <button class="manual-start-picker__other" type="button" data-manual-date={day.toString()} data-manual-time="10:00">Más kezdés…</button>
+                </div>
+              </details>
               {dayExceptions.map((exception) => (
                 <div class:list={['exception-chip', `exception-chip--${exception.kind}`]}>
                   <span>{exception.kind === 'blocked' ? 'Zárva' : 'Extra nyitva'}</span>
@@ -338,8 +414,21 @@ const syncTime = (value: unknown) => value
                   </div>
                 );
               })}
+              {dayManualBlocks.map((block) => (
+                <div class="manual-block-chip">
+                  <span>{block.guest_name || 'Manuális blokk'}</span>
+                  <strong>{busyTimeOnDay(block.starts_at, day, 'start')}–{busyTimeOnDay(block.occupied_ends_at, day, 'end')}</strong>
+                  <small>{block.service_category === 'home' ? 'Home Service' : 'Stúdió'} · {block.duration_minutes} perc{Number(block.buffer_minutes) ? ` + ${block.buffer_minutes} perc buffer` : ' · buffer nélkül'}</small>
+                  {block.note && <small>{block.note}</small>}
+                  <form method="post" onsubmit="return confirm('Biztosan felszabadítod ezt a manuális időpontot?')">
+                    <input type="hidden" name="action" value="cancel_manual_block" />
+                    <input type="hidden" name="id" value={block.id} />
+                    <button type="submit">Felszabadítás</button>
+                  </form>
+                </div>
+              ))}
               <div class="day-bookings">
-                {dayBookings.length === 0 && <p class="empty-day">Nincs foglalás</p>}
+                {dayBookings.length === 0 && dayManualBlocks.length === 0 && <p class="empty-day">Nincs foglalás</p>}
                 {dayBookings.map((booking) => {
                   const start = localBooking(booking.starts_at);
                   const end = localBooking(booking.ends_at);
@@ -422,6 +511,7 @@ const syncTime = (value: unknown) => value
             const dayExceptions = exceptionsByDay.get(date) || [];
             const openWindows = openWindowsByDay.get(date) || [];
             const googleBusyWindows = googleBusyByDay.get(date) || [];
+            const dayManualBlocks = manualBlocksByDay.get(date) || [];
             const dayWeek = day.subtract({ days: day.dayOfWeek - 1 }).toString();
             return (
               <a
@@ -430,7 +520,7 @@ const syncTime = (value: unknown) => value
                   'month-day--outside': day.month !== monthStart.month || day.year !== monthStart.year,
                 }]}
                 href={`/admin?week=${dayWeek}&month=${date.slice(0, 7)}`}
-                aria-label={`${day.toLocaleString('hu-HU', { year: 'numeric', month: 'long', day: 'numeric' })}: ${openWindows.length} foglalható idősáv, ${dayBookings.length} foglalás, ${dayExceptions.length} egyedi módosítás, ${googleBusyWindows.length} Google-foglaltság. Részletek a heti nézetben.`}
+                aria-label={`${day.toLocaleString('hu-HU', { year: 'numeric', month: 'long', day: 'numeric' })}: ${openWindows.length} nyitott idősáv, ${dayBookings.length} foglalás, ${dayManualBlocks.length} manuális blokk, ${dayExceptions.length} egyedi módosítás, ${googleBusyWindows.length} Google-foglaltság. Részletek a heti nézetben.`}
               >
                 <span class="month-day__number">{day.day}</span>
                 <span class="month-day__items">
@@ -452,6 +542,12 @@ const syncTime = (value: unknown) => value
                       –{busyTimeOnDay(busy.ends_at, day, 'end')}
                     </span>;
                   })}
+                  {dayManualBlocks.map((block) => (
+                    <span class="month-chip month-chip--manual" title={`${block.guest_name || 'Manuális blokk'} · ${block.duration_minutes} perc${Number(block.buffer_minutes) ? ` + ${block.buffer_minutes} perc buffer` : ''}`}>
+                      {busyTimeOnDay(block.starts_at, day, 'start')}–{busyTimeOnDay(block.occupied_ends_at, day, 'end')}
+                      <span class="month-chip__label"> {block.guest_name || 'Manuális blokk'}</span>
+                    </span>
+                  ))}
                   {dayBookings.map((booking) => {
                     const start = localBooking(booking.starts_at);
                     return <span class:list={['month-chip', `month-chip--${booking.service_category}`, { 'month-chip--cancelled': booking.status === 'cancelled' }]}>
@@ -467,6 +563,28 @@ const syncTime = (value: unknown) => value
         <p class="month-hint">Kattints egy napra a foglalások részleteihez és a heti nézethez.</p>
       </section>
       )}
+
+      <dialog id="manual-block-dialog" class="manual-block-dialog" open={Boolean(manualBlockError)} aria-labelledby="manual-block-title">
+        <form method="post" class="manual-block-form">
+          <input type="hidden" name="action" value="add_manual_block" />
+          <div class="manual-block-dialog__head"><div><span class="eyebrow">Admin naptár</span><h2 id="manual-block-title">Manuális időpont / blokk</h2></div><button id="manual-block-close" type="button" aria-label="Ablak bezárása">×</button></div>
+          <p>Névvel külső foglalásként, név nélkül egyszerű lezárásként használhatod. Ügyfélnek nem küld automatikus e-mailt.</p>
+          {manualBlockError && <p class="manual-block-error" role="alert">{manualBlockError}</p>}
+          <div class="manual-block-form__row">
+            <label>Dátum<input name="day" type="date" value={manualDraft.day || selected.toString()} required /></label>
+            <label>Kezdés<input name="startTime" type="time" step="900" value={manualDraft.startTime || '10:00'} required /></label>
+          </div>
+          <div class="manual-block-form__row">
+            <label>Időtartam (perc)<input name="durationMinutes" type="number" min="15" max="240" step="15" value={manualDraft.durationMinutes || '60'} required /></label>
+            <label>Típus<select name="category"><option value="studio" selected={manualDraft.category !== 'home'}>Studio Visit</option><option value="home" selected={manualDraft.category === 'home'}>Home Service</option></select></label>
+          </div>
+          <label>Vendég neve (opcionális)<input name="guestName" maxlength="120" value={manualDraft.guestName || ''} placeholder="pl. WhatsApp-foglalás" /></label>
+          <label>Megjegyzés (opcionális)<input name="note" maxlength="500" value={manualDraft.note || ''} placeholder="pl. privát időpont" /></label>
+          <label class="manual-block-form__check"><input name="applyStandardBuffer" type="checkbox" checked={Object.keys(manualDraft).length ? manualDraft.applyStandardBuffer === 'on' : true} /> Standard buffer alkalmazása</label>
+          <p id="manual-block-preview" class="manual-block-preview" aria-live="polite"></p>
+          <div class="manual-block-form__actions"><button type="button" id="manual-block-cancel" class="btn btn--outline">Mégse</button><button class="btn btn--primary" type="submit">Időpont rögzítése</button></div>
+        </form>
+      </dialog>
 
       <section class="admin-panels">
         <article class="admin-panel">
@@ -594,6 +712,47 @@ const syncTime = (value: unknown) => value
         </div>
       </section>
     </main>
+    <script>
+      const dialog = document.querySelector<HTMLDialogElement>('#manual-block-dialog');
+      const form = dialog?.querySelector<HTMLFormElement>('form');
+      if (dialog && form) {
+        const day = form.elements.namedItem('day') as HTMLInputElement;
+        const startTime = form.elements.namedItem('startTime') as HTMLInputElement;
+        const duration = form.elements.namedItem('durationMinutes') as HTMLInputElement;
+        const category = form.elements.namedItem('category') as HTMLSelectElement;
+        const useBuffer = form.elements.namedItem('applyStandardBuffer') as HTMLInputElement;
+        const preview = dialog.querySelector<HTMLElement>('#manual-block-preview');
+        const updatePreview = () => {
+          if (!preview || !startTime.value || !Number(duration.value)) return;
+          const [hour, minute] = startTime.value.split(':').map(Number);
+          const base = hour * 60 + minute;
+          const massageEnd = base + Number(duration.value);
+          const buffer = useBuffer.checked ? category.value === 'home' ? 120 : 30 : 0;
+          const occupiedEnd = massageEnd + buffer;
+          const label = (value: number) => `${String(Math.floor(value / 60) % 24).padStart(2, '0')}:${String(value % 60).padStart(2, '0')}${value >= 1440 ? ' (másnap)' : ''}`;
+          preview.textContent = `${startTime.value}–${label(massageEnd)} kezelés${buffer ? ` · ${label(massageEnd)}–${label(occupiedEnd)} buffer` : ' · buffer nélkül'}`;
+        };
+        for (const control of [startTime, duration, category, useBuffer]) control.addEventListener('change', updatePreview);
+        for (const button of document.querySelectorAll<HTMLButtonElement>('[data-manual-date]')) {
+          button.addEventListener('click', () => {
+            day.value = button.dataset.manualDate || '';
+            startTime.value = button.dataset.manualTime || '10:00';
+            updatePreview();
+            dialog.showModal();
+            startTime.focus();
+          });
+        }
+        const close = () => dialog.close();
+        dialog.querySelector('#manual-block-close')?.addEventListener('click', close);
+        dialog.querySelector('#manual-block-cancel')?.addEventListener('click', close);
+        dialog.addEventListener('click', (event) => { if (event.target === dialog) close(); });
+        if (dialog.hasAttribute('open')) {
+          dialog.close();
+          dialog.showModal();
+        }
+        updatePreview();
+      }
+    </script>
   </body>
 </html>
 
@@ -618,6 +777,7 @@ const syncTime = (value: unknown) => value
   .booking-legend__swatch--open { width: 1rem; border: 1px solid var(--pine); border-radius: 0.18rem; background: var(--pine-soft); }
   .booking-legend__swatch--studio { background: var(--pine); }
   .booking-legend__swatch--home { background: var(--clay); }
+  .booking-legend__swatch--manual { border-radius: 0.18rem; background: #7b6a9c; }
   .booking-legend__swatch--google { background: #5f6f8f; }
   .calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(9rem, 1fr)); overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow-soft); }
   .calendar-day { min-height: 24rem; padding: 0.75rem; border-right: 1px solid var(--border); }
@@ -642,6 +802,7 @@ const syncTime = (value: unknown) => value
   .month-chip--open { border-color: var(--pine); background: var(--pine-soft); color: var(--pine-dark); }
   .month-chip--blocked { border-color: var(--clay); background: var(--clay-soft); color: var(--clay-dark); }
   .month-chip--google { border-color: #5f6f8f; background: #edf0f6; color: #34415d; }
+  .month-chip--manual { border-color: #7b6a9c; background: #f0edf7; color: #4c3e65; }
   .month-chip--studio { border-color: var(--pine); background: var(--pine-soft); color: var(--pine-dark); }
   .month-chip--home { border-color: var(--clay); background: var(--clay-soft); color: var(--clay-dark); }
   .month-chip--cancelled { border-color: var(--border); background: #eeeae3; color: var(--ink-soft); text-decoration: line-through; }
@@ -650,6 +811,18 @@ const syncTime = (value: unknown) => value
   .open-window { display: grid; gap: 0.12rem; padding: 0.55rem 0.6rem; border: 1px solid rgb(40 82 71 / 0.22); border-left: 3px solid var(--pine); border-radius: 0.45rem; background: var(--pine-soft); color: var(--pine-dark); }
   .open-window span { font-size: 0.62rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
   .open-window strong { font-size: 0.78rem; }
+  .manual-notice { margin: -0.4rem 0 1rem; padding: 0.8rem 1rem; border-radius: var(--radius-sm); background: var(--pine-soft); color: var(--pine-dark); font-weight: 700; }
+  .manual-start-picker { margin-bottom: 0.6rem; border: 1px solid var(--border); border-radius: 0.45rem; background: #fff; }
+  .manual-start-picker summary { padding: 0.5rem 0.6rem; color: var(--pine-dark); cursor: pointer; font-size: 0.7rem; font-weight: 800; }
+  .manual-start-picker__times { display: flex; flex-wrap: wrap; gap: 0.3rem; max-height: 10rem; overflow-y: auto; padding: 0 0.5rem 0.55rem; }
+  .manual-start-picker__times button { border: 1px solid var(--pine); border-radius: 999px; background: var(--pine-soft); color: var(--pine-dark); padding: 0.22rem 0.43rem; cursor: pointer; font: inherit; font-size: 0.68rem; }
+  .manual-start-picker__times button:hover, .manual-start-picker__times button:focus-visible { background: var(--pine); color: #fff; }
+  .manual-start-picker__times .manual-start-picker__other { border-color: var(--clay); background: var(--clay-soft); color: var(--clay-dark); }
+  .manual-block-chip { display: grid; gap: 0.15rem; margin-bottom: 0.5rem; padding: 0.5rem 0.6rem; border-left: 3px solid #7b6a9c; border-radius: 0.4rem; background: #f0edf7; color: #4c3e65; overflow-wrap: anywhere; }
+  .manual-block-chip > span { font-size: 0.72rem; font-weight: 800; }
+  .manual-block-chip strong { font-size: 0.76rem; }
+  .manual-block-chip small { font-size: 0.65rem; line-height: 1.4; }
+  .manual-block-chip button { padding: 0; border: 0; background: none; color: #8f2f24; cursor: pointer; font: inherit; font-size: 0.67rem; font-weight: 800; }
   .exception-chip { display: grid; margin-bottom: 0.5rem; padding: 0.5rem; border-radius: 0.45rem; background: var(--clay-soft); color: var(--clay-dark); font-size: 0.72rem; }
   .exception-chip--open { background: var(--pine-soft); color: var(--pine-dark); }
   .exception-chip small { opacity: 0.78; }
@@ -678,6 +851,21 @@ const syncTime = (value: unknown) => value
   .retry-link { margin-bottom: 0.55rem; padding: 0; border: 0; background: none; color: var(--clay-dark); cursor: pointer; font: inherit; font-weight: 700; }
   .danger-link { padding: 0; border: 0; background: none; color: #8f2f24; cursor: pointer; font: inherit; font-weight: 700; }
   .cancelled-label { color: #8f2f24; font-weight: 700; }
+  .manual-block-dialog { width: min(92vw, 34rem); max-height: min(88vh, 50rem); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 0; background: var(--surface); color: var(--ink); box-shadow: 0 1.5rem 4rem rgb(22 41 36 / 0.25); }
+  .manual-block-dialog::backdrop { background: rgb(22 41 36 / 0.55); }
+  .manual-block-form { display: grid; gap: 0.9rem; padding: clamp(1.2rem, 4vw, 2rem); }
+  .manual-block-dialog__head { display: flex; justify-content: space-between; gap: 1rem; align-items: start; }
+  .manual-block-dialog__head h2 { max-width: none; margin: 0.25rem 0 0; font-size: clamp(1.5rem, 4vw, 2rem); }
+  .manual-block-dialog__head button { width: 2rem; height: 2rem; border: 0; border-radius: 50%; background: var(--clay-soft); color: var(--clay-dark); cursor: pointer; font-size: 1.4rem; }
+  .manual-block-form > p { margin: 0; color: var(--ink-soft); font-size: 0.83rem; line-height: 1.5; }
+  .manual-block-form .manual-block-error { padding: 0.7rem; border-radius: 0.4rem; background: #f8e5e2; color: #8f2f24; }
+  .manual-block-form__row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.8rem; }
+  .manual-block-form label { display: grid; gap: 0.3rem; color: var(--pine-dark); font-size: 0.72rem; font-weight: 800; }
+  .manual-block-form input, .manual-block-form select { width: 100%; min-height: 2.7rem; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.55rem; background: #fff; color: var(--ink); font: inherit; font-size: 0.9rem; font-weight: 400; }
+  .manual-block-form .manual-block-form__check { display: flex; align-items: center; gap: 0.55rem; font-size: 0.8rem; }
+  .manual-block-form__check input { width: 1rem; min-height: 1rem; margin: 0; }
+  .manual-block-form .manual-block-preview { padding: 0.7rem; border-radius: var(--radius-sm); background: var(--pine-soft); color: var(--pine-dark); font-weight: 700; }
+  .manual-block-form__actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 0.6rem; }
   .admin-panels { display: grid; gap: 1.25rem; margin-top: 1.5rem; }
   @media (min-width: 64rem) { .admin-panels { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   .admin-panel { position: relative; overflow: hidden; padding: clamp(1.4rem, 3vw, 2.5rem); border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); }
@@ -725,6 +913,7 @@ const syncTime = (value: unknown) => value
     .google-calendar-form { grid-template-columns: 1fr; }
   }
   @media (max-width: 42rem) {
+    .manual-block-form__row { grid-template-columns: 1fr; }
     .month-weekday { padding: 0.45rem 0; }
     .month-weekday__full { display: none; }
     .month-weekday__short { display: inline; }

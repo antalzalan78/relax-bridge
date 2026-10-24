@@ -8,6 +8,7 @@ import {
 import { Temporal } from '@js-temporal/polyfill';
 import { getDatabase } from './db';
 import { ensureGoogleCalendarSchema } from './google-calendar-schema';
+import { ensureManualBlocksSchema } from './manual-blocks-schema';
 
 const GOOGLE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
 const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
@@ -24,7 +25,8 @@ const GOOGLE_SCOPES = [
 export type GoogleCalendarEntityType =
   | 'booking'
   | 'availability_rule'
-  | 'availability_exception';
+  | 'availability_exception'
+  | 'manual_block';
 
 type ConnectionRow = {
   calendar_id: string | null;
@@ -525,10 +527,33 @@ function bookingEvent(row: any, timeZone: string): GoogleEvent {
   };
 }
 
+function manualBlockEvent(row: any, timeZone: string): GoogleEvent {
+  const start = new Date(row.starts_at);
+  const end = new Date(row.ends_at);
+  const occupiedEnd = new Date(row.occupied_ends_at);
+  const local = (value: Date) => new Intl.DateTimeFormat('hu-HU', {
+    hour: '2-digit', minute: '2-digit', timeZone,
+  }).format(value);
+  return {
+    summary: `Relax Bridge · ${row.guest_name || 'Niet beschikbaar'}`,
+    description: [
+      'Manuális admin időpont / blokk.',
+      `Kezelés: ${local(start)}–${local(end)} (${row.duration_minutes} perc)`,
+      row.buffer_minutes ? `Standard buffer: ${row.buffer_minutes} perc` : 'Standard buffer nélkül',
+      row.note ? `Megjegyzés: ${row.note}` : null,
+    ].filter(Boolean).join('\n'),
+    start: { dateTime: start.toISOString(), timeZone },
+    end: { dateTime: occupiedEnd.toISOString(), timeZone },
+    transparency: 'opaque',
+    extendedProperties: extendedProperties('manual_block', String(row.id)),
+  };
+}
+
 export async function syncGoogleCalendarEntity(
   entityType: GoogleCalendarEntityType,
   entityId: string,
 ): Promise<void> {
+  if (entityType === 'manual_block') await ensureManualBlocksSchema();
   const row = await connectionRow();
   if (!row?.calendar_id || !isGoogleCalendarConfigured()) return;
   const database = getDatabase();
@@ -549,11 +574,16 @@ export async function syncGoogleCalendarEntity(
       SELECT * FROM availability_rules WHERE id = ${entityId}::uuid AND active = true
     `;
     if (source) event = recurringRuleEvent(source, timeZone);
-  } else {
+  } else if (entityType === 'availability_exception') {
     [source] = await database`
       SELECT * FROM availability_exceptions WHERE id = ${entityId}::uuid
     `;
     if (source) event = exceptionEvent(source, timeZone);
+  } else {
+    [source] = await database`
+      SELECT * FROM manual_calendar_blocks WHERE id = ${entityId}::uuid AND cancelled_at IS NULL
+    `;
+    if (source) event = manualBlockEvent(source, timeZone);
   }
 
   if (!event) {
@@ -609,21 +639,24 @@ export async function safelyRemoveGoogleCalendarEntity(
 }
 
 export async function syncAllToGoogleCalendar(): Promise<void> {
+  await ensureManualBlocksSchema();
   const row = await connectionRow();
   if (!row?.calendar_id || !isGoogleCalendarConfigured()) return;
   const database = getDatabase();
-  const [rules, exceptions, bookings] = await Promise.all([
+  const [rules, exceptions, bookings, manualBlocks] = await Promise.all([
     database`SELECT id FROM availability_rules WHERE active = true`,
     database`SELECT id FROM availability_exceptions WHERE day >= current_date`,
     database`
       SELECT id FROM bookings
       WHERE status = 'confirmed' AND ends_at >= now()
     `,
+    database`SELECT id FROM manual_calendar_blocks WHERE cancelled_at IS NULL AND occupied_ends_at >= now()`,
   ]);
   const targets = [
     ...rules.map((item: any) => ({ type: 'availability_rule' as const, id: String(item.id) })),
     ...exceptions.map((item: any) => ({ type: 'availability_exception' as const, id: String(item.id) })),
     ...bookings.map((item: any) => ({ type: 'booking' as const, id: String(item.id) })),
+    ...manualBlocks.map((item: any) => ({ type: 'manual_block' as const, id: String(item.id) })),
   ];
   const expected = new Set(targets.map((target) => `${target.type}:${target.id}`));
 

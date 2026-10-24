@@ -3,7 +3,7 @@ import { Temporal } from '@js-temporal/polyfill';
 import { z } from 'zod';
 import {
   getAvailableDates,
-  getAvailableSlots,
+  getDaySlotChoices,
   getBookingSettings,
 } from '../../lib/server/booking-repository';
 import {
@@ -75,7 +75,7 @@ export const GET: APIRoute = async ({ url }) => {
     const range = localDayInstantRange(parsed.data.date, settings.timeZone);
     await safelyRefreshGoogleCalendarBusy(range);
 
-    const slots = await getAvailableSlots({
+    const choices = await getDaySlotChoices({
       date: parsed.data.date,
       category: parsed.data.category,
       durationMinutes: parsed.data.minutes,
@@ -84,7 +84,8 @@ export const GET: APIRoute = async ({ url }) => {
     return Response.json({
       date: parsed.data.date,
       timeZone: settings.timeZone,
-      slots: slots.map(({ start, end, label }) => ({ start, end, label })),
+      slots: choices.available.map(({ start, end, label }) => ({ start, end, label })),
+      unavailableSlots: choices.unavailable.map(({ start, label }) => ({ start, label })),
     });
   } catch (error) {
     console.error('Availability lookup failed', error);
