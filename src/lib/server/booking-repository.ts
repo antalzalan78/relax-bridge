@@ -36,7 +36,7 @@ export class SlotUnavailableError extends Error {
 
 export class ManualBlockConflictError extends Error {
   constructor() {
-    super('Az időszak ütközik egy meglévő foglalással vagy blokkal.');
+    super('Az időpont a foglalási szabályok szerint nem elérhető: ellenőrizd a nyitvatartást, az előfoglalási határidőt és a többi foglalást.');
   }
 }
 
@@ -140,7 +140,7 @@ async function getManualBlockRows(query: Queryable, range: InstantWindow) {
     FROM manual_calendar_blocks
     WHERE cancelled_at IS NULL
       AND starts_at < ${range.end}::timestamptz + interval '3 hours'
-      AND occupied_ends_at > ${range.start}::timestamptz
+      AND ends_at > ${range.start}::timestamptz - interval '3 hours'
   `;
 }
 
@@ -781,8 +781,8 @@ export async function listManualCalendarBlocks(from: string, to: string) {
       occupied_ends_at, duration_minutes, buffer_minutes, guest_name, note
     FROM manual_calendar_blocks
     WHERE cancelled_at IS NULL
-      AND occupied_starts_at < ${to}::timestamptz
-      AND occupied_ends_at > ${from}::timestamptz
+      AND starts_at < ${to}::timestamptz
+      AND ends_at > ${from}::timestamptz
     ORDER BY starts_at
   `;
 }
@@ -816,33 +816,48 @@ export async function addManualCalendarBlock(input: {
       const start = day.toZonedDateTime({ timeZone: settings.timeZone, plainTime: time }).toInstant();
       const now = Temporal.Instant.from(input.now ?? Temporal.Now.instant().toString());
       if (Temporal.Instant.compare(start, now) <= 0) throw new Error('Múltbeli időpont nem rögzíthető.');
-      const end = start.add({ minutes: input.durationMinutes });
+      const selected = input.applyStandardBuffer
+        ? (await getAvailableSlotsWithQuery({
+          query: transaction,
+          date: input.day,
+          category: input.category,
+          durationMinutes: input.durationMinutes,
+          settings,
+          now: now.toString(),
+        })).find((slot) => Temporal.Instant.compare(Temporal.Instant.from(slot.start), start) === 0)
+        : null;
+      if (input.applyStandardBuffer && !selected) throw new ManualBlockConflictError();
+      const end = selected
+        ? Temporal.Instant.from(selected.end)
+        : start.add({ minutes: input.durationMinutes });
       const bufferMinutes = input.applyStandardBuffer
         ? input.category === 'home' ? settings.homeBufferBeforeMinutes : settings.studioBufferBeforeMinutes
         : 0;
-      const occupiedStart = start.subtract({ minutes: bufferMinutes });
-      const occupiedEnd = end.add({ minutes: bufferMinutes });
-      const [bookingConflict] = await transaction`
-        SELECT 1 FROM bookings
-        WHERE status = 'confirmed'
-          AND tstzrange(busy_starts_at, busy_ends_at, '[)') &&
-            tstzrange(${occupiedStart.toString()}::timestamptz, ${occupiedEnd.toString()}::timestamptz, '[)')
-        LIMIT 1
-      `;
-      const [googleConflict] = await transaction`
-        SELECT 1 FROM google_calendar_busy
-        WHERE starts_at < ${occupiedEnd.toString()}::timestamptz
-          AND ends_at > ${occupiedStart.toString()}::timestamptz
-        LIMIT 1
-      `;
-      const [manualConflict] = await transaction`
-        SELECT 1 FROM manual_calendar_blocks
-        WHERE cancelled_at IS NULL
-          AND occupied_starts_at < ${occupiedEnd.toString()}::timestamptz
-          AND occupied_ends_at > ${occupiedStart.toString()}::timestamptz
-        LIMIT 1
-      `;
-      if (bookingConflict || googleConflict || manualConflict) throw new ManualBlockConflictError();
+      const occupiedStart = selected ? Temporal.Instant.from(selected.busyStart) : start;
+      const occupiedEnd = selected ? Temporal.Instant.from(selected.busyEnd) : end;
+      if (!input.applyStandardBuffer) {
+        const [bookingConflict] = await transaction`
+          SELECT 1 FROM bookings
+          WHERE status = 'confirmed'
+            AND starts_at < ${end.toString()}::timestamptz
+            AND ends_at > ${start.toString()}::timestamptz
+          LIMIT 1
+        `;
+        const [googleConflict] = await transaction`
+          SELECT 1 FROM google_calendar_busy
+          WHERE starts_at < ${end.toString()}::timestamptz
+            AND ends_at > ${start.toString()}::timestamptz
+          LIMIT 1
+        `;
+        const [manualConflict] = await transaction`
+          SELECT 1 FROM manual_calendar_blocks
+          WHERE cancelled_at IS NULL
+            AND starts_at < ${end.toString()}::timestamptz
+            AND ends_at > ${start.toString()}::timestamptz
+          LIMIT 1
+        `;
+        if (bookingConflict || googleConflict || manualConflict) throw new ManualBlockConflictError();
+      }
 
       const id = randomUUID();
       await transaction`
