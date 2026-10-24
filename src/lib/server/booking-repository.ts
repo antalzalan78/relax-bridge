@@ -6,7 +6,7 @@ import {
   localTimeWindowInstantRange,
 } from '../booking/availability';
 import { bookingMinimumStart } from '../booking/booking-window';
-import { manualBlockWindows } from '../booking/manual-blocks';
+import { homeToManualStudioBufferMinutes, manualBlockWindows } from '../booking/manual-blocks';
 import {
   homeServiceBufferMinutes,
   studioVisitBufferMinutes,
@@ -205,6 +205,7 @@ async function getBusyWindows(
   query: Queryable,
   date: string,
   settings: BookingSettings,
+  category: BookingCategory,
 ): Promise<InstantWindow[]> {
   await ensureGoogleCalendarSchema();
   const range = localDayInstantRange(date, settings.timeZone);
@@ -222,7 +223,7 @@ async function getBusyWindows(
       AND ends_at > ${range.start}::timestamptz
   `;
 
-  const manual = manualBlockWindows(await getManualBlockRows(query, range));
+  const manual = manualBlockWindows(await getManualBlockRows(query, range), category);
   return [...rows.map((row: any) => busyWindowFromRow(row, settings)), ...manual.busy];
 }
 
@@ -247,7 +248,7 @@ async function getSlotChoicesWithQuery(input: {
     input.date,
     settings,
   );
-  const busy = await getBusyWindows(input.query, input.date, settings);
+  const busy = await getBusyWindows(input.query, input.date, settings, input.category);
   const isHome = input.category === 'home';
 
   const candidateInput = {
@@ -389,7 +390,7 @@ export async function getAvailableDates(input: {
     exceptionsByDay.set(day, current);
   }
 
-  const manual = manualBlockWindows(manualRows);
+  const manual = manualBlockWindows(manualRows, input.category);
   const busyWindows: InstantWindow[] = [
     ...busyRows.map((row: any) => busyWindowFromRow(row, settings)),
     ...manual.busy,
@@ -541,8 +542,11 @@ export async function getNextAvailableSlot(input: {
   const manual = manualBlockWindows(manualRows);
   const busyWindows: InstantWindow[] = [
     ...busyRows.map((row: any) => busyWindowFromRow(row, settings)),
-    ...manual.busy,
   ];
+  const manualBusyByCategory = {
+    studio: manual.busy,
+    home: manualBlockWindows(manualRows, 'home').busy,
+  };
   for (let offset = 0; offset <= settings.bookingHorizonDays; offset += 1) {
     const day = today.add({ days: offset });
     const date = day.toString();
@@ -591,7 +595,7 @@ export async function getNextAvailableSlot(input: {
         timeZone: settings.timeZone,
         openWindows: open,
         blockedWindows: blocked,
-        busyWindows,
+        busyWindows: [...busyWindows, ...manualBusyByCategory[candidate.category]],
         durationMinutes: candidate.durationMinutes,
         bufferBeforeMinutes: isHome
           ? settings.homeBufferBeforeMinutes
@@ -827,6 +831,22 @@ export async function addManualCalendarBlock(input: {
         })).find((slot) => Temporal.Instant.compare(Temporal.Instant.from(slot.start), start) === 0)
         : null;
       if (input.applyStandardBuffer && !selected) throw new ManualBlockConflictError();
+      if (input.applyStandardBuffer && input.category === 'studio') {
+        const earliestHomeEnd = start.subtract({ minutes: homeToManualStudioBufferMinutes });
+        const [precedingHome] = await transaction`
+          SELECT 1 FROM (
+            SELECT ends_at FROM bookings
+            WHERE status = 'confirmed' AND service_category = 'home'
+            UNION ALL
+            SELECT ends_at FROM manual_calendar_blocks
+            WHERE cancelled_at IS NULL AND service_category = 'home' AND buffer_minutes > 0
+          ) AS home_appointments
+          WHERE ends_at > ${earliestHomeEnd.toString()}::timestamptz
+            AND ends_at <= ${start.toString()}::timestamptz
+          LIMIT 1
+        `;
+        if (precedingHome) throw new ManualBlockConflictError();
+      }
       const end = selected
         ? Temporal.Instant.from(selected.end)
         : start.add({ minutes: input.durationMinutes });

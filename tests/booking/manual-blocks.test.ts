@@ -74,6 +74,19 @@ test('buffered manual appointments use the same busy window as regular bookings'
   assert.equal(exact.blocked[0].end, end);
 });
 
+test('a Home Service needs 60 minutes before a buffered manual Studio Visit', () => {
+  const row = {
+    starts_at: '2026-11-02T13:00:00Z',
+    ends_at: '2026-11-02T14:00:00Z',
+    service_category: 'studio' as const,
+    buffer_minutes: 30,
+  };
+  assert.equal(manualBlocks.manualBlockWindows([row]).busy[0].start, '2026-11-02T12:30:00Z');
+  assert.equal(manualBlocks.manualBlockWindows([row], 'studio').busy[0].start, '2026-11-02T12:30:00Z');
+  assert.equal(manualBlocks.manualBlockWindows([row], 'home').busy[0].start, '2026-11-02T12:00:00Z');
+  assert.deepEqual(manualBlocks.manualBlockWindows([{ ...row, buffer_minutes: 0 }], 'home').busy, []);
+});
+
 test('lazy schema upgrades legacy manual occupancy without deleting appointments', async () => {
   const pg = new PGlite();
   try {
@@ -229,5 +242,95 @@ test('manual blocks affect public slots, reject collisions and can be released',
     )`);
     await assert.rejects(repository.addManualCalendarBlock({ ...input, startTime: '11:30' }), /nem elérhető/);
     await repository.addManualCalendarBlock({ ...input, startTime: '11:45' });
+  } finally { await pg.close(); }
+});
+
+test('a 14:00 manual Studio Visit leaves no 12:30 Home Service in a 12:30–18:00 window', async () => {
+  const pg = new PGlite();
+  try {
+    for (const migration of [
+      '0001_booking.sql', '0004_google_calendar.sql', '0005_booking_buffers.sql',
+      '0014_manual_calendar_blocks.sql', '0015_manual_blocks_booking_logic.sql',
+    ]) {
+      await pg.exec(readFileSync(new URL(`../../db/migrations/${migration}`, import.meta.url), 'utf8'));
+    }
+    await pg.query("INSERT INTO availability_rules (id, weekday, start_time, end_time) VALUES ('00000000-0000-4000-8000-000000000001', 1, '12:30', '18:00')");
+    const query = async (strings: TemplateStringsArray, ...values: unknown[]) => {
+      const sql = strings.reduce((text, part, index) => text + (index ? `$${index}` : '') + part, '');
+      return (await pg.query(sql, values)).rows;
+    };
+    const database = Object.assign(query, {
+      begin: async (callback: (transaction: typeof query) => Promise<unknown>) => {
+        await pg.exec('BEGIN');
+        try { const result = await callback(query); await pg.exec('COMMIT'); return result; }
+        catch (error) { await pg.exec('ROLLBACK'); throw error; }
+      },
+    });
+    const repository = loadRepository(database);
+    const now = '2026-11-01T00:00:00Z';
+    const input = {
+      day: '2026-11-02', startTime: '14:00', durationMinutes: 60,
+      category: 'studio', guestName: '', note: '', applyStandardBuffer: true, now,
+    } as const;
+    const initialHome = await repository.getAvailableSlots({
+      date: input.day, category: 'home', durationMinutes: 60, now,
+    });
+    assert.equal(initialHome.some((slot: { label: string }) => slot.label === '12:30'), true);
+
+    const id = await repository.addManualCalendarBlock(input);
+    const home = await repository.getAvailableSlots({
+      date: input.day, category: 'home', durationMinutes: 60, now,
+    });
+    assert.equal(home.some((slot: { label: string }) => slot.label === '12:30'), false);
+    assert.equal(home.some((slot: { label: string }) => slot.label === '17:00'), true);
+    const studio = await repository.getAvailableSlots({
+      date: input.day, category: 'studio', durationMinutes: 60, now,
+    });
+    assert.equal(studio.some((slot: { label: string }) => slot.label === '12:30'), true);
+    const choices = await repository.getDaySlotChoices({
+      date: input.day, category: 'home', durationMinutes: 60, now,
+    });
+    assert.equal(choices.unavailable.some((slot: { label: string }) => slot.label === '12:30'), true);
+    const nextHome = await repository.getNextAvailableSlot({
+      candidates: [{ category: 'home', durationMinutes: 60 }], now,
+    });
+    assert.equal(nextHome?.date, input.day);
+    assert.equal(nextHome?.start, '2026-11-02T16:00:00Z');
+
+    await pg.query("UPDATE availability_rules SET end_time = '16:30' WHERE id = '00000000-0000-4000-8000-000000000001'");
+    const homeDates = await repository.getAvailableDates({
+      from: input.day, to: input.day, category: 'home', durationMinutes: 60, now,
+    });
+    assert.deepEqual(Array.from(homeDates.dates), []);
+    const studioDates = await repository.getAvailableDates({
+      from: input.day, to: input.day, category: 'studio', durationMinutes: 60, now,
+    });
+    assert.deepEqual(Array.from(studioDates.dates), [input.day]);
+
+    await repository.cancelManualCalendarBlock(id);
+    const exactId = await repository.addManualCalendarBlock({ ...input, applyStandardBuffer: false });
+    const exactHome = await repository.getAvailableSlots({
+      date: input.day, category: 'home', durationMinutes: 60, now,
+    });
+    assert.equal(exactHome.some((slot: { label: string }) => slot.label === '12:30'), true);
+    await repository.cancelManualCalendarBlock(exactId);
+
+    const earlierHomeId = await repository.addManualCalendarBlock({
+      ...input, category: 'home', startTime: '12:30',
+    });
+    await assert.rejects(repository.addManualCalendarBlock(input), /nem elérhető/);
+    await repository.cancelManualCalendarBlock(earlierHomeId);
+
+    await pg.query(`INSERT INTO bookings (
+      id, reference, service_key, service_category, service_title,
+      duration_minutes, price_eur, customer_name, customer_email,
+      customer_phone, locale, starts_at, ends_at, busy_starts_at, busy_ends_at
+    ) VALUES (
+      '00000000-0000-4000-8000-000000000089', 'RB-TEST-HOME', 'relax', 'home', 'Home Relaxmassage',
+      60, 80, 'Existing guest', 'guest@example.com', '0000000000', 'nl',
+      '2026-11-02T11:30:00Z', '2026-11-02T12:30:00Z',
+      '2026-11-02T09:30:00Z', '2026-11-02T12:30:00Z'
+    )`);
+    await assert.rejects(repository.addManualCalendarBlock(input), /nem elérhető/);
   } finally { await pg.close(); }
 });
