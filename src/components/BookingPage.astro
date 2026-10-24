@@ -771,11 +771,22 @@ const homeConfig = {
         const payload = await response.json();
         slotStatus.textContent = payload.slots.length ? '' : copy.noSlots;
 
-        for (const slot of payload.slots) {
+        const shownSlots = [
+          ...payload.slots.map((slot: any) => ({ ...slot, unavailable: false })),
+          ...(payload.unavailableSlots || []).map((slot: any) => ({ ...slot, unavailable: true })),
+        ].sort((first: any, second: any) => first.start.localeCompare(second.start));
+        for (const slot of shownSlots) {
           const button = document.createElement('button');
           button.type = 'button';
           button.className = 'slot-button';
           button.textContent = slot.label;
+          if (slot.unavailable) {
+            button.disabled = true;
+            button.title = copy.unavailableSlot;
+            button.setAttribute('aria-label', `${slot.label} · ${copy.unavailableSlot}`);
+            slotGrid.append(button);
+            continue;
+          }
           button.addEventListener('click', () => {
             slotGrid.querySelectorAll('button').forEach((item) => item.removeAttribute('aria-pressed'));
             button.setAttribute('aria-pressed', 'true');
@@ -1240,6 +1251,7 @@ const homeConfig = {
 
   :global(.slot-button:hover),
   :global(.slot-button[aria-pressed='true']) { background: var(--logo-green); color: #fff; }
+  :global(.slot-button:disabled) { border-color: var(--border); background: #f0eee9; color: var(--ink-soft); cursor: not-allowed; text-decoration: line-through; opacity: 0.7; }
   .booking-card--details { scroll-margin-top: 7rem; }
   .appointment-summary { display: grid; gap: 0.2rem; margin-bottom: 2rem; padding: 1.2rem; border-left: 3px solid var(--logo-green); background: var(--pine-soft); }
   :global(.appointment-summary span) { color: var(--pine-dark); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }

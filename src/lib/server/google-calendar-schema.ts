@@ -44,7 +44,7 @@ async function createGoogleCalendarSchema(): Promise<void> {
     await transaction`
       CREATE TABLE IF NOT EXISTS google_calendar_event_links (
         entity_type text NOT NULL CHECK (
-          entity_type IN ('booking', 'availability_rule', 'availability_exception')
+          entity_type IN ('booking', 'availability_rule', 'availability_exception', 'manual_block')
         ),
         entity_id uuid NOT NULL,
         calendar_id text NOT NULL,
