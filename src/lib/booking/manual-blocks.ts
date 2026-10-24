@@ -17,7 +17,7 @@ const instant = (value: Date | string) => Temporal.Instant.from(
   value instanceof Date ? value.toISOString() : String(value),
 );
 
-/** The optional after-buffer is a hard block; the treatment is busy for category-aware gaps. */
+/** Buffered manual appointments use the same occupied window as regular bookings. */
 export function manualBlockWindows(rows: ManualBlockRow[]): ManualBlockWindows {
   const result: ManualBlockWindows = { blocked: [], busy: [] };
   for (const row of rows) {
@@ -28,10 +28,6 @@ export function manualBlockWindows(rows: ManualBlockRow[]): ManualBlockWindows {
       result.busy.push({
         start: start.subtract({ minutes: bufferMinutes }).toString(),
         end: end.toString(),
-      });
-      result.blocked.push({
-        start: end.toString(),
-        end: end.add({ minutes: bufferMinutes }).toString(),
       });
     } else {
       result.blocked.push({ start: start.toString(), end: end.toString() });

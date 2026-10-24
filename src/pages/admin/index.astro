@@ -289,7 +289,7 @@ const manualBlocksByDay = new Map(days.map((day) => {
   const end = Temporal.Instant.from(range.end).epochMilliseconds;
   return [day.toString(), manualBlocks.filter((block) =>
     new Date(block.starts_at).getTime() < end &&
-    new Date(block.occupied_ends_at).getTime() > start
+    new Date(block.ends_at).getTime() > start
   )] as const;
 }));
 const manualStartTimes = (start: string, end: string) => {
@@ -417,7 +417,7 @@ const syncTime = (value: unknown) => value
               {dayManualBlocks.map((block) => (
                 <div class="manual-block-chip">
                   <span>{block.guest_name || 'Manuális blokk'}</span>
-                  <strong>{busyTimeOnDay(block.starts_at, day, 'start')}–{busyTimeOnDay(block.occupied_ends_at, day, 'end')}</strong>
+                  <strong>{busyTimeOnDay(block.starts_at, day, 'start')}–{busyTimeOnDay(block.ends_at, day, 'end')}</strong>
                   <small>{block.service_category === 'home' ? 'Home Service' : 'Stúdió'} · {block.duration_minutes} perc{Number(block.buffer_minutes) ? ` + ${block.buffer_minutes} perc buffer` : ' · buffer nélkül'}</small>
                   {block.note && <small>{block.note}</small>}
                   <form method="post" onsubmit="return confirm('Biztosan felszabadítod ezt a manuális időpontot?')">
@@ -544,7 +544,7 @@ const syncTime = (value: unknown) => value
                   })}
                   {dayManualBlocks.map((block) => (
                     <span class="month-chip month-chip--manual" title={`${block.guest_name || 'Manuális blokk'} · ${block.duration_minutes} perc${Number(block.buffer_minutes) ? ` + ${block.buffer_minutes} perc buffer` : ''}`}>
-                      {busyTimeOnDay(block.starts_at, day, 'start')}–{busyTimeOnDay(block.occupied_ends_at, day, 'end')}
+                      {busyTimeOnDay(block.starts_at, day, 'start')}–{busyTimeOnDay(block.ends_at, day, 'end')}
                       <span class="month-chip__label"> {block.guest_name || 'Manuális blokk'}</span>
                     </span>
                   ))}
@@ -568,7 +568,7 @@ const syncTime = (value: unknown) => value
         <form method="post" class="manual-block-form">
           <input type="hidden" name="action" value="add_manual_block" />
           <div class="manual-block-dialog__head"><div><span class="eyebrow">Admin naptár</span><h2 id="manual-block-title">Manuális időpont / blokk</h2></div><button id="manual-block-close" type="button" aria-label="Ablak bezárása">×</button></div>
-          <p>Névvel külső foglalásként, név nélkül egyszerű lezárásként használhatod. Ügyfélnek nem küld automatikus e-mailt.</p>
+          <p>Névvel külső foglalásként, név nélkül lezárásként használhatod. Standard bufferrel ugyanazok a nyitvatartási, előfoglalási és ütközési szabályok érvényesek, mint a vendégoldalon. Ügyfélnek nem küld automatikus e-mailt.</p>
           {manualBlockError && <p class="manual-block-error" role="alert">{manualBlockError}</p>}
           <div class="manual-block-form__row">
             <label>Dátum<input name="day" type="date" value={manualDraft.day || selected.toString()} required /></label>
@@ -727,10 +727,10 @@ const syncTime = (value: unknown) => value
           const [hour, minute] = startTime.value.split(':').map(Number);
           const base = hour * 60 + minute;
           const massageEnd = base + Number(duration.value);
-          const buffer = useBuffer.checked ? category.value === 'home' ? 120 : 30 : 0;
-          const occupiedEnd = massageEnd + buffer;
           const label = (value: number) => `${String(Math.floor(value / 60) % 24).padStart(2, '0')}:${String(value % 60).padStart(2, '0')}${value >= 1440 ? ' (másnap)' : ''}`;
-          preview.textContent = `${startTime.value}–${label(massageEnd)} kezelés${buffer ? ` · ${label(massageEnd)}–${label(occupiedEnd)} buffer` : ' · buffer nélkül'}`;
+          preview.textContent = useBuffer.checked
+            ? `${startTime.value}–${label(massageEnd)} ${category.value === 'home' ? 'Home Service' : 'Studio Visit'} · következő Stúdió legkorábban ${label(massageEnd + 30)}, Home Service ${label(massageEnd + 120)} (ha nincs más ütközés).`
+            : `${startTime.value}–${label(massageEnd)} pontos idősávzárás · buffer nélkül.`;
         };
         for (const control of [startTime, duration, category, useBuffer]) control.addEventListener('change', updatePreview);
         for (const button of document.querySelectorAll<HTMLButtonElement>('[data-manual-date]')) {

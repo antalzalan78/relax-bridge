@@ -23,7 +23,7 @@ ALTER TABLE manual_calendar_blocks
   DROP CONSTRAINT IF EXISTS manual_calendar_blocks_no_overlap;
 ALTER TABLE manual_calendar_blocks
   ADD CONSTRAINT manual_calendar_blocks_no_overlap
-  EXCLUDE USING gist (tstzrange(occupied_starts_at, occupied_ends_at, '[)') WITH &&)
+  EXCLUDE USING gist (tstzrange(starts_at, ends_at, '[)') WITH &&)
   WHERE (cancelled_at IS NULL);
 
 ALTER TABLE google_calendar_event_links

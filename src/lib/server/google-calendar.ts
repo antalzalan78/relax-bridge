@@ -530,7 +530,6 @@ function bookingEvent(row: any, timeZone: string): GoogleEvent {
 function manualBlockEvent(row: any, timeZone: string): GoogleEvent {
   const start = new Date(row.starts_at);
   const end = new Date(row.ends_at);
-  const occupiedEnd = new Date(row.occupied_ends_at);
   const local = (value: Date) => new Intl.DateTimeFormat('hu-HU', {
     hour: '2-digit', minute: '2-digit', timeZone,
   }).format(value);
@@ -543,7 +542,7 @@ function manualBlockEvent(row: any, timeZone: string): GoogleEvent {
       row.note ? `Megjegyzés: ${row.note}` : null,
     ].filter(Boolean).join('\n'),
     start: { dateTime: start.toISOString(), timeZone },
-    end: { dateTime: occupiedEnd.toISOString(), timeZone },
+    end: { dateTime: end.toISOString(), timeZone },
     transparency: 'opaque',
     extendedProperties: extendedProperties('manual_block', String(row.id)),
   };
@@ -650,7 +649,7 @@ export async function syncAllToGoogleCalendar(): Promise<void> {
       SELECT id FROM bookings
       WHERE status = 'confirmed' AND ends_at >= now()
     `,
-    database`SELECT id FROM manual_calendar_blocks WHERE cancelled_at IS NULL AND occupied_ends_at >= now()`,
+    database`SELECT id FROM manual_calendar_blocks WHERE cancelled_at IS NULL AND ends_at >= now()`,
   ]);
   const targets = [
     ...rules.map((item: any) => ({ type: 'availability_rule' as const, id: String(item.id) })),

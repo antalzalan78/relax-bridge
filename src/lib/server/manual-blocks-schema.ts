@@ -32,15 +32,31 @@ async function createManualBlocksSchema(): Promise<void> {
       WHERE cancelled_at IS NULL
     `;
     const [overlap] = await transaction`
-      SELECT 1 FROM pg_constraint
+      SELECT pg_get_constraintdef(oid) AS definition FROM pg_constraint
       WHERE conrelid = 'manual_calendar_blocks'::regclass
         AND conname = 'manual_calendar_blocks_no_overlap'
     `;
-    if (!overlap) await transaction`
-      ALTER TABLE manual_calendar_blocks
-      ADD CONSTRAINT manual_calendar_blocks_no_overlap
-      EXCLUDE USING gist (tstzrange(occupied_starts_at, occupied_ends_at, '[)') WITH &&)
-      WHERE (cancelled_at IS NULL)
+    await transaction`
+      UPDATE manual_calendar_blocks
+      SET occupied_ends_at = ends_at
+      WHERE buffer_minutes > 0 AND occupied_ends_at > ends_at
+    `;
+    if (!String(overlap?.definition || '').includes('tstzrange(starts_at, ends_at')) {
+      await transaction`
+        ALTER TABLE manual_calendar_blocks
+        DROP CONSTRAINT IF EXISTS manual_calendar_blocks_no_overlap
+      `;
+      await transaction`
+        ALTER TABLE manual_calendar_blocks
+        ADD CONSTRAINT manual_calendar_blocks_no_overlap
+        EXCLUDE USING gist (tstzrange(starts_at, ends_at, '[)') WITH &&)
+        WHERE (cancelled_at IS NULL)
+      `;
+    }
+    await transaction`
+      CREATE INDEX IF NOT EXISTS manual_calendar_blocks_core_time_idx
+      ON manual_calendar_blocks (starts_at, ends_at)
+      WHERE cancelled_at IS NULL
     `;
     const [linkConstraint] = await transaction`
       SELECT pg_get_constraintdef(oid) AS definition FROM pg_constraint
