@@ -732,12 +732,48 @@ export async function consumeRateLimit(input: {
   return numberValue(row.attempts) <= input.limit;
 }
 
+let availabilityRuleSeriesSchemaReady: Promise<void> | null = null;
+
+async function ensureAvailabilityRuleSeriesSchema(): Promise<void> {
+  if (!availabilityRuleSeriesSchemaReady) {
+    availabilityRuleSeriesSchemaReady = (async () => {
+      const database = getDatabase();
+      await database`ALTER TABLE availability_rules ADD COLUMN IF NOT EXISTS series_id uuid`;
+      await database`CREATE INDEX IF NOT EXISTS availability_rules_series_idx ON availability_rules (series_id)`;
+    })().catch((error) => {
+      availabilityRuleSeriesSchemaReady = null;
+      throw error;
+    });
+  }
+  await availabilityRuleSeriesSchemaReady;
+}
+
+function availabilityRuleMonths(months: string[]): Array<{ key: string; from: string | null; until: string | null }> {
+  if (months.length > 36) throw new Error('Legfeljebb 36 hónap választható.');
+  const keys = [...new Set(months)];
+  for (const key of keys) {
+    if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(key)) throw new Error('Érvénytelen hónap.');
+    Temporal.PlainYearMonth.from(key);
+  }
+  if (!keys.length) return [{ key: '', from: null, until: null }];
+  return keys.sort().map((key) => {
+    const first = Temporal.PlainYearMonth.from(key).toPlainDate({ day: 1 });
+    return {
+      key,
+      from: first.toString(),
+      until: first.add({ months: 1 }).subtract({ days: 1 }).toString(),
+    };
+  });
+}
+
 export async function listAvailabilityRules() {
+  await ensureAvailabilityRuleSeriesSchema();
   return getDatabase()`
     SELECT id, weekday, start_time::text AS start_time,
-      end_time::text AS end_time, valid_from, valid_until, active
+      end_time::text AS end_time, valid_from::text AS valid_from,
+      valid_until::text AS valid_until, series_id, active
     FROM availability_rules
-    ORDER BY weekday, start_time
+    ORDER BY weekday, start_time, valid_from NULLS FIRST
   `;
 }
 
@@ -915,17 +951,129 @@ export async function addAvailabilityRule(input: {
   weekday: number;
   startTime: string;
   endTime: string;
-}) {
-  const id = randomUUID();
-  await getDatabase()`
-    INSERT INTO availability_rules (id, weekday, start_time, end_time)
-    VALUES (${id}, ${input.weekday}, ${input.startTime}::time, ${input.endTime}::time)
-  `;
-  return id;
+  months: string[];
+}): Promise<string[]> {
+  await ensureAvailabilityRuleSeriesSchema();
+  const selections = availabilityRuleMonths(input.months);
+  const seriesId = randomUUID();
+  return getDatabase().begin(async (transaction) => {
+    const ids: string[] = [];
+    for (const selection of selections) {
+      const id = randomUUID();
+      await transaction`
+        INSERT INTO availability_rules (
+          id, series_id, weekday, start_time, end_time, valid_from, valid_until
+        ) VALUES (
+          ${id}, ${seriesId}, ${input.weekday}, ${input.startTime}::time,
+          ${input.endTime}::time, ${selection.from}::date, ${selection.until}::date
+        )
+      `;
+      ids.push(id);
+    }
+    return ids;
+  });
 }
 
-export async function deleteAvailabilityRule(id: string) {
-  await getDatabase()`DELETE FROM availability_rules WHERE id = ${id}`;
+export async function updateAvailabilityRuleMonths(id: string, months: string[]): Promise<{
+  syncIds: string[];
+  removedIds: string[];
+}> {
+  await ensureAvailabilityRuleSeriesSchema();
+  const selections = availabilityRuleMonths(months);
+  return getDatabase().begin(async (transaction) => {
+    await transaction`SELECT pg_advisory_xact_lock(734052026)`;
+    const [selected] = await transaction`
+      SELECT id, series_id FROM availability_rules WHERE id = ${id}::uuid
+    `;
+    if (!selected) throw new Error('A heti idősáv nem található.');
+    const seriesId = String(selected.series_id || selected.id);
+    if (!selected.series_id) {
+      await transaction`
+        UPDATE availability_rules SET series_id = ${seriesId}::uuid WHERE id = ${id}::uuid
+      `;
+    }
+    const rows = selected.series_id
+      ? await transaction`
+          SELECT id, weekday, start_time::text AS start_time,
+            end_time::text AS end_time, valid_from::text AS valid_from,
+            valid_until::text AS valid_until, active
+          FROM availability_rules WHERE series_id = ${seriesId}::uuid
+          ORDER BY valid_from NULLS FIRST
+        `
+      : await transaction`
+          SELECT id, weekday, start_time::text AS start_time,
+            end_time::text AS end_time, valid_from::text AS valid_from,
+            valid_until::text AS valid_until, active
+          FROM availability_rules WHERE id = ${id}::uuid
+        `;
+    const existingByMonth = new Map(rows.map((row: any) => [
+      row.valid_from ? String(row.valid_from).slice(0, 7) : '', row,
+    ]));
+    const preserved = new Set<string>();
+    const syncIds: string[] = [];
+    for (const selection of selections) {
+      const row = existingByMonth.get(selection.key);
+      if (row) {
+        if (row.valid_from !== selection.from || row.valid_until !== selection.until) {
+          await transaction`
+            UPDATE availability_rules SET valid_from = ${selection.from}::date,
+              valid_until = ${selection.until}::date WHERE id = ${String(row.id)}::uuid
+          `;
+        }
+        preserved.add(String(row.id));
+        syncIds.push(String(row.id));
+      }
+    }
+    const reusable = rows.filter((row: any) => !preserved.has(String(row.id)));
+    for (const selection of selections) {
+      if (existingByMonth.has(selection.key)) continue;
+      const row = reusable.shift();
+      const ruleId = row ? String(row.id) : randomUUID();
+      if (row) {
+        await transaction`
+          UPDATE availability_rules SET series_id = ${seriesId}::uuid,
+            valid_from = ${selection.from}::date, valid_until = ${selection.until}::date
+          WHERE id = ${ruleId}::uuid
+        `;
+      } else {
+        const base = rows[0];
+        await transaction`
+          INSERT INTO availability_rules (
+            id, series_id, weekday, start_time, end_time, valid_from, valid_until, active
+          ) VALUES (
+            ${ruleId}, ${seriesId}, ${base.weekday}, ${base.start_time}::time,
+            ${base.end_time}::time, ${selection.from}::date, ${selection.until}::date,
+            ${base.active}
+          )
+        `;
+      }
+      syncIds.push(ruleId);
+    }
+    const removedIds: string[] = [];
+    for (const row of reusable) {
+      const ruleId = String(row.id);
+      await transaction`DELETE FROM availability_rules WHERE id = ${ruleId}::uuid`;
+      removedIds.push(ruleId);
+    }
+    return { syncIds, removedIds };
+  });
+}
+
+export async function deleteAvailabilityRule(id: string): Promise<string[]> {
+  await ensureAvailabilityRuleSeriesSchema();
+  return getDatabase().begin(async (transaction) => {
+    const [selected] = await transaction`
+      SELECT series_id FROM availability_rules WHERE id = ${id}::uuid
+    `;
+    if (!selected) return [];
+    const rows = selected.series_id
+      ? await transaction`
+          DELETE FROM availability_rules WHERE series_id = ${String(selected.series_id)}::uuid
+          RETURNING id
+        `
+      : await transaction`DELETE FROM availability_rules WHERE id = ${id}::uuid RETURNING id`;
+    return rows.map((row: any) => String(row.id));
+  });
 }
 
 export async function addAvailabilityException(input: {
