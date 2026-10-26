@@ -11,6 +11,7 @@ import {
   getNextAvailableSlot,
 } from '../../lib/server/booking-repository';
 import { safelyRefreshGoogleCalendarBusy } from '../../lib/server/google-calendar';
+import { isPublicBookingCategoryEnabled } from '../../lib/booking/public-service-availability';
 
 export const prerender = false;
 
@@ -27,6 +28,7 @@ export const GET: APIRoute = async () => {
     const shortestByCategory = new Map<BookingCategory, number>();
 
     for (const option of options) {
+      if (!isPublicBookingCategoryEnabled(option.category)) continue;
       const current = shortestByCategory.get(option.category);
       if (current === undefined || option.minutes < current) {
         shortestByCategory.set(option.category, option.minutes);

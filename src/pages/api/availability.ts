@@ -11,6 +11,7 @@ import {
   todayInTimeZone,
 } from '../../lib/booking/availability';
 import { safelyRefreshGoogleCalendarBusy } from '../../lib/server/google-calendar';
+import { isPublicBookingCategoryEnabled } from '../../lib/booking/public-service-availability';
 
 export const prerender = false;
 
@@ -42,6 +43,9 @@ export const GET: APIRoute = async ({ url }) => {
   const parsed = querySchema.safeParse(Object.fromEntries(url.searchParams));
   if (!parsed.success) {
     return Response.json({ error: 'invalid_request' }, { status: 400 });
+  }
+  if (!isPublicBookingCategoryEnabled(parsed.data.category)) {
+    return Response.json({ error: 'home_service_temporarily_unavailable' }, { status: 503 });
   }
 
   try {

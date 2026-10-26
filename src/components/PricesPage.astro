@@ -10,8 +10,10 @@ import {
 import { t } from '../i18n';
 import { massageCreatorText } from '../i18n/massage-creator';
 import { pricesText } from '../i18n/prices';
+import { homeServiceUnavailableLabel } from '../i18n/home-service-availability';
 import { creatorAddons, creatorBases } from '../lib/booking/massage-creator';
 import { homeServiceTravelFeeEur } from '../lib/booking/home-service';
+import { homeServiceBookingEnabled } from '../lib/booking/public-service-availability';
 import { getServices } from '../lib/services';
 
 interface Props {
@@ -143,7 +145,14 @@ const addonRows = [
         <p class="price-overview-rule">{copy.homeRule}</p>
         <div class="price-overview-panel__footer">
           <span>{d.prices.intro}</span>
-          <a class="btn btn--primary" href={homeBookingHref}>{d.options.homeService.bookingCta}<span aria-hidden="true">&rarr;</span></a>
+          <div class="service-unavailable-action">
+            {!homeServiceBookingEnabled && <span class="service-unavailable-badge">{homeServiceUnavailableLabel[locale]}</span>}
+            {homeServiceBookingEnabled ? (
+              <a class="btn btn--primary" href={homeBookingHref}>{d.options.homeService.bookingCta}<span aria-hidden="true">&rarr;</span></a>
+            ) : (
+              <span class="btn btn--unavailable" aria-disabled="true">{d.options.homeService.bookingCta}</span>
+            )}
+          </div>
         </div>
       </div>
     </section>

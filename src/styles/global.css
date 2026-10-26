@@ -255,6 +255,40 @@ img {
   color: #fff;
 }
 
+.service-unavailable-badge {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid color-mix(in srgb, var(--clay) 55%, var(--border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--clay) 10%, var(--surface));
+  color: var(--clay-dark);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.055em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.btn--unavailable,
+.btn--unavailable:hover {
+  border-color: var(--border);
+  background: color-mix(in srgb, var(--border) 60%, var(--surface));
+  box-shadow: none;
+  color: var(--ink-soft);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.service-unavailable-action {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.7rem;
+}
+
 .btn--ghost {
   border-color: var(--border);
   background: transparent;
