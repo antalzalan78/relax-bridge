@@ -2,7 +2,9 @@
 import Base from '../layouts/Base.astro';
 import { bookingPath, pathFor, privacyPath, studioVisitBookingPath, type Locale } from '../data/site';
 import { bookingText } from '../i18n/booking';
+import { homeServiceUnavailableLabel } from '../i18n/home-service-availability';
 import { getBookingOptions, getHomeServiceBookingOptions } from '../lib/booking/catalog';
+import { homeServiceBookingEnabled } from '../lib/booking/public-service-availability';
 import {
   homeServiceMaximumGuests,
   homeServiceMaximumMinutes,
@@ -48,7 +50,7 @@ const homeConfig = {
   path={path}
   alternates={alternates}
 >
-  <section class="booking-choice" id="booking-choice">
+  <section class="booking-choice" id="booking-choice" data-home-booking-enabled={homeServiceBookingEnabled}>
     <div class="wrap booking-choice__inner">
       <a class="back-link" href={pathFor(locale)}>
         <span aria-hidden="true">&larr;</span> Relax Bridge
@@ -68,15 +70,26 @@ const homeConfig = {
           </span>
         </a>
 
-        <a class="booking-choice-card booking-choice-card--home" href={homeBookingHref}>
-          <span class="booking-choice-card__number" aria-hidden="true">02</span>
-          <span class="eyebrow">Relax Bridge</span>
-          <h2>Home Service</h2>
-          <p>{copy.choiceHomeBody}</p>
-          <span class="booking-choice-card__cta">
-            {copy.choiceHomeCta}<span aria-hidden="true">&rarr;</span>
-          </span>
-        </a>
+        {homeServiceBookingEnabled ? (
+          <a class="booking-choice-card booking-choice-card--home" href={homeBookingHref}>
+            <span class="booking-choice-card__number" aria-hidden="true">02</span>
+            <span class="eyebrow">Relax Bridge</span>
+            <h2>Home Service</h2>
+            <p>{copy.choiceHomeBody}</p>
+            <span class="booking-choice-card__cta">
+              {copy.choiceHomeCta}<span aria-hidden="true">&rarr;</span>
+            </span>
+          </a>
+        ) : (
+          <div class="booking-choice-card booking-choice-card--home booking-choice-card--unavailable">
+            <span class="booking-choice-card__number" aria-hidden="true">02</span>
+            <span class="eyebrow">Relax Bridge</span>
+            <h2>Home Service</h2>
+            <p>{copy.choiceHomeBody}</p>
+            <span class="service-unavailable-badge">{homeServiceUnavailableLabel[locale]}</span>
+            <span class="booking-choice-card__cta" aria-disabled="true">{copy.choiceHomeCta}</span>
+          </div>
+        )}
       </div>
     </div>
   </section>
@@ -121,7 +134,7 @@ const homeConfig = {
                 {option.title} · {option.minutes} min · € {option.priceEur}
               </option>
             ))}
-            <option value="home:custom" data-category="home">{copy.home}</option>
+            {homeServiceBookingEnabled && <option value="home:custom" data-category="home">{copy.home}</option>}
           </select>
           <p class="field-instruction">{copy.serviceInstruction}</p>
         </div>
@@ -293,10 +306,17 @@ const homeConfig = {
   const bookingChoice = document.querySelector<HTMLElement>('#booking-choice');
   const bookingFlow = document.querySelector<HTMLElement>('#booking-flow');
   const bookingParams = new URLSearchParams(window.location.search);
+  const homeBookingEnabled = bookingChoice?.dataset.homeBookingEnabled === 'true';
+  const requestsUnavailableHome = !homeBookingEnabled && (
+    bookingParams.get('category') === 'home' ||
+    bookingParams.get('service')?.startsWith('home:')
+  );
   const opensBookingFlow =
-    bookingParams.has('category') ||
-    bookingParams.has('service') ||
-    bookingParams.get('creator') === '1';
+    !requestsUnavailableHome && (
+      bookingParams.has('category') ||
+      bookingParams.has('service') ||
+      bookingParams.get('creator') === '1'
+    );
   if (bookingChoice && bookingFlow && opensBookingFlow) {
     bookingChoice.hidden = true;
     bookingFlow.hidden = false;
@@ -1029,6 +1049,15 @@ const homeConfig = {
     border-color: color-mix(in srgb, var(--clay) 55%, var(--border));
     box-shadow: 0 1.4rem 3.5rem rgb(56 43 31 / 0.13);
     transform: translateY(-0.35rem);
+  }
+  .booking-choice-card--unavailable:hover {
+    border-color: var(--border);
+    box-shadow: var(--shadow-soft);
+    transform: none;
+  }
+  .booking-choice-card--unavailable .booking-choice-card__cta {
+    background: var(--border);
+    color: var(--ink-soft);
   }
   .booking-choice-card:focus-visible { outline: 2px solid var(--logo-green); outline-offset: 3px; }
   .booking-choice-card h2 { margin-top: 1rem; font-size: clamp(2.6rem, 6vw, 4.7rem); }

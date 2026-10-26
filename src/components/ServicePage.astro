@@ -4,6 +4,8 @@ import { bookingPath, questionnairePath, site, pathFor, type Locale } from '../d
 import { anchors } from '../data/routes';
 import { t } from '../i18n';
 import { homeServiceDurationText } from '../i18n/home-service-duration';
+import { homeServiceUnavailableLabel } from '../i18n/home-service-availability';
+import { homeServiceBookingEnabled } from '../lib/booking/public-service-availability';
 import {
   getServices,
   servicePath,
@@ -81,9 +83,16 @@ const jsonLd = [
         {category === 'home' && (
           <p class="service-booking__rule">{homeServiceDurationText[locale]}</p>
         )}
-        <a class="btn btn--primary btn--block" href={bookingHref}>
-          {d.service.bookCta}<span aria-hidden="true">&rarr;</span>
-        </a>
+        {category === 'home' && !homeServiceBookingEnabled ? (
+          <>
+            <span class="service-unavailable-badge">{homeServiceUnavailableLabel[locale]}</span>
+            <span class="btn btn--unavailable btn--block" aria-disabled="true">{d.service.bookCta}</span>
+          </>
+        ) : (
+          <a class="btn btn--primary btn--block" href={bookingHref}>
+            {d.service.bookCta}<span aria-hidden="true">&rarr;</span>
+          </a>
+        )}
         <a class="text-link service-booking__gift" href={questionnairePath(locale)}>
           {d.nav.questionnaire}<span aria-hidden="true">&rarr;</span>
         </a>

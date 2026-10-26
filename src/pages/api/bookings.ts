@@ -32,6 +32,7 @@ import {
 import { localDayInstantRange } from '../../lib/booking/availability';
 import { recordBookingJourneySuccess } from '../../lib/server/website-analytics-repository';
 import { Temporal } from '@js-temporal/polyfill';
+import { isPublicBookingCategoryEnabled } from '../../lib/booking/public-service-availability';
 
 export const prerender = false;
 
@@ -305,6 +306,9 @@ export const POST: APIRoute = async ({ request }) => {
     const parsed = bookingSchema.safeParse(await readJson(request));
     if (!parsed.success) {
       return Response.json({ error: 'invalid_request' }, { status: 400 });
+    }
+    if (!isPublicBookingCategoryEnabled(parsed.data.category)) {
+      return Response.json({ error: 'home_service_temporarily_unavailable' }, { status: 503 });
     }
 
     const allowed = await consumeRateLimit({
