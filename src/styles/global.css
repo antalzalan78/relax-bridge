@@ -1144,7 +1144,7 @@ img {
   display: flex;
   gap: 1.25rem;
   align-items: flex-start;
-  margin-bottom: clamp(2rem, 5vw, 4rem);
+  margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
 }
 
 .studio-choice-heading > span {
@@ -1285,8 +1285,8 @@ img {
 
 .studio-choice-action {
   display: flex;
-  justify-content: center;
-  margin-top: clamp(2.5rem, 6vw, 4.5rem);
+  justify-content: flex-start;
+  margin-top: 1.25rem;
 }
 
 .studio-creator-section {

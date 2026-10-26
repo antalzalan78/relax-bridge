@@ -57,6 +57,11 @@ const creatorHref = massageCreatorPath(locale);
       <div>
         <span class="eyebrow">Studio Visit</span>
         <h2>{copy.readyHeading}</h2>
+        <div class="studio-choice-action">
+          <a class="btn btn--primary" href={readyBookingHref}>
+            {copy.readyCta}<span aria-hidden="true">&rarr;</span>
+          </a>
+        </div>
       </div>
     </header>
 
@@ -96,11 +101,6 @@ const creatorHref = massageCreatorPath(locale);
     </div>
     <p class="studio-offer-group__payment-note">{d.prices.intro}</p>
 
-    <div class="studio-choice-action">
-      <a class="btn btn--primary" href={readyBookingHref}>
-        {copy.readyCta}<span aria-hidden="true">&rarr;</span>
-      </a>
-    </div>
   </section>
 
   <section class="section section--tint studio-creator-section" id="massage-creator">
