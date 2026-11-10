@@ -468,6 +468,8 @@ const homeConfig = {
     ));
     let availableDates = new Set<string>();
     let calendarRequest = 0;
+    let calendarController: AbortController | null = null;
+    let slotRequest = 0;
     date.value = '';
 
     const monthFormatter = new Intl.DateTimeFormat(dateLocale, {
@@ -620,7 +622,11 @@ const homeConfig = {
 
     const loadAvailabilityCalendar = async (resetDate = false) => {
       const requestId = ++calendarRequest;
+      calendarController?.abort();
+      const controller = new AbortController();
+      calendarController = controller;
       if (resetDate) {
+        slotRequest += 1;
         date.value = '';
         start.value = '';
         details.hidden = true;
@@ -646,27 +652,54 @@ const homeConfig = {
         minutes: String(option.reservedMinutes || option.minutes),
       });
 
-      try {
-        const response = await fetch(`/api/availability?${params}`);
-        if (!response.ok) throw new Error('availability');
-        const payload = await response.json();
+      let quickSucceeded = false;
+      let freshComplete = false;
+      let freshFailed = false;
+      const applyCalendar = (payload: { lastDay?: string; dates?: string[] }, provisional: boolean) => {
         if (requestId !== calendarRequest) return;
         calendarMaximum = payload.lastDay || defaultMaximum;
         availableDates = new Set(payload.dates || []);
         if (date.value && !availableDates.has(date.value)) {
+          slotRequest += 1;
           date.value = '';
           start.value = '';
           details.hidden = true;
           preferencesContinue.hidden = true;
           slotGrid.replaceChildren();
+          slotStatus.textContent = copy.chooseFirst;
         }
-        calendarStatus.textContent = availableDates.size ? '' : copy.calendarNoAvailability;
+        calendarStatus.textContent = provisional
+          ? copy.calendarChecking
+          : availableDates.size ? '' : copy.calendarNoAvailability;
         renderCalendar();
-      } catch {
+      };
+      const requestCalendar = async (quick: boolean) => {
+        const query = new URLSearchParams(params);
+        if (quick) query.set('quick', '1');
+        const response = await fetch(`/api/availability?${query}`, { signal: controller.signal });
+        if (!response.ok) throw new Error('availability');
+        return response.json();
+      };
+      const quickRequest = requestCalendar(true).then((payload) => {
+        quickSucceeded = true;
+        if (!freshComplete) {
+          applyCalendar(payload, true);
+          if (freshFailed && requestId === calendarRequest) {
+            calendarStatus.textContent = copy.calendarRefreshFailed;
+          }
+        }
+      }).catch(() => {});
+      const freshRequest = requestCalendar(false).then((payload) => {
+        freshComplete = true;
+        applyCalendar(payload, false);
+      }).catch(() => {
         if (requestId !== calendarRequest) return;
-        calendarStatus.textContent = copy.error;
+        freshFailed = true;
+        calendarStatus.textContent = quickSucceeded ? copy.calendarRefreshFailed : copy.error;
         renderCalendar();
-      }
+      });
+      await Promise.all([quickRequest, freshRequest]);
+      if (requestId === calendarRequest) calendarController = null;
     };
 
     const updateHomeBuilder = () => {
@@ -768,6 +801,7 @@ const homeConfig = {
       }).format(new Date(`${date.value}T12:00:00Z`));
 
     async function loadSlots() {
+      const requestId = ++slotRequest;
       start.value = '';
       details.hidden = true;
       preferencesContinue.hidden = true;
@@ -781,6 +815,8 @@ const homeConfig = {
 
       slotStatus.textContent = copy.loading;
       try {
+        const requestedDate = date.value;
+        const requestedService = service.value;
         const params = new URLSearchParams({
           date: date.value,
           category: option.category,
@@ -789,6 +825,7 @@ const homeConfig = {
         const response = await fetch(`/api/availability?${params}`);
         if (!response.ok) throw new Error('availability');
         const payload = await response.json();
+        if (requestId !== slotRequest || date.value !== requestedDate || service.value !== requestedService) return;
         slotStatus.textContent = payload.slots.length ? '' : copy.noSlots;
 
         const shownSlots = [
@@ -837,6 +874,7 @@ const homeConfig = {
           slotGrid.append(button);
         }
       } catch {
+        if (requestId !== slotRequest) return;
         slotStatus.textContent = copy.error;
       }
     }
