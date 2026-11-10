@@ -50,18 +50,24 @@ export const GET: APIRoute = async ({ url }) => {
 
   try {
     if ('from' in parsed.data) {
-      const settings = await getBookingSettings();
-      await safelyRefreshGoogleCalendarBusy({
-        start: localDayInstantRange(parsed.data.from, settings.timeZone).start,
-        end: localDayInstantRange(parsed.data.to, settings.timeZone).end,
-      });
+      const quick = url.searchParams.get('quick') === '1';
+      // A quick month snapshot may be provisional; day and booking requests still refresh Google.
+      if (!quick) {
+        const settings = await getBookingSettings();
+        await safelyRefreshGoogleCalendarBusy({
+          start: localDayInstantRange(parsed.data.from, settings.timeZone).start,
+          end: localDayInstantRange(parsed.data.to, settings.timeZone).end,
+        });
+      }
       const calendar = await getAvailableDates({
         from: parsed.data.from,
         to: parsed.data.to,
         category: parsed.data.category,
         durationMinutes: parsed.data.minutes,
       });
-      return Response.json(calendar);
+      return Response.json({ ...calendar, provisional: quick }, {
+        headers: { 'Cache-Control': 'private, no-store' },
+      });
     }
 
     const settings = await getBookingSettings();
