@@ -55,12 +55,42 @@
     },
     {
       "source": "/relaxmassage-2",
-      "destination": "/home-service/relaxmassage",
+      "destination": "/massage/relaxmassage",
       "permanent": true
     },
     {
       "source": "/nek-schouder-rugmassage",
-      "destination": "/home-service/nek-schouder-rugmassage",
+      "destination": "/massage/nek-schouder-rugmassage",
+      "permanent": true
+    },
+    {
+      "source": "/home-service/relaxmassage",
+      "destination": "/massage/relaxmassage",
+      "permanent": true
+    },
+    {
+      "source": "/home-service/nek-schouder-rugmassage",
+      "destination": "/massage/nek-schouder-rugmassage",
+      "permanent": true
+    },
+    {
+      "source": "/en/home-service/relax-massage",
+      "destination": "/en/massage/relax-massage",
+      "permanent": true
+    },
+    {
+      "source": "/en/home-service/neck-shoulder-back-massage",
+      "destination": "/en/massage/neck-shoulder-back-massage",
+      "permanent": true
+    },
+    {
+      "source": "/hu/hazhoz/relaxmasszazs",
+      "destination": "/hu/masszazs/relaxmasszazs",
+      "permanent": true
+    },
+    {
+      "source": "/hu/hazhoz/nyak-vall-hatmasszazs",
+      "destination": "/hu/masszazs/nyak-vall-hatmasszazs",
       "permanent": true
     },
     {

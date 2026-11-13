@@ -9,7 +9,7 @@ import ServicePage from '../../../components/ServicePage.astro';
 export const getStaticPaths = (async () => {
   const services = await getCollection('services');
   return services
-    .filter((s) => s.data.lang !== 'nl')
+    .filter((s) => s.data.lang !== 'nl' && s.data.category === 'studio')
     .map((service) => {
       const lang = service.data.lang as Exclude<Locale, 'nl'>;
       return {

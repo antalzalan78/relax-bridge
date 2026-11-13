@@ -4,8 +4,8 @@ import { homeServiceDurationText } from './home-service-duration';
 const booking = {
   nl: {
     choiceEyebrow: 'Online reserveren',
-    choiceTitle: 'Waar wil je je massage ontvangen?',
-    choiceIntro: 'Kies eerst waar je je massage wilt ontvangen. In de studio kies je daarna een vaste behandeling of de Massage Creator.',
+    choiceTitle: 'Kies jouw massage in de studio.',
+    choiceIntro: 'Kies daarna een vaste behandeling of stel je eigen massage samen met de Massage Creator.',
     choiceStudioBody: 'Kom tot rust in mijn rustige studio in Tilburg. Kies daarna een vaste behandeling of stel je eigen massage samen.',
     choiceStudioCta: 'Bekijk Studio Visit',
     choiceHomeBody: 'Geniet van de massage in je eigen huis, in Tilburg of Reeshof. Je kunt voor maximaal drie personen tegelijk reserveren.',
@@ -99,8 +99,8 @@ const booking = {
   },
   en: {
     choiceEyebrow: 'Book online',
-    choiceTitle: 'Where would you like your massage?',
-    choiceIntro: 'First choose where you would like your massage. In the studio, you can then choose a ready-made treatment or the Massage Creator.',
+    choiceTitle: 'Choose your studio massage.',
+    choiceIntro: 'Then choose a ready-made treatment or create your own with the Massage Creator.',
     choiceStudioBody: 'Unwind in my quiet studio in Tilburg. Then choose a ready-made treatment or create your own massage.',
     choiceStudioCta: 'Explore Studio Visit',
     choiceHomeBody: 'Enjoy your massage in the comfort of your own home in Tilburg or Reeshof. You can book for up to three people at once.',
@@ -194,8 +194,8 @@ const booking = {
   },
   hu: {
     choiceEyebrow: 'Online foglalás',
-    choiceTitle: 'Hol szeretnéd a masszázst?',
-    choiceIntro: 'Először válaszd ki a helyszínt. A stúdiónál ezután dönthetsz a kész kezelés és a Massage Creator között.',
+    choiceTitle: 'Válaszd ki a stúdiómasszázsodat.',
+    choiceIntro: 'Ezután kész kezelés vagy a Massage Creator közül választhatsz.',
     choiceStudioBody: 'Kapcsolódj ki a nyugodt tilburgi stúdiómban. Ezután válassz kész kezelést, vagy állítsd össze a sajátodat.',
     choiceStudioCta: 'Studio Visit lehetőségei',
     choiceHomeBody: 'Élvezd a masszázst a saját otthonod kényelmében, Tilburgban vagy Reeshofban. Egyszerre legfeljebb három főre foglalhatsz.',

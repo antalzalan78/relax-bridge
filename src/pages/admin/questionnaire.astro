@@ -47,7 +47,7 @@ const sections = [
     other: [],
   },
   {
-    title: labels.questions.homeService,
+    title: `${labels.questions.homeService} (korábbi kérdés)`,
     options: homeServiceKeys.map((key) => ({ key, label: labels.homeService.find((option) => option.key === key)!.label, count: summary.homeService[key] })),
     other: [],
   },

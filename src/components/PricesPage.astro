@@ -10,10 +10,7 @@ import {
 import { t } from '../i18n';
 import { massageCreatorText } from '../i18n/massage-creator';
 import { pricesText } from '../i18n/prices';
-import { homeServiceUnavailableLabel } from '../i18n/home-service-availability';
 import { creatorAddons, creatorBases } from '../lib/booking/massage-creator';
-import { homeServiceTravelFeeEur } from '../lib/booking/home-service';
-import { homeServiceBookingEnabled } from '../lib/booking/public-service-availability';
 import { getServices } from '../lib/services';
 
 interface Props {
@@ -25,7 +22,6 @@ const d = t(locale);
 const copy = pricesText(locale);
 const creatorCopy = massageCreatorText(locale);
 const studio = await getServices(locale, 'studio');
-const home = await getServices(locale, 'home');
 const path = pricesPath(locale);
 const alternates = {
   nl: pricesPath('nl'),
@@ -33,7 +29,6 @@ const alternates = {
   hu: pricesPath('hu'),
 };
 const readyBookingHref = `${bookingPath(locale)}?category=studio`;
-const homeBookingHref = `${bookingPath(locale)}?category=home`;
 const creatorHref = massageCreatorPath(locale);
 const baseRows = [
   { label: creatorCopy.relaxTitle, priceEur: creatorBases.relax.priceEur },
@@ -69,7 +64,6 @@ const addonRows = [
       <nav class="price-overview-nav" aria-label={copy.categoriesLabel}>
         <a href="#studio">{d.options.studio.label}</a>
         <a href="#creator">{copy.creatorHeading}</a>
-        <a href="#home">{d.options.homeService.label}</a>
       </nav>
     </div>
   </section>
@@ -126,36 +120,6 @@ const addonRows = [
       </div>
     </section>
 
-    <section class="price-overview-section" id="home">
-      <header class="price-overview-heading">
-        <span class="price-overview-number" aria-hidden="true">03</span>
-        <div>
-          <span class="eyebrow">Relax Bridge</span>
-          <h2>{d.options.homeService.label}</h2>
-          <p>{copy.homeIntro}</p>
-        </div>
-      </header>
-      <div class="price-overview-panel">
-        <PriceTable locale={locale} caption={copy.homeTreatmentsHeading} services={home} />
-        <div class="price-overview-fee">
-          <strong>{copy.travelFeeHeading}</strong>
-          <strong>€ {homeServiceTravelFeeEur}</strong>
-          <p>{copy.travelFeeNote}</p>
-        </div>
-        <p class="price-overview-rule">{copy.homeRule}</p>
-        <div class="price-overview-panel__footer">
-          <span>{d.prices.intro}</span>
-          <div class="service-unavailable-action">
-            {!homeServiceBookingEnabled && <span class="service-unavailable-badge">{homeServiceUnavailableLabel[locale]}</span>}
-            {homeServiceBookingEnabled ? (
-              <a class="btn btn--primary" href={homeBookingHref}>{d.options.homeService.bookingCta}<span aria-hidden="true">&rarr;</span></a>
-            ) : (
-              <span class="btn btn--unavailable" aria-disabled="true">{d.options.homeService.bookingCta}</span>
-            )}
-          </div>
-        </div>
-      </div>
-    </section>
   </div>
 </Base>
 

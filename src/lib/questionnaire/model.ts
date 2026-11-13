@@ -44,7 +44,7 @@ export const questionnaireSubmissionSchema = z
     priorities: z.array(z.enum(priorityKeys)).min(1).max(priorityKeys.length).refine(uniqueValues),
     prioritiesOther: z.string().trim().max(300).optional(),
     timing: z.array(z.enum(timingKeys)).min(1).max(timingKeys.length).refine(uniqueValues),
-    homeService: z.enum(homeServiceKeys),
+    homeService: z.enum(homeServiceKeys).optional(),
     website: z.string().max(0).optional(),
   })
   .strict()
@@ -81,5 +81,5 @@ export interface QuestionnaireAnswers {
   priorities: PriorityKey[];
   prioritiesOther?: string;
   timing: TimingKey[];
-  homeService: HomeServiceKey;
+  homeService?: HomeServiceKey;
 }

@@ -1,8 +1,8 @@
 import type { BookingCategory } from './types';
 
-// Keep Home Service information visible while its public online booking is paused.
+// Retired service: preserve legacy booking records, but never accept new public bookings.
 export const homeServiceBookingEnabled = false;
 
 export function isPublicBookingCategoryEnabled(category: BookingCategory): boolean {
-  return category !== 'home' || homeServiceBookingEnabled;
+  return category === 'studio';
 }

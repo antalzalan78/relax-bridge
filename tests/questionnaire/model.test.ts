@@ -7,7 +7,6 @@ const valid = {
   situations: ['relaxation'],
   priorities: ['personalized'],
   timing: ['weekday_morning'],
-  homeService: 'occasionally',
   website: '',
 };
 
@@ -15,7 +14,13 @@ test('accepts a minimal anonymous questionnaire response', () => {
   const parsed = questionnaireSubmissionSchema.parse(valid);
   assert.equal(parsed.locale, 'hu');
   assert.deepEqual(parsed.situations, ['relaxation']);
+  assert.equal(parsed.homeService, undefined);
   assert.equal('website' in parsed, false);
+});
+
+test('accepts the former Home Service answer on existing clients', () => {
+  const parsed = questionnaireSubmissionSchema.parse({ ...valid, homeService: 'occasionally' });
+  assert.equal(parsed.homeService, 'occasionally');
 });
 
 test('requires text when an Other option is selected', () => {

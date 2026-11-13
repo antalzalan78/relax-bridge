@@ -308,7 +308,7 @@ export const POST: APIRoute = async ({ request }) => {
       return Response.json({ error: 'invalid_request' }, { status: 400 });
     }
     if (!isPublicBookingCategoryEnabled(parsed.data.category)) {
-      return Response.json({ error: 'home_service_temporarily_unavailable' }, { status: 503 });
+      return Response.json({ error: 'home_service_unavailable' }, { status: 404 });
     }
 
     const allowed = await consumeRateLimit({

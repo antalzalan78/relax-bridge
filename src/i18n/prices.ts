@@ -1,12 +1,11 @@
 import type { Locale } from '../data/site';
-import { homeServiceDurationText } from './home-service-duration';
 
 const pricePage = {
   nl: {
     eyebrow: 'Relax Bridge · Tarieven',
     title: 'Alle prijzen op één plek.',
-    metaDescription: 'Bekijk de prijzen van Studio Visit-behandelingen, de Massage Creator en Home Service in Tilburg.',
-    intro: 'Een overzicht van de behandelingen in de studio, jouw eigen samenstelling met de Massage Creator en Home Service.',
+    metaDescription: 'Bekijk de prijzen van Studio Visit-behandelingen en de Massage Creator in Tilburg.',
+    intro: 'Een overzicht van de behandelingen in de studio en jouw eigen samenstelling met de Massage Creator.',
     categoriesLabel: 'Spring naar een categorie',
     readyHeading: 'Vaste behandelingen',
     readyIntro: 'Kies een bestaande behandeling in de studio. De prijzen gelden per persoon en per behandeling.',
@@ -17,17 +16,12 @@ const pricePage = {
     addonsHeading: 'Aanvullingen',
     creatorRule: 'De totale behandeling duurt maximaal 120 minuten. De gerichte rug-, nek- en schouderaanvulling is alleen beschikbaar bij een Relaxmassage als basis; niet elke combinatie is mogelijk.',
     creatorCta: 'Stel je massage samen',
-    homeIntro: 'De onderstaande behandelprijzen zijn exclusief de eenmalige voorrijkosten per adres.',
-    homeTreatmentsHeading: 'Behandelingen',
-    travelFeeHeading: 'Eenmalige voorrijkosten per adres',
-    travelFeeNote: 'Deze kosten worden één keer per boeking toegevoegd, ook als meerdere personen op hetzelfde adres een behandeling krijgen.',
-    homeRule: homeServiceDurationText.nl,
   },
   en: {
     eyebrow: 'Relax Bridge · Price list',
     title: 'All prices in one place.',
-    metaDescription: 'See prices for Studio Visit treatments, the Massage Creator and Home Service in Tilburg.',
-    intro: 'An overview of studio treatments, a custom treatment with the Massage Creator and Home Service.',
+    metaDescription: 'See prices for Studio Visit treatments and the Massage Creator in Tilburg.',
+    intro: 'An overview of studio treatments and a custom treatment with the Massage Creator.',
     categoriesLabel: 'Jump to a category',
     readyHeading: 'Ready-made treatments',
     readyIntro: 'Choose an existing studio treatment. Prices are per person and per treatment.',
@@ -38,17 +32,12 @@ const pricePage = {
     addonsHeading: 'Add-ons',
     creatorRule: 'The complete treatment lasts no more than 120 minutes. The focused back, neck and shoulder add-on is available only with a Relax Massage base; not every combination is possible.',
     creatorCta: 'Create your massage',
-    homeIntro: 'The treatment prices below exclude the one-time travel fee per address.',
-    homeTreatmentsHeading: 'Treatments',
-    travelFeeHeading: 'One-time travel fee per address',
-    travelFeeNote: 'This fee is added once per booking, even when several people receive a treatment at the same address.',
-    homeRule: homeServiceDurationText.en,
   },
   hu: {
     eyebrow: 'Relax Bridge · Árlista',
     title: 'Minden ár egy helyen.',
-    metaDescription: 'A Studio Visit kezelések, a Massage Creator és a tilburgi Home Service árai egy helyen.',
-    intro: 'A stúdióban választható kész kezelések, a Massage Creator és a Home Service árainak áttekintése.',
+    metaDescription: 'A Studio Visit kezelések és a Massage Creator árai egy helyen.',
+    intro: 'A stúdióban választható kész kezelések és a Massage Creator árainak áttekintése.',
     categoriesLabel: 'Ugrás a kategóriához',
     readyHeading: 'Kész kezelések',
     readyIntro: 'Válassz egy kész stúdiókezelést. Az árak személyenként és kezelésenként értendők.',
@@ -59,11 +48,6 @@ const pricePage = {
     addonsHeading: 'Kiegészítők',
     creatorRule: 'A teljes kezelés legfeljebb 120 perc lehet. A célzott hát-, nyak- és vállkiegészítő csak relaxmasszázs alapkezelés mellett választható; nem minden kombináció lehetséges.',
     creatorCta: 'Saját masszázs összeállítása',
-    homeIntro: 'Az alábbi kezelési árakon felül címenként egyszeri kiszállási díj fizetendő.',
-    homeTreatmentsHeading: 'Kezelések',
-    travelFeeHeading: 'Egyszeri kiszállási díj címenként',
-    travelFeeNote: 'A díj foglalásonként egyszer kerül hozzáadásra akkor is, ha ugyanazon a címen többen kapnak kezelést.',
-    homeRule: homeServiceDurationText.hu,
   },
 } as const;
 

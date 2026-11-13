@@ -45,7 +45,7 @@ export function summarizeQuestionnaire(
     for (const key of row.answers.situations) if (key in situations) situations[key] += 1;
     for (const key of row.answers.priorities) if (key in priorities) priorities[key] += 1;
     for (const key of row.answers.timing) if (key in timing) timing[key] += 1;
-    if (row.answers.homeService in homeService) homeService[row.answers.homeService] += 1;
+    if (row.answers.homeService && row.answers.homeService in homeService) homeService[row.answers.homeService] += 1;
     collectOther(situationOther, row.answers.situationsOther);
     collectOther(priorityOther, row.answers.prioritiesOther);
 

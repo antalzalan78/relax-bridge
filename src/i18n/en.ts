@@ -4,9 +4,9 @@ export default {
   htmlLang: 'en',
 
   meta: {
-    title: 'Relax Bridge — Massage in Tilburg | Studio & at your home',
+    title: 'Relax Bridge — Massage in Tilburg | Studio Visit',
     description:
-      'Relaxation massage, neck-shoulder-back, facial and foot massage in Tilburg. Visit the studio, or I come to your home by bicycle. From € 40.',
+      'Relaxation, neck-shoulder-back, facial and foot massage at the studio in Tilburg-Reeshof. From € 40.',
   },
 
   tagline: 'The bridge between tension and relaxation.',
@@ -40,9 +40,9 @@ export default {
   hero: {
     title: 'Massage in Tilburg',
     intro:
-      'Take some time to completely unwind in my peaceful studio in Tilburg. Prefer your own surroundings? Home service is also available.',
+      'Take some time to completely unwind with a personal massage in my peaceful studio in Tilburg-Reeshof.',
     mobileIntro:
-      'Nearly 20 years of experience. Relax in my Tilburg studio or choose Home Service at your place.',
+      'Nearly 20 years of experience. Relax with a personal massage in my Tilburg-Reeshof studio.',
     primaryCta: 'Book an appointment',
     secondaryCta: 'See the prices',
   },
@@ -123,11 +123,11 @@ export default {
   goodToKnow: {
     heading: 'Good to know',
     practicalCta: 'Practical information',
-    practicalSummary: 'Cancellation, parking, getting to the studio and space for a massage at home.',
+    practicalSummary: 'Cancellation, parking and getting to the studio.',
     items: [
       {
         title: 'Booking an appointment',
-        body: 'Start with the booking button and choose Studio Visit or Home Service first. In the studio, you can then pick a ready-made treatment or create your own with the Massage Creator. Prefer personal contact? Feel free to send me a message on WhatsApp.',
+        body: 'Start with the booking button. Then pick a ready-made treatment or create your own with the Massage Creator. Prefer personal contact? Feel free to send me a message on WhatsApp.',
       },
       {
         title: 'Changing or cancelling an appointment',
@@ -138,16 +138,8 @@ export default {
         body: 'The studio is in Tilburg–Reeshof. You will receive the exact address after your booking is confirmed so you can plan your route. Parking is available on the street.',
       },
       {
-        title: 'How much space is needed at home?',
-        body: 'Please leave at least 2 × 3 metres of clear space for the massage table. No other preparation is needed; I bring the equipment with me.',
-      },
-      {
         title: 'Prices and payment',
-        body: 'Payment takes place after the treatment and can easily be made by card on location. Payment by card is also possible for home service.',
-      },
-      {
-        title: 'Home service',
-        body: `I come to your home and bring everything needed — you only need to relax. A one-time €15 travel fee per address is added to the treatment price. I will ask for your exact address and phone number so I can reach you easily. ${homeServiceDurationText.en}`,
+        body: 'Payment takes place after the treatment and can easily be made by card on location.',
       },
       {
         title: 'When is it better to postpone a massage?',
@@ -155,7 +147,7 @@ export default {
       },
       {
         title: 'Short questionnaire',
-        body: 'Which times and options matter to you when booking a massage? Four short, anonymous questions help me shape Relax Bridge around what people need.',
+        body: 'Which times and options matter to you when booking a massage? Three short, anonymous questions help me shape Relax Bridge around what people need.',
       },
     ],
     questionnaireCta: 'Take the questionnaire',
@@ -181,7 +173,7 @@ export default {
     googleReviewCta: 'Leave a Google review',
     email: 'Email',
     area: 'Service area',
-    areaBody: 'Studio in Tilburg. Home service in Tilburg and Reeshof.',
+    areaBody: 'Studio in Tilburg-Reeshof.',
     follow: 'Follow me',
     playlists: 'My playlists',
   },

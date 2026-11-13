@@ -23,8 +23,8 @@ export const site = {
   city: 'Tilburg',
   /** TODO: a studio pontos cime. Kell a LocalBusiness strukturalt adathoz. */
   address: null as { street: string; postalCode: string; city: string } | null,
-  /** Home service lefedettseg. */
-  areaServed: ['Tilburg', 'Reeshof'],
+  /** Studio location for local search data. */
+  areaServed: ['Tilburg'],
 
   /**
    * TODO: nyitvatartas. Formatum: ['Mo-Fr 09:00-20:00', 'Sa 10:00-16:00']

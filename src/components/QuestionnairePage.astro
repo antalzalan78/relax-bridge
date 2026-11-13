@@ -122,20 +122,6 @@ const weekendTiming = copy.timing.filter((option) => option.key.startsWith('week
         <p class="question-error" id="timing-error" data-group-error hidden>{copy.required}</p>
       </fieldset>
 
-      <fieldset class="question-card" data-required-group="homeService">
-        <span class="question-card__number" aria-hidden="true">04</span>
-        <legend>{copy.questions.homeService}</legend>
-        <div class="option-list option-list--compact" aria-describedby="home-service-error">
-          {copy.homeService.map((option) => (
-            <label class="option-card">
-              <input type="radio" name="homeService" value={option.key} />
-              <span>{option.label}</span>
-            </label>
-          ))}
-        </div>
-        <p class="question-error" id="home-service-error" data-group-error hidden>{copy.required}</p>
-      </fieldset>
-
       <div hidden aria-hidden="true">
         <label for="questionnaire-website">Website</label>
         <input id="questionnaire-website" name="website" type="text" tabindex="-1" autocomplete="off" />
@@ -229,7 +215,6 @@ const weekendTiming = copy.timing.filter((option) => option.key.startsWith('week
         priorities: values('priorities'),
         prioritiesOther: (form.elements.namedItem('prioritiesOther') as HTMLInputElement).value.trim() || undefined,
         timing: values('timing'),
-        homeService: values('homeService')[0],
         website: (form.elements.namedItem('website') as HTMLInputElement).value,
       };
 

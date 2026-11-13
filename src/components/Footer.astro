@@ -12,7 +12,6 @@ interface Props {
 const { locale } = Astro.props;
 const d = t(locale);
 const studio = await getServices(locale, 'studio');
-const home = await getServices(locale, 'home');
 const year = new Date().getFullYear();
 ---
 
@@ -25,7 +24,7 @@ const year = new Date().getFullYear();
       <p>{d.tagline}</p>
     </div>
 
-    <div class="grid grid--3">
+    <div class="grid grid--2">
       <div>
         <h3>{d.nav.studio}</h3>
         <ul>
@@ -33,21 +32,6 @@ const year = new Date().getFullYear();
             studio.map((s) => (
               <li>
                 <a href={servicePath(locale, 'studio', s.data.slug)}>
-                  {s.data.title}
-                </a>
-              </li>
-            ))
-          }
-        </ul>
-      </div>
-
-      <div>
-        <h3>{d.nav.homeService}</h3>
-        <ul>
-          {
-            home.map((s) => (
-              <li>
-                <a href={servicePath(locale, 'home', s.data.slug)}>
                   {s.data.title}
                 </a>
               </li>
