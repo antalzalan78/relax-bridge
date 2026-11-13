@@ -18,7 +18,7 @@ const questionnaire = {
     eyebrow: 'Jouw voorkeuren',
     title: 'Help Relax Bridge verder',
     intro:
-      'Met vier korte vragen help je mij het aanbod en de beschikbare tijden beter te laten aansluiten. Invullen duurt ongeveer twee minuten.',
+      'Met drie korte vragen help je mij het aanbod en de beschikbare tijden beter te laten aansluiten. Invullen duurt ongeveer twee minuten.',
     anonymous: 'De vragenlijst is anoniem. Ik vraag niet om je naam, e-mailadres of telefoonnummer.',
     requiredHint: 'Meerdere antwoorden mogelijk.',
     required: 'Kies ten minste één antwoord.',
@@ -78,7 +78,7 @@ const questionnaire = {
     eyebrow: 'Your preferences',
     title: 'Help shape Relax Bridge',
     intro:
-      'Four short questions help me align the treatments and available times more closely with what people need. It takes about two minutes.',
+      'Three short questions help me align the treatments and available times more closely with what people need. It takes about two minutes.',
     anonymous: 'The questionnaire is anonymous. I do not ask for your name, email address or telephone number.',
     requiredHint: 'You may select more than one answer.',
     required: 'Select at least one answer.',
@@ -138,7 +138,7 @@ const questionnaire = {
     eyebrow: 'A te szempontjaid',
     title: 'Segíts formálni a Relax Bridge-et',
     intro:
-      'Négy rövid kérdéssel segíthetsz, hogy a kezelések és az elérhető időpontok jobban igazodjanak az igényekhez. A kitöltés körülbelül két perc.',
+      'Három rövid kérdéssel segíthetsz, hogy a kezelések és az elérhető időpontok jobban igazodjanak az igényekhez. A kitöltés körülbelül két perc.',
     anonymous: 'A kérdőív névtelen. Nem kérünk nevet, e-mail-címet vagy telefonszámot.',
     requiredHint: 'Több választ is adhatsz.',
     required: 'Válassz legalább egy lehetőséget.',

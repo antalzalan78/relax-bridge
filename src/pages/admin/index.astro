@@ -154,7 +154,7 @@ if (Astro.request.method === 'POST') {
         day: z.iso.date(),
         startTime: z.string().regex(/^\d{2}:\d{2}$/),
         durationMinutes: z.coerce.number().int().min(15).max(240),
-        category: z.enum(['studio', 'home']),
+        category: z.literal('studio'),
         guestName: z.string().trim().max(120).optional(),
         note: z.string().trim().max(500).optional(),
         applyStandardBuffer: z.string().optional(),
@@ -623,7 +623,7 @@ const syncTime = (value: unknown) => value
           </div>
           <div class="manual-block-form__row">
             <label>Időtartam (perc)<input name="durationMinutes" type="number" min="15" max="240" step="15" value={manualDraft.durationMinutes || '60'} required /></label>
-            <label>Típus<select name="category"><option value="studio" selected={manualDraft.category !== 'home'}>Studio Visit</option><option value="home" selected={manualDraft.category === 'home'}>Home Service</option></select></label>
+            <label>Típus<select name="category"><option value="studio">Studio Visit</option></select></label>
           </div>
           <label>Vendég neve (opcionális)<input name="guestName" maxlength="120" value={manualDraft.guestName || ''} placeholder="pl. WhatsApp-foglalás" /></label>
           <label>Megjegyzés (opcionális)<input name="note" maxlength="500" value={manualDraft.note || ''} placeholder="pl. privát időpont" /></label>
@@ -861,7 +861,6 @@ const syncTime = (value: unknown) => value
         const day = form.elements.namedItem('day') as HTMLInputElement;
         const startTime = form.elements.namedItem('startTime') as HTMLInputElement;
         const duration = form.elements.namedItem('durationMinutes') as HTMLInputElement;
-        const category = form.elements.namedItem('category') as HTMLSelectElement;
         const useBuffer = form.elements.namedItem('applyStandardBuffer') as HTMLInputElement;
         const preview = dialog.querySelector<HTMLElement>('#manual-block-preview');
         const updatePreview = () => {
@@ -871,10 +870,10 @@ const syncTime = (value: unknown) => value
           const massageEnd = base + Number(duration.value);
           const label = (value: number) => `${String(Math.floor(value / 60) % 24).padStart(2, '0')}:${String(value % 60).padStart(2, '0')}${value >= 1440 ? ' (másnap)' : ''}`;
           preview.textContent = useBuffer.checked
-            ? `${startTime.value}–${label(massageEnd)} ${category.value === 'home' ? 'Home Service' : 'Studio Visit'} · következő Stúdió legkorábban ${label(massageEnd + 30)}, Home Service ${label(massageEnd + 120)} (ha nincs más ütközés).`
+            ? `${startTime.value}–${label(massageEnd)} Studio Visit · következő stúdiófoglalás legkorábban ${label(massageEnd + 30)} (ha nincs más ütközés).`
             : `${startTime.value}–${label(massageEnd)} pontos idősávzárás · buffer nélkül.`;
         };
-        for (const control of [startTime, duration, category, useBuffer]) control.addEventListener('change', updatePreview);
+        for (const control of [startTime, duration, useBuffer]) control.addEventListener('change', updatePreview);
         for (const button of document.querySelectorAll<HTMLButtonElement>('[data-manual-date]')) {
           button.addEventListener('click', () => {
             day.value = button.dataset.manualDate || '';

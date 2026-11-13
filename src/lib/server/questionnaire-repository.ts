@@ -31,7 +31,7 @@ export async function createQuestionnaireResponse(input: {
     priorities: input.answers.priorities,
     ...(input.answers.prioritiesOther ? { prioritiesOther: input.answers.prioritiesOther } : {}),
     timing: input.answers.timing,
-    homeService: input.answers.homeService,
+    ...(input.answers.homeService ? { homeService: input.answers.homeService } : {}),
   };
   await database`
     INSERT INTO questionnaire_responses (id, locale, answers)

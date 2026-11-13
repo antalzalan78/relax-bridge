@@ -4,9 +4,9 @@ export default {
   htmlLang: 'hu-HU',
 
   meta: {
-    title: 'Relax Bridge — Masszázs Tilburgban | Stúdióban és házhoz',
+    title: 'Relax Bridge — Masszázs Tilburgban | Studio Visit',
     description:
-      'Relaxmasszázs, nyak-váll-hátmasszázs, arc- és talpmasszázs Tilburgban. Gyere a stúdióba, vagy házhoz megyek biciklivel. Már 40 eurótól.',
+      'Relaxmasszázs, nyak-váll-hátmasszázs, arc- és talpmasszázs a tilburgi stúdióban. Már 40 eurótól.',
   },
 
   tagline: 'A híd a feszültség és a felüdülés között.',
@@ -40,9 +40,9 @@ export default {
   hero: {
     title: 'Masszázs Tilburgban',
     intro:
-      'Kapcsolódj ki teljesen a nyugodt tilburgi stúdiómban. Inkább a saját környezetedben maradnál? Házhoz menő szolgáltatás is elérhető.',
+      'Kapcsolódj ki teljesen személyre szabott masszázzsal a nyugodt tilburgi stúdiómban.',
     mobileIntro:
-      'Közel 20 év tapasztalat. Kapcsolódj ki a tilburgi stúdiómban, vagy válaszd a Home Service-t otthonodban.',
+      'Közel 20 év tapasztalat. Kapcsolódj ki a tilburgi stúdiómban egy személyre szabott masszázzsal.',
     primaryCta: 'Időpontfoglalás',
     secondaryCta: 'Árak megtekintése',
   },
@@ -123,11 +123,11 @@ export default {
   goodToKnow: {
     heading: 'Jó tudni',
     practicalCta: 'Gyakorlati tudnivalók',
-    practicalSummary: 'Lemondás, parkolás, a stúdió megközelítése és az otthoni masszázs helyigénye.',
+    practicalSummary: 'Lemondás, parkolás és a stúdió megközelítése.',
     items: [
       {
         title: 'Időpontfoglalás',
-        body: 'Az időpontfoglalás gombnál először válaszd ki, hogy Studio Visit vagy Home Service kezelést szeretnél. A stúdióban ezután kész kezelés vagy a Massage Creator közül választhatsz. Ha inkább személyesen egyeztetnél, nyugodtan írj üzenetet WhatsAppon.',
+        body: 'Az időpontfoglalás gomb után kész kezelés vagy a Massage Creator közül választhatsz. Ha inkább személyesen egyeztetnél, nyugodtan írj üzenetet WhatsAppon.',
       },
       {
         title: 'Módosítás és lemondás',
@@ -138,16 +138,8 @@ export default {
         body: 'A stúdió Tilburg–Reeshofban található. A pontos címet a visszaigazolt foglalás után küldöm el, így megtervezheted az útvonalat. Utcai parkolás lehetséges.',
       },
       {
-        title: 'Mennyi hely kell az otthoni masszázshoz?',
-        body: 'A masszázságy számára legalább 2 × 3 méter szabad helyre van szükség. Más előkészületet nem kérek; a felszerelést én viszem.',
-      },
-      {
         title: 'Árak és fizetés',
-        body: 'A fizetés a kezelés után történik, egyszerűen a helyszínen, bankkártyával. Bankkártyás fizetés a házhoz menő szolgáltatásnál is lehetséges.',
-      },
-      {
-        title: 'Házhoz megyek',
-        body: `Hozzád megyek, és mindent viszek, amire szükség van — neked csak pihenned kell. A kezelések árán felül címenként egyszeri €15 kiszállási díjat számolok fel. Elkérem a pontos címedet és a telefonszámodat, hogy könnyen elérjelek. ${homeServiceDurationText.hu}`,
+        body: 'A fizetés a kezelés után történik, egyszerűen a helyszínen, bankkártyával.',
       },
       {
         title: 'Mikor érdemes elhalasztani a masszázst?',
@@ -155,7 +147,7 @@ export default {
       },
       {
         title: 'Rövid kérdőív',
-        body: 'Mely időpontok és lehetőségek fontosak neked egy masszázs foglalásakor? Négy rövid, névtelen kérdéssel segíthetsz, hogy a Relax Bridge jobban igazodjon az igényekhez.',
+        body: 'Mely időpontok és lehetőségek fontosak neked egy masszázs foglalásakor? Három rövid, névtelen kérdéssel segíthetsz, hogy a Relax Bridge jobban igazodjon az igényekhez.',
       },
     ],
     questionnaireCta: 'Kérdőív kitöltése',
@@ -181,7 +173,7 @@ export default {
     googleReviewCta: 'Google-értékelés írása',
     email: 'E-mail',
     area: 'Ellátott terület',
-    areaBody: 'Stúdió Tilburgban. Házhoz Tilburgban és Reeshofban.',
+    areaBody: 'Stúdió Tilburg-Reeshofban.',
     follow: 'Kövess',
     playlists: 'A playlistjeim',
   },

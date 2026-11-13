@@ -4,9 +4,9 @@ export default {
   htmlLang: 'nl-NL',
 
   meta: {
-    title: 'Relax Bridge — Massage in Tilburg | Studio & aan huis',
+    title: 'Relax Bridge — Massage in Tilburg | Studio Visit',
     description:
-      'Ontspanningsmassage, nek-schouder-rugmassage, gezichts- en voetmassage in Tilburg. Kom naar de studio of ik kom met de fiets bij je thuis. Vanaf € 40.',
+      'Ontspanningsmassage, nek-schouder-rugmassage, gezichts- en voetmassage in de studio in Tilburg-Reeshof. Vanaf € 40.',
   },
 
   tagline: 'De brug tussen spanning en ontspanning.',
@@ -40,9 +40,9 @@ export default {
   hero: {
     title: 'Massage in Tilburg - Reeshof',
     intro:
-      'Bijna 20 jaar massage-ervaring, met persoonlijke aandacht voor jou. Kom tot rust in mijn rustige studio in de Reeshof, of geniet van een massage bij jou thuis in Tilburg.',
+      'Bijna 20 jaar massage-ervaring, met persoonlijke aandacht voor jou. Kom tot rust in mijn rustige studio in de Reeshof.',
     mobileIntro:
-      'Bijna 20 jaar ervaring. Ontspan in mijn studio in Tilburg-Reeshof of kies Home Service bij jou thuis.',
+      'Bijna 20 jaar ervaring. Ontspan met een persoonlijke massage in mijn studio in Tilburg-Reeshof.',
     primaryCta: 'Afspraak maken',
     secondaryCta: 'Bekijk de prijzen',
   },
@@ -123,11 +123,11 @@ export default {
   goodToKnow: {
     heading: 'Goed om te weten',
     practicalCta: 'Praktische informatie',
-    practicalSummary: 'Annuleren, parkeren, de studio bereiken en de ruimte voor een massage aan huis.',
+    practicalSummary: 'Annuleren, parkeren en de studio bereiken.',
     items: [
       {
         title: 'Afspraak maken',
-        body: 'Begin met de knop Afspraak maken en kies eerst Studio Visit of Home Service. In de studio kies je daarna een vaste behandeling of stel je jouw massage samen met de Massage Creator. Liever persoonlijk contact? Stuur me gerust een WhatsApp-bericht.',
+        body: 'Begin met de knop Afspraak maken. Kies daarna een vaste behandeling of stel je jouw massage samen met de Massage Creator. Liever persoonlijk contact? Stuur me gerust een WhatsApp-bericht.',
       },
       {
         title: 'Wijzigen of annuleren',
@@ -138,16 +138,8 @@ export default {
         body: 'De studio ligt in Tilburg–Reeshof. Het exacte adres ontvang je nadat je boeking is bevestigd, zodat je je route kunt plannen. Parkeren kan op straat.',
       },
       {
-        title: 'Hoeveel ruimte is er thuis nodig?',
-        body: 'Zorg voor minimaal 2 × 3 meter vrije ruimte voor de massagetafel. Verder hoef je niets voor te bereiden; ik neem de benodigdheden mee.',
-      },
-      {
         title: 'Prijzen en betaling',
-        body: 'De betaling vindt plaats na de behandeling en kan eenvoudig met pin op locatie worden gedaan. Ook bij Home service is betalen met pin mogelijk.',
-      },
-      {
-        title: 'Home service',
-        body: `Ik kom bij je thuis en neem alles mee wat nodig is — jij hoeft alleen maar te ontspannen. Naast de behandelprijs betaal je per adres eenmalig € 15 aan voorrijkosten. Ik vraag je om je exacte adres en telefoonnummer, zodat ik je makkelijk kan bereiken. ${homeServiceDurationText.nl}`,
+        body: 'De betaling vindt plaats na de behandeling en kan eenvoudig met pin op locatie worden gedaan.',
       },
       {
         title: 'Wanneer kun je een massage beter uitstellen?',
@@ -155,7 +147,7 @@ export default {
       },
       {
         title: 'Korte vragenlijst',
-        body: 'Welke momenten en mogelijkheden zijn voor jou belangrijk bij het boeken van een massage? Met vier korte, anonieme vragen help je mij het aanbod van Relax Bridge beter te laten aansluiten.',
+        body: 'Welke momenten en mogelijkheden zijn voor jou belangrijk bij het boeken van een massage? Met drie korte, anonieme vragen help je mij het aanbod van Relax Bridge beter te laten aansluiten.',
       },
     ],
     questionnaireCta: 'Vul de vragenlijst in',
@@ -181,7 +173,7 @@ export default {
     googleReviewCta: 'Schrijf een Google-beoordeling',
     email: 'E-mail',
     area: 'Werkgebied',
-    areaBody: 'Studio in Tilburg. Home service in Tilburg en Reeshof.',
+    areaBody: 'Studio in Tilburg-Reeshof.',
     follow: 'Volg me',
     playlists: 'Mijn playlists',
   },
