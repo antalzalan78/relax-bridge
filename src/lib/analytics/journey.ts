@@ -86,7 +86,7 @@ export function blogArticleRoute(value: string): { locale: Locale; slug: string 
 }
 
 export function isBookingDestination(value: string): boolean {
-  return journeyPageKey(value) === 'booking';
+  return ['booking', 'studio-visit'].includes(journeyPageKey(value) ?? '');
 }
 
 export function summarizeJourneySessions(rows: JourneySessionRow[]): JourneySummary {
@@ -110,7 +110,7 @@ export function summarizeJourneySessions(rows: JourneySessionRow[]): JourneySumm
     const bookings = Number(row.bookings) || 0;
     const pages = (row.pages ?? []).filter((page) => page !== 'privacy' && page !== 'questionnaire');
     const distinctPages = pages.filter((page, index) => page !== pages[index - 1]);
-    const sawBooking = distinctPages.includes('booking');
+    const sawBooking = distinctPages.includes('booking') || distinctPages.includes('studio-visit');
 
     summary.pageViews += pageViews;
     summary.bookingClicks += clicks;

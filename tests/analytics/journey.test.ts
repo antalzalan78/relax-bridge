@@ -16,6 +16,7 @@ test('maps localized public service pages to the same safe journey category', ()
   assert.equal(journeyPageKey('/en/prices'), 'prices');
   assert.equal(journeyPageKey('/hu/arak'), 'prices');
   assert.equal(isBookingDestination('/en/booking'), true);
+  assert.equal(isBookingDestination('/hu/studio-visit'), true);
   assert.equal(isBookingDestination('/en/massage-creator'), false);
 });
 
@@ -24,6 +25,18 @@ test('does not retain arbitrary or administrative paths', () => {
   assert.equal(journeyPageKey('/api/bookings'), null);
   assert.equal(journeyPageKey('/customer/private-value'), null);
   assert.equal(journeyPageKey('//external.example/path'), null);
+});
+
+test('Studio Visit is counted as the booking entry after removing the extra chooser', () => {
+  const summary = summarizeJourneySessions([{
+    source: 'google',
+    pages: ['home', 'studio-visit'],
+    page_views: 2,
+    booking_clicks: 1,
+    bookings: 0,
+  }]);
+  assert.equal(summary.bookingPageSessions, 1);
+  assert.equal(summary.campaigns[0]?.bookingPageSessions, 1);
 });
 
 test('recognizes only localized article URLs, not topic, admin or arbitrary routes', () => {
