@@ -1,16 +1,15 @@
 ---
 import BookingPage from '../../components/BookingPage.astro';
+import { bookingEntryRedirect } from '../../lib/booking/entry-route';
 import type { Locale } from '../../data/site';
 
-export function getStaticPaths() {
-  return ['en', 'hu'].map((lang) => ({ params: { lang }, props: { locale: lang } }));
-}
+export const prerender = false;
 
-interface Props {
-  locale: Locale;
-}
+const locale = Astro.params.lang;
+if (locale !== 'en' && locale !== 'hu') return new Response('Not found', { status: 404 });
 
-const { locale } = Astro.props;
+const destination = bookingEntryRedirect(locale as Locale, Astro.url);
+if (destination) return Astro.redirect(destination, 302);
 ---
 
 <BookingPage locale={locale} />

@@ -29,9 +29,9 @@ const d = t(locale);
 const studioCopy = studioBookingText(locale);
 
 const studio = await getServices(locale, 'studio');
-const bookingHref = bookingPath(locale);
+const bookingHref = studioVisitBookingPath(locale);
 const studioBookingHref = studioVisitBookingPath(locale);
-const studioReadyBookingHref = `${bookingHref}?category=studio`;
+const studioReadyBookingHref = `${bookingPath(locale)}?category=studio`;
 const creatorHref = massageCreatorPath(locale);
 
 const alternates = homeAlternates();

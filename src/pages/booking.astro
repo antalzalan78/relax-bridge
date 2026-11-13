@@ -1,5 +1,11 @@
 ---
 import BookingPage from '../components/BookingPage.astro';
+import { bookingEntryRedirect } from '../lib/booking/entry-route';
+
+export const prerender = false;
+
+const destination = bookingEntryRedirect('nl', Astro.url);
+if (destination) return Astro.redirect(destination, 302);
 ---
 
 <BookingPage locale="nl" />
