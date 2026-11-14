@@ -32,6 +32,26 @@ test('Massage Creator and ready-made treatments are both bookable, with Creator 
   assert.ok(prices.indexOf('id="creator"') < prices.indexOf('id="studio"'));
 });
 
+test('the retired Studio Visit label is absent from guest-facing copy', async () => {
+  for (const path of [
+    'src/components/HomePage.astro',
+    'src/components/Footer.astro',
+    'src/components/PricesPage.astro',
+    'src/components/StudioVisitBookingPage.astro',
+    'src/components/MassageCreatorPage.astro',
+    'src/i18n/nl.ts',
+    'src/i18n/en.ts',
+    'src/i18n/hu.ts',
+    'src/i18n/booking.ts',
+    'src/i18n/studio-booking.ts',
+    'src/i18n/massage-creator.ts',
+    'src/i18n/prices.ts',
+    'src/pages/api/bookings.ts',
+  ]) {
+    assert.doesNotMatch(await source(path), /Studio Visit/, path);
+  }
+});
+
 test('retired Home Service has no public service content or booking form fields', async () => {
   for (const locale of ['nl', 'en', 'hu']) {
     const files = await readdir(new URL(`../../src/content/services/${locale}/`, import.meta.url));

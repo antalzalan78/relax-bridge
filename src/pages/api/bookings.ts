@@ -152,7 +152,7 @@ function bookingNotes(input: z.infer<typeof bookingSchema>): string | undefined 
     input.creatorMusic ? `${labels.music}: ${labels.musicOptions[input.creatorMusic]}` : null,
   ].filter(Boolean);
 
-  const preferencesNote = choices.length ? `Studio Visit — ${choices.join(' · ')}` : undefined;
+  const preferencesNote = choices.length ? choices.join(' · ') : undefined;
   return [treatmentNote, preferencesNote, input.notes].filter(Boolean).join('\n') || undefined;
 }
 

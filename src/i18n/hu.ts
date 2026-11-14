@@ -2,7 +2,7 @@ export default {
   htmlLang: 'hu-HU',
 
   meta: {
-    title: 'Relax Bridge — Masszázs Tilburgban | Studio Visit',
+    title: 'Relax Bridge — Masszázs Tilburgban',
     description:
       'Relaxmasszázs, nyak-váll-hátmasszázs, arc- és talpmasszázs a tilburgi stúdióban. Már 40 eurótól.',
   },
@@ -16,7 +16,6 @@ export default {
   nav: {
     home: 'Főoldal',
     services: 'Kezelések',
-    studio: 'Studio Visit',
     prices: 'Árak',
     blog: 'Blog',
     about: 'Rólam',
@@ -68,7 +67,7 @@ export default {
 
   options: {
     studio: {
-      label: 'Studio Visit',
+      label: 'A stúdió',
       title: 'Szívesen látlak az otthonomban.',
       body: 'Egy csendes hely Tilburgban, ahol semmit nem kell csinálnod.',
       location: {
@@ -78,7 +77,7 @@ export default {
       subtitle:
         'Nyugodt hely Tilburg-Reeshofban, ahol igazán magadra figyelhetsz.',
       cta: 'Kezelések megtekintése',
-      bookingCta: 'Studio Visit foglalása',
+      bookingCta: 'Válassz kezelést',
       personalization: {
         title: 'Massage Creator',
         spotlightEyebrow: 'A te masszázsod, a te választásod',
@@ -100,7 +99,6 @@ export default {
     price: 'Ár',
     minutes: 'perc',
     from: 'már',
-    studioHeading: 'Studio Visit',
   },
 
   goodToKnow: {

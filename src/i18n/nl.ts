@@ -2,7 +2,7 @@ export default {
   htmlLang: 'nl-NL',
 
   meta: {
-    title: 'Relax Bridge — Massage in Tilburg | Studio Visit',
+    title: 'Relax Bridge — Massage in Tilburg',
     description:
       'Ontspanningsmassage, nek-schouder-rugmassage, gezichts- en voetmassage in de studio in Tilburg-Reeshof. Vanaf € 40.',
   },
@@ -16,7 +16,6 @@ export default {
   nav: {
     home: 'Home',
     services: 'Behandelingen',
-    studio: 'Studio Visit',
     prices: 'Prijzen',
     blog: 'Blog',
     about: 'Over mij',
@@ -68,7 +67,7 @@ export default {
 
   options: {
     studio: {
-      label: 'Studio Visit',
+      label: 'De studio',
       title: 'Je bent welkom bij mij thuis.',
       body: 'Een rustige plek in Tilburg waar je niets hoeft te doen.',
       location: {
@@ -78,7 +77,7 @@ export default {
       subtitle:
         'Een rustige plek in Tilburg-Reeshof, voor jouw moment van ontspanning.',
       cta: 'Bekijk de behandelingen',
-      bookingCta: 'Studio Visit reserveren',
+      bookingCta: 'Kies je behandeling',
       personalization: {
         title: 'Massage Creator',
         spotlightEyebrow: 'Jouw massage, jouw keuze',
@@ -100,7 +99,6 @@ export default {
     price: 'Prijs',
     minutes: 'minuten',
     from: 'vanaf',
-    studioHeading: 'Studio Visit',
   },
 
   goodToKnow: {

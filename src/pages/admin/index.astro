@@ -623,7 +623,7 @@ const syncTime = (value: unknown) => value
           </div>
           <div class="manual-block-form__row">
             <label>Időtartam (perc)<input name="durationMinutes" type="number" min="15" max="240" step="15" value={manualDraft.durationMinutes || '60'} required /></label>
-            <label>Típus<select name="category"><option value="studio">Studio Visit</option></select></label>
+            <label>Típus<select name="category"><option value="studio">Stúdiókezelés</option></select></label>
           </div>
           <label>Vendég neve (opcionális)<input name="guestName" maxlength="120" value={manualDraft.guestName || ''} placeholder="pl. WhatsApp-foglalás" /></label>
           <label>Megjegyzés (opcionális)<input name="note" maxlength="500" value={manualDraft.note || ''} placeholder="pl. privát időpont" /></label>
@@ -870,7 +870,7 @@ const syncTime = (value: unknown) => value
           const massageEnd = base + Number(duration.value);
           const label = (value: number) => `${String(Math.floor(value / 60) % 24).padStart(2, '0')}:${String(value % 60).padStart(2, '0')}${value >= 1440 ? ' (másnap)' : ''}`;
           preview.textContent = useBuffer.checked
-            ? `${startTime.value}–${label(massageEnd)} Studio Visit · következő stúdiófoglalás legkorábban ${label(massageEnd + 30)} (ha nincs más ütközés).`
+            ? `${startTime.value}–${label(massageEnd)} stúdiókezelés · következő stúdiófoglalás legkorábban ${label(massageEnd + 30)} (ha nincs más ütközés).`
             : `${startTime.value}–${label(massageEnd)} pontos idősávzárás · buffer nélkül.`;
         };
         for (const control of [startTime, duration, useBuffer]) control.addEventListener('change', updatePreview);

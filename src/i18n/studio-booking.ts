@@ -2,7 +2,7 @@ import type { Locale } from '../data/site';
 
 const studioBooking = {
   nl: {
-    eyebrow: 'Studio Visit',
+    eyebrow: 'Online reserveren',
     title: 'Kies jouw massage.',
     intro:
       'Kies een vaste behandeling in de studio of stel je eigen behandeling samen met de Massage Creator.',
@@ -45,7 +45,7 @@ const studioBooking = {
     },
   },
   en: {
-    eyebrow: 'Studio Visit',
+    eyebrow: 'Book online',
     title: 'Choose your massage.',
     intro:
       'Choose a ready-made treatment in the studio, or build your own with the Massage Creator.',
@@ -88,7 +88,7 @@ const studioBooking = {
     },
   },
   hu: {
-    eyebrow: 'Studio Visit',
+    eyebrow: 'Online foglalás',
     title: 'Válaszd ki a masszázsod.',
     intro:
       'Válassz a kész stúdiókezelések közül, vagy állítsd össze a sajátodat a Massage Creator segítségével.',

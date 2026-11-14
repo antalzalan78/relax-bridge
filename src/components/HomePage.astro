@@ -58,10 +58,8 @@ const jsonLd = [
         <h1>{d.hero.title}</h1>
         <p class="lead hero__intro--desktop">{d.hero.intro}</p>
         <p class="lead hero__intro--mobile">{d.hero.mobileIntro}</p>
-        <div class="hero__meta" aria-label={`${d.nav.studio}, Tilburg`}>
-          <span>{d.nav.studio}</span>
-          <span aria-hidden="true">&middot;</span>
-          <span>Tilburg</span>
+        <div class="hero__meta" aria-label="Tilburg-Reeshof">
+          <span>Tilburg-Reeshof</span>
         </div>
         <div class="btn-row">
           <a class="btn btn--primary" href={bookingHref}>
@@ -176,7 +174,6 @@ const jsonLd = [
 
         <header class="studio-offer-group__heading">
           <div class="studio-offer-group__heading-copy">
-            <span class="eyebrow">Studio Visit</span>
             <h2>{studioCopy.readyHeading}</h2>
           </div>
           <a class="btn btn--primary" href={studioReadyBookingHref}>
