@@ -115,30 +115,7 @@ const jsonLd = [
     <WaveDivider animate />
   </div>
 
-  <section class="section creator-spotlight-section" id={anchors.services} aria-labelledby="creator-spotlight-title">
-    <div class="wrap">
-      <div class="creator-spotlight">
-        <div class="creator-spotlight__intro">
-          <span class="eyebrow">{d.options.studio.personalization.spotlightEyebrow}</span>
-          <h2 id="creator-spotlight-title">Massage Creator</h2>
-          <p class="lead">{d.options.studio.personalization.spotlightIntro}</p>
-          <a class="btn btn--primary" href={creatorHref}>
-            {d.options.studio.personalization.spotlightCta}<span aria-hidden="true">&rarr;</span>
-          </a>
-        </div>
-        <ol class="creator-spotlight__steps">
-          {d.options.studio.personalization.spotlightSteps.map((step, index) => (
-            <li>
-              <span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
-              <div><h3>{step.title}</h3><p>{step.body}</p></div>
-            </li>
-          ))}
-        </ol>
-      </div>
-    </div>
-  </section>
-
-  <section class="section location-section location-section--studio">
+  <section class="section location-section location-section--studio" id={anchors.services}>
     <div class="wrap">
       <div class="section-heading section-heading--wide services-heading">
         <h2>{d.nav.services}</h2>
@@ -178,6 +155,25 @@ const jsonLd = [
       </div>
 
       <section class="studio-offer-group" id="studio-services">
+        <article class="creator-spotlight" aria-labelledby="creator-spotlight-title">
+          <div class="creator-spotlight__intro">
+            <span class="eyebrow">{d.options.studio.personalization.spotlightEyebrow}</span>
+            <h2 id="creator-spotlight-title">Massage Creator</h2>
+            <p class="lead">{d.options.studio.personalization.spotlightIntro}</p>
+            <a class="btn btn--primary" href={creatorHref}>
+              {d.options.studio.personalization.spotlightCta}<span aria-hidden="true">&rarr;</span>
+            </a>
+          </div>
+          <ol class="creator-spotlight__steps">
+            {d.options.studio.personalization.spotlightSteps.map((step, index) => (
+              <li>
+                <span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+                <div><h3>{step.title}</h3><p>{step.body}</p></div>
+              </li>
+            ))}
+          </ol>
+        </article>
+
         <header class="studio-offer-group__heading">
           <div class="studio-offer-group__heading-copy">
             <span class="eyebrow">Studio Visit</span>

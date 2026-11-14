@@ -892,6 +892,7 @@ img {
   flex-wrap: wrap;
   gap: 1rem clamp(1.5rem, 4vw, 3.5rem);
   align-items: flex-end;
+  margin-top: clamp(2.5rem, 4vw, 4rem);
   padding-bottom: 1.25rem;
   border-bottom: 1px solid var(--border);
 }
@@ -909,18 +910,14 @@ img {
   padding-top: clamp(2rem, 4vw, 3.25rem);
 }
 
-.creator-spotlight-section {
-  scroll-margin-top: 6rem;
-  padding-bottom: 0;
-}
-
 .creator-spotlight {
   display: grid;
-  gap: clamp(2rem, 5vw, 4rem);
-  padding: clamp(2rem, 5vw, 4rem);
-  border-radius: var(--radius-lg);
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  padding: clamp(1.4rem, 3vw, 2.2rem);
+  border: 1px solid var(--pine-dark);
+  border-radius: var(--radius);
   background: var(--pine-dark);
-  box-shadow: var(--shadow-raised);
+  box-shadow: var(--shadow-soft);
   color: #fff;
 }
 
@@ -931,6 +928,7 @@ img {
 .creator-spotlight h2 {
   margin-bottom: 0.6rem;
   color: #fff;
+  font-size: clamp(2rem, 1.55rem + 1.7vw, 3.3rem);
 }
 
 .creator-spotlight .lead {
@@ -981,7 +979,7 @@ img {
 
 @media (min-width: 52rem) {
   .creator-spotlight {
-    grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 0.85fr);
+    grid-template-columns: minmax(0, 1.2fr) minmax(16rem, 0.8fr);
     align-items: center;
   }
 }

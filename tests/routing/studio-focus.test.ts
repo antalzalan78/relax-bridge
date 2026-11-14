@@ -6,8 +6,10 @@ const source = async (path: string) => readFile(new URL(`../../${path}`, import.
 
 test('the homepage introduces Relax Bridge before the featured Massage Creator and ready-made treatments', async () => {
   const homepage = await source('src/components/HomePage.astro');
-  assert.ok(homepage.indexOf('homepage-introduction') < homepage.indexOf('creator-spotlight-section'));
-  assert.ok(homepage.indexOf('creator-spotlight-section') < homepage.indexOf('studio-offer-group'));
+  assert.ok(homepage.indexOf('homepage-introduction') < homepage.indexOf('services-heading'));
+  assert.ok(homepage.indexOf('services-heading') < homepage.indexOf('creator-spotlight'));
+  assert.ok(homepage.indexOf('creator-spotlight') < homepage.indexOf('studio-offer-group__heading'));
+  assert.match(homepage, /id=\{anchors\.services\}/);
   assert.match(homepage, /href=\{creatorHref\}/);
 
   const titles = [
