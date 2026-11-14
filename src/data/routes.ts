@@ -1,10 +1,10 @@
 import type { Locale } from './site';
 
-/** A kategoria URL-szegmense nyelvenkent. */
-export const categoryPath: Record<Locale, Record<'studio' | 'home', string>> = {
-  nl: { studio: 'massage', home: 'home-service' },
-  en: { studio: 'massage', home: 'home-service' },
-  hu: { studio: 'masszazs', home: 'hazhoz' },
+/** Az aktiv studio-kezelesek URL-szegmense nyelvenkent. */
+export const categoryPath: Record<Locale, Record<'studio', string>> = {
+  nl: { studio: 'massage' },
+  en: { studio: 'massage' },
+  hu: { studio: 'masszazs' },
 };
 
 /**

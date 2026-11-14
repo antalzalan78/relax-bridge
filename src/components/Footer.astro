@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import logo from '../assets/logo.png';
-import { site, pathFor, privacyPath, type Locale } from '../data/site';
+import { site, pathFor, privacyPath, massageCreatorPath, type Locale } from '../data/site';
 import { t } from '../i18n';
 import { getServices, servicePath } from '../lib/services';
 
@@ -28,6 +28,7 @@ const year = new Date().getFullYear();
       <div>
         <h3>{d.nav.studio}</h3>
         <ul>
+          <li><a href={massageCreatorPath(locale)}>Massage Creator</a></li>
           {
             studio.map((s) => (
               <li>

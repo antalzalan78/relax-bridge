@@ -3,7 +3,7 @@ import { locales, pathFor, type Locale } from '../data/site';
 import { categoryPath } from '../data/routes';
 
 export type Service = CollectionEntry<'services'>;
-export type Category = 'studio' | 'home';
+export type Category = 'studio';
 
 /** Egy kezeles utvonala adott nyelven. */
 export function servicePath(

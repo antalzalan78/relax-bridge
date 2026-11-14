@@ -255,40 +255,6 @@ img {
   color: #fff;
 }
 
-.service-unavailable-badge {
-  display: inline-flex;
-  width: fit-content;
-  align-items: center;
-  padding: 0.45rem 0.8rem;
-  border: 1px solid color-mix(in srgb, var(--clay) 55%, var(--border));
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--clay) 10%, var(--surface));
-  color: var(--clay-dark);
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0.055em;
-  line-height: 1.2;
-  text-transform: uppercase;
-}
-
-.btn--unavailable,
-.btn--unavailable:hover {
-  border-color: var(--border);
-  background: color-mix(in srgb, var(--border) 60%, var(--surface));
-  box-shadow: none;
-  color: var(--ink-soft);
-  cursor: not-allowed;
-  transform: none;
-}
-
-.service-unavailable-action {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.7rem;
-}
-
 .btn--ghost {
   border-color: var(--border);
   background: transparent;
@@ -718,7 +684,7 @@ img {
   }
 }
 
-/* Kulon helyszinblokkok: kep, kezelesek es arak egyutt. */
+/* A studio kezelesei es arai. */
 
 .location-section {
   position: relative;
@@ -732,40 +698,8 @@ img {
   z-index: 1;
 }
 
-.location-section--home::before {
-  --motif-size: clamp(9.5rem, 12vw, 11.5rem);
-  --checker-size: clamp(19rem, 24vw, 23rem);
-
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-  background-image: var(--section-logo-pattern);
-  background-repeat: repeat;
-  background-position: 0 0;
-  background-size: var(--motif-size) auto;
-  content: '';
-  pointer-events: none;
-  -webkit-mask-image: conic-gradient(#000 0 25%, transparent 0 50%, #000 0 75%, transparent 0);
-  mask-image: conic-gradient(#000 0 25%, transparent 0 50%, #000 0 75%, transparent 0);
-  -webkit-mask-position: 0 0;
-  mask-position: 0 0;
-  -webkit-mask-size: var(--checker-size) var(--checker-size);
-  mask-size: var(--checker-size) var(--checker-size);
-  mix-blend-mode: multiply;
-  opacity: 0.065;
-}
-
 .location-section--studio {
   padding-top: clamp(4.75rem, 9vw, 8rem);
-}
-
-@media (max-width: 52rem) {
-  .location-section--home::before {
-    --motif-size: 9.5rem;
-    --checker-size: 19rem;
-
-    opacity: 0.055;
-  }
 }
 
 .services-heading {
@@ -927,55 +861,6 @@ img {
   margin-top: 1.25rem;
 }
 
-.studio-personalization-highlights {
-  display: grid;
-  gap: 1rem;
-  margin-top: clamp(1.25rem, 2.5vw, 2rem);
-  padding-block: clamp(1.25rem, 2.5vw, 2rem);
-  border-block: 1px solid var(--border);
-}
-
-@media (min-width: 48rem) {
-  .studio-personalization-highlights {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-.studio-personalization-highlights__intro {
-  max-width: 48rem;
-  margin: clamp(1.25rem, 2.5vw, 2rem) 0 0;
-  color: var(--pine-dark);
-  font-size: clamp(1.15rem, 1.02rem + 0.45vw, 1.45rem);
-  font-weight: 750;
-  line-height: 1.5;
-}
-
-.studio-personalization-highlight {
-  display: grid;
-  grid-template-columns: 2rem minmax(0, 1fr);
-  gap: 0.2rem 0.75rem;
-}
-
-.studio-personalization-highlight > span {
-  padding-top: 0.3rem;
-  color: var(--clay-dark);
-  font-size: 0.68rem;
-  font-weight: 750;
-  letter-spacing: 0.12em;
-}
-
-.studio-personalization-highlight h3 {
-  color: var(--pine-dark);
-  font-size: clamp(1.15rem, 1.05rem + 0.3vw, 1.35rem);
-}
-
-.studio-personalization-highlight p {
-  margin: 0.45rem 0 0;
-  color: var(--ink-soft);
-  font-size: 0.92rem;
-  line-height: 1.55;
-}
-
 .location-offer {
   display: grid;
   align-items: start;
@@ -1024,6 +909,83 @@ img {
   padding-top: clamp(2rem, 4vw, 3.25rem);
 }
 
+.creator-spotlight-section {
+  scroll-margin-top: 6rem;
+  padding-bottom: 0;
+}
+
+.creator-spotlight {
+  display: grid;
+  gap: clamp(2rem, 5vw, 4rem);
+  padding: clamp(2rem, 5vw, 4rem);
+  border-radius: var(--radius-lg);
+  background: var(--pine-dark);
+  box-shadow: var(--shadow-raised);
+  color: #fff;
+}
+
+.creator-spotlight .eyebrow {
+  color: var(--clay-soft);
+}
+
+.creator-spotlight h2 {
+  margin-bottom: 0.6rem;
+  color: #fff;
+}
+
+.creator-spotlight .lead {
+  color: rgb(255 255 255 / 0.86);
+}
+
+.creator-spotlight__intro .btn {
+  margin-top: 1rem;
+}
+
+.creator-spotlight__steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.creator-spotlight__steps li {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  gap: 0.75rem;
+  padding-block: 1rem;
+  border-bottom: 1px solid rgb(255 255 255 / 0.22);
+}
+
+.creator-spotlight__steps li:first-child {
+  border-top: 1px solid rgb(255 255 255 / 0.22);
+}
+
+.creator-spotlight__steps li > span {
+  color: var(--clay-soft);
+  font-size: 0.77rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.creator-spotlight__steps h3 {
+  margin-bottom: 0.35rem;
+  color: #fff;
+  font-size: clamp(1.2rem, 1rem + 0.5vw, 1.55rem);
+}
+
+.creator-spotlight__steps p {
+  margin: 0;
+  color: rgb(255 255 255 / 0.78);
+  font-size: 0.94rem;
+  line-height: 1.6;
+}
+
+@media (min-width: 52rem) {
+  .creator-spotlight {
+    grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 0.85fr);
+    align-items: center;
+  }
+}
+
 .massage-creator {
   display: grid;
   gap: clamp(2rem, 5vw, 5rem);
@@ -1033,41 +995,6 @@ img {
   border-radius: var(--radius-lg);
   background: color-mix(in srgb, var(--surface) 86%, var(--pine-soft));
   box-shadow: var(--shadow-soft);
-}
-
-.massage-creator--studio-intro {
-  margin-top: clamp(2rem, 4vw, 3.5rem);
-}
-
-@media (min-width: 58rem) {
-  .massage-creator--studio-intro {
-    grid-template-columns: 1fr;
-  }
-
-  .massage-creator--studio-intro .massage-creator__intro {
-    display: grid;
-    grid-template-columns: minmax(15rem, 0.8fr) minmax(18rem, 1.2fr) auto;
-    align-items: center;
-    gap: 0.75rem 2rem;
-  }
-
-  .massage-creator--studio-intro .eyebrow,
-  .massage-creator--studio-intro h2 {
-    grid-column: 1;
-  }
-
-  .massage-creator--studio-intro .lead {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-    margin-top: 0;
-  }
-
-  .massage-creator--studio-intro .btn {
-    grid-column: 3;
-    grid-row: 1 / span 2;
-    margin-top: 0;
-    white-space: nowrap;
-  }
 }
 
 @media (min-width: 58rem) {
@@ -1121,7 +1048,7 @@ img {
 }
 
 .studio-choice-hero {
-  padding-block: clamp(4rem, 9vw, 8rem);
+  padding-block: clamp(3rem, 7vw, 5.5rem);
   border-bottom: 1px solid var(--border);
 }
 
@@ -1132,7 +1059,7 @@ img {
 .studio-choice-hero h1 {
   max-width: 16ch;
   margin-top: 0.5rem;
-  font-size: clamp(3rem, 2rem + 5vw, 6.8rem);
+  font-size: clamp(3rem, 2rem + 4vw, 5.5rem);
 }
 
 .studio-choice-hero .lead {

@@ -1,5 +1,3 @@
-import { homeServiceDurationText } from './home-service-duration';
-
 export default {
   htmlLang: 'hu-HU',
 
@@ -19,7 +17,6 @@ export default {
     home: 'Főoldal',
     services: 'Kezelések',
     studio: 'Studio Visit',
-    homeService: 'Házhoz megyek',
     prices: 'Árak',
     blog: 'Blog',
     about: 'Rólam',
@@ -38,11 +35,11 @@ export default {
   },
 
   hero: {
-    title: 'Masszázs Tilburgban',
+    title: 'A te masszázsod. A te pillanatod.',
     intro:
-      'Kapcsolódj ki teljesen személyre szabott masszázzsal a nyugodt tilburgi stúdiómban.',
+      'A Relax Bridge-ben, Tilburg-Reeshofban nyugalom, személyes figyelem és hozzád illő masszázs vár. Közel húsz év tapasztalatával segítek, hogy igazán kikapcsolódj.',
     mobileIntro:
-      'Közel 20 év tapasztalat. Kapcsolódj ki a tilburgi stúdiómban egy személyre szabott masszázzsal.',
+      'Nyugalom és személyes figyelem a tilburgi stúdiómban. Egy masszázs, amely hozzád illik.',
     primaryCta: 'Időpontfoglalás',
     secondaryCta: 'Árak megtekintése',
   },
@@ -67,8 +64,6 @@ export default {
       'A Relax Bridge masszőrének portréja, amint egy erdei padon ül.',
     studio:
       'A Relax Bridge masszázsszobája Tilburgban: masszázságy, törölközők és masszázsolaj.',
-    homeService:
-      'A bicikli és az utánfutó, amiben a masszázságy elutazik hozzád.',
   },
 
   options: {
@@ -81,31 +76,20 @@ export default {
         body: 'A pontos címet a visszaigazolt foglalás után küldjük el.',
       },
       subtitle:
-        'Válassz a négy kezelés közül, vagy alkosd meg a sajátodat a Massage Creator segítségével.',
+        'Nyugodt hely Tilburg-Reeshofban, ahol igazán magadra figyelhetsz.',
       cta: 'Kezelések megtekintése',
       bookingCta: 'Studio Visit foglalása',
       personalization: {
         title: 'Massage Creator',
-        intro:
-          'A Studio Visit élményét pedig néhány apró részlettel még személyesebbé teheted. Ezeket az időpontfoglalás során választhatod ki.',
-        items: [
-          {
-            title: 'Illat',
-            body: 'Válaszd ki a számodra kellemes illatot, vagy kérd a kezelést illatmentesen.',
-          },
-          {
-            title: 'Zene',
-            body: 'Válassz a hangulatodhoz illő zenei világot, hallgasd a saját zenédet, vagy élvezd a masszázst teljes csendben.',
-          },
+        spotlightEyebrow: 'A te masszázsod, a te választásod',
+        spotlightIntro: 'Nem egy kész kezelést választanál? Állítsd össze a saját masszázsodat: válassz alapkezelést, adj hozzá illő elemeket, és azonnal látod az időtartamot és az árat.',
+        spotlightCta: 'Összeállítom a masszázsomat',
+        spotlightSteps: [
+          { title: 'Válassz alapkezelést', body: 'Indulj relaxmasszázzsal vagy célzott hátmasszázzsal.' },
+          { title: 'Tedd személyessé', body: 'Egészítsd ki a kezelést, és választhatsz illatot és zenét is.' },
+          { title: 'Foglald le a pillanatod', body: 'Foglalás előtt átnézheted a teljes kezelést, az időtartamot és az árat.' },
         ],
       },
-    },
-    homeService: {
-      label: 'Home Service',
-      title: 'Élvezd a masszázst a saját otthonod kényelmében. Házhoz megyek a biciklimmel, Tilburgban és Reeshofban.',
-      body: `A Home Service keretében relaxmasszázs és nyak–váll–hátmasszázs választható. ${homeServiceDurationText.hu} Egy foglalás legfeljebb 3 főre szólhat. Személyenként egy kezelés választható. Egy címre egyszeri €15 kiszállási díj kerül felszámításra, függetlenül attól, hányan veszik igénybe a masszázst. Több személy esetén a kezelések között rövid előkészítési idővel is számolok. A foglalás során a rendszer segít összeállítani a rendelkezésre álló időhöz illő kezeléseket.`,
-      cta: 'Kezelések megtekintése',
-      bookingCta: 'Home Service foglalása',
     },
   },
 
@@ -117,7 +101,6 @@ export default {
     minutes: 'perc',
     from: 'már',
     studioHeading: 'Studio Visit',
-    homeHeading: 'Házhoz megyek',
   },
 
   goodToKnow: {
@@ -159,7 +142,6 @@ export default {
     whatsappCta: 'Kérdezz WhatsAppon',
     backToAll: 'Összes kezelés',
     studioBadge: 'A stúdióban, Tilburg',
-    homeBadge: 'Nálad otthon, Tilburg és Reeshof',
     otherServices: 'További kezelések',
   },
 

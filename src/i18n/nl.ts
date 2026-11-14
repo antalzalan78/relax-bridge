@@ -1,5 +1,3 @@
-import { homeServiceDurationText } from './home-service-duration';
-
 export default {
   htmlLang: 'nl-NL',
 
@@ -19,7 +17,6 @@ export default {
     home: 'Home',
     services: 'Behandelingen',
     studio: 'Studio Visit',
-    homeService: 'Home service',
     prices: 'Prijzen',
     blog: 'Blog',
     about: 'Over mij',
@@ -38,11 +35,11 @@ export default {
   },
 
   hero: {
-    title: 'Massage in Tilburg - Reeshof',
+    title: 'Jouw massage. Jouw moment.',
     intro:
-      'Bijna 20 jaar massage-ervaring, met persoonlijke aandacht voor jou. Kom tot rust in mijn rustige studio in de Reeshof.',
+      'Bij Relax Bridge in Tilburg-Reeshof vind je rust, persoonlijke aandacht en een massage die bij jou past. Met bijna 20 jaar ervaring help ik je even helemaal op adem te komen.',
     mobileIntro:
-      'Bijna 20 jaar ervaring. Ontspan met een persoonlijke massage in mijn studio in Tilburg-Reeshof.',
+      'Rust en persoonlijke aandacht in mijn studio in Tilburg-Reeshof. Een massage die bij jou past.',
     primaryCta: 'Afspraak maken',
     secondaryCta: 'Bekijk de prijzen',
   },
@@ -67,8 +64,6 @@ export default {
       'Portret van de masseuse van Relax Bridge, zittend op een bankje in het bos.',
     studio:
       'De massageruimte van Relax Bridge in Tilburg, met massagetafel, handdoeken en massageolie.',
-    homeService:
-      'De fiets met de aanhanger waarin de massagetafel meegaat naar je huis.',
   },
 
   options: {
@@ -81,31 +76,20 @@ export default {
         body: 'Het exacte adres ontvang je na de bevestiging van je boeking.',
       },
       subtitle:
-        'Kies uit vier behandelingen, of stel je eigen behandeling samen met de Massage Creator.',
+        'Een rustige plek in Tilburg-Reeshof, voor jouw moment van ontspanning.',
       cta: 'Bekijk de behandelingen',
       bookingCta: 'Studio Visit reserveren',
       personalization: {
         title: 'Massage Creator',
-        intro:
-          'Met een paar kleine details maak je jouw Studio Visit nog persoonlijker. Je kunt deze tijdens het reserveren kiezen.',
-        items: [
-          {
-            title: 'Geur',
-            body: 'Kies een geur die je prettig vindt, of vraag om een geurloze behandeling.',
-          },
-          {
-            title: 'Muziek',
-            body: 'Kies muziek die bij je stemming past, luister naar je eigen muziek of geniet van de massage in volledige stilte.',
-          },
+        spotlightEyebrow: 'Jouw massage, jouw keuze',
+        spotlightIntro: 'Geen standaard behandeling, maar een massage die je zelf samenstelt. Kies een basis, voeg toe wat bij je past en zie meteen de tijd en prijs.',
+        spotlightCta: 'Stel jouw massage samen',
+        spotlightSteps: [
+          { title: 'Kies je basis', body: 'Begin met een relaxmassage of een gerichte rugmassage.' },
+          { title: 'Maak het persoonlijk', body: 'Voeg passende behandelingselementen toe en kies eventueel geur en muziek.' },
+          { title: 'Boek jouw moment', body: 'Bekijk je complete massage, de duur en de prijs voordat je reserveert.' },
         ],
       },
-    },
-    homeService: {
-      label: 'Home Service',
-      title: 'Geniet van de massage in het comfort van je eigen huis. Ik kom met de fiets bij je thuis, in Tilburg en Reeshof.',
-      body: `Bij Home Service kun je kiezen uit een relaxmassage en een nek-, schouder- en rugmassage. ${homeServiceDurationText.nl} Eén reservering kan voor maximaal 3 personen worden gemaakt. Per persoon kan één behandeling worden gekozen. Per adres wordt eenmalig € 15 aan voorrijkosten berekend, ongeacht hoeveel personen gebruikmaken van de massage. Bij meerdere personen houd ik ook rekening met een korte voorbereidingstijd tussen de behandelingen. Tijdens het reserveren helpt het systeem je behandelingen samen te stellen die binnen de beschikbare tijd passen.`,
-      cta: 'Bekijk de behandelingen',
-      bookingCta: 'Home service reserveren',
     },
   },
 
@@ -117,7 +101,6 @@ export default {
     minutes: 'minuten',
     from: 'vanaf',
     studioHeading: 'Studio Visit',
-    homeHeading: 'Home service',
   },
 
   goodToKnow: {
@@ -159,7 +142,6 @@ export default {
     whatsappCta: 'Vraag stellen via WhatsApp',
     backToAll: 'Alle behandelingen',
     studioBadge: 'In de studio, Tilburg',
-    homeBadge: 'Bij je thuis, Tilburg en Reeshof',
     otherServices: 'Andere behandelingen',
   },
 
