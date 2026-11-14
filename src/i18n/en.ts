@@ -1,10 +1,8 @@
-import { homeServiceDurationText } from './home-service-duration';
-
 export default {
   htmlLang: 'en',
 
   meta: {
-    title: 'Relax Bridge — Massage in Tilburg | Studio Visit',
+    title: 'Relax Bridge — Massage in Tilburg',
     description:
       'Relaxation, neck-shoulder-back, facial and foot massage at the studio in Tilburg-Reeshof. From € 40.',
   },
@@ -18,8 +16,6 @@ export default {
   nav: {
     home: 'Home',
     services: 'Services',
-    studio: 'Studio Visit',
-    homeService: 'Home service',
     prices: 'Prices',
     blog: 'Blog',
     about: 'About me',
@@ -38,11 +34,11 @@ export default {
   },
 
   hero: {
-    title: 'Massage in Tilburg',
+    title: 'Your massage. Your moment.',
     intro:
-      'Take some time to completely unwind with a personal massage in my peaceful studio in Tilburg-Reeshof.',
+      'At Relax Bridge in Tilburg-Reeshof, you will find calm, personal attention and a massage that feels right for you. With nearly 20 years of experience, I help you take a moment to truly unwind.',
     mobileIntro:
-      'Nearly 20 years of experience. Relax with a personal massage in my Tilburg-Reeshof studio.',
+      'Calm and personal attention in my Tilburg-Reeshof studio. A massage that feels right for you.',
     primaryCta: 'Book an appointment',
     secondaryCta: 'See the prices',
   },
@@ -67,13 +63,11 @@ export default {
       'Portrait of the Relax Bridge massage therapist, sitting on a bench in the woods.',
     studio:
       'The Relax Bridge massage room in Tilburg, with massage table, towels and massage oil.',
-    homeService:
-      'The bicycle with the trailer that carries the massage table to your home.',
   },
 
   options: {
     studio: {
-      label: 'Studio Visit',
+      label: 'The studio',
       title: 'You are welcome in my home.',
       body: 'A quiet place in Tilburg where you do not have to do anything.',
       location: {
@@ -81,31 +75,20 @@ export default {
         body: 'The exact address will be sent after your booking has been confirmed.',
       },
       subtitle:
-        'Choose from four treatments, or create your own treatment with the Massage Creator.',
+        'A peaceful place in Tilburg-Reeshof, made for your moment of relaxation.',
       cta: 'See the treatments',
-      bookingCta: 'Book a Studio Visit',
+      bookingCta: 'Choose a treatment',
       personalization: {
         title: 'Massage Creator',
-        intro:
-          'Make your Studio Visit even more personal with a few small details. You can choose these while booking your appointment.',
-        items: [
-          {
-            title: 'Scent',
-            body: 'Choose a scent you enjoy, or request a fragrance-free treatment.',
-          },
-          {
-            title: 'Music',
-            body: 'Choose music that suits your mood, listen to your own music or enjoy the massage in complete silence.',
-          },
+        spotlightEyebrow: 'Your massage, your choice',
+        spotlightIntro: 'Want something more personal than a fixed treatment? Create your own massage: choose a base, add what suits you and see the duration and price straight away.',
+        spotlightCta: 'Create your massage',
+        spotlightSteps: [
+          { title: 'Choose a base', body: 'Start with a relaxing massage or focused back massage.' },
+          { title: 'Make it personal', body: 'Add suitable treatment elements and choose a scent and music if you wish.' },
+          { title: 'Book your moment', body: 'Review your complete massage, duration and price before booking.' },
         ],
       },
-    },
-    homeService: {
-      label: 'Home Service',
-      title: 'Enjoy your massage in the comfort of your own home. I come to your home by bicycle, in Tilburg and Reeshof.',
-      body: `With Home Service, you can choose a Relax Massage or a Neck, Shoulder & Back Massage. ${homeServiceDurationText.en} One booking can be for up to 3 people. One treatment may be selected per person. A one-time €15 travel fee is charged per address, regardless of how many people receive a massage. For multiple people, I also allow a short preparation time between treatments. During booking, the system helps you put together treatments that fit the available time.`,
-      cta: 'See the treatments',
-      bookingCta: 'Book a Home Service',
     },
   },
 
@@ -116,8 +99,6 @@ export default {
     price: 'Price',
     minutes: 'minutes',
     from: 'from',
-    studioHeading: 'Studio Visit',
-    homeHeading: 'Home service',
   },
 
   goodToKnow: {
@@ -159,7 +140,6 @@ export default {
     whatsappCta: 'Ask a question on WhatsApp',
     backToAll: 'All treatments',
     studioBadge: 'At the studio, Tilburg',
-    homeBadge: 'At your home, Tilburg and Reeshof',
     otherServices: 'Other treatments',
   },
 

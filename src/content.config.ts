@@ -13,17 +13,13 @@ const services = defineCollection({
   loader: glob({
     pattern: '**/*.md',
     base: './src/content/services',
-    /*
-     * Alapbol az Astro a frontmatter `slug` mezojet hasznalna azonositonak, es
-     * a studios meg a hazhoz meno valtozat ugyanazt a slugot kapja (kulon URL
-     * ag ala kerulnek). Ezert a fajlnev az azonosito.
-     */
+    /* A fajlnev marad az azonosito, a lokalizalt slug pedig az URL alapja. */
     generateId: ({ entry }) => entry.replace(/\.md$/, ''),
   }),
   schema: z.object({
     lang: z.enum(['nl', 'en', 'hu']),
     key: z.enum(['relax', 'neck-shoulder-back', 'facial', 'foot']),
-    category: z.enum(['studio', 'home']),
+    category: z.literal('studio'),
     /** Az URL utolso szegmense, nyelvenkent eltero. */
     slug: z.string(),
     title: z.string(),

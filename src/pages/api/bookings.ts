@@ -1,14 +1,6 @@
 import type { APIRoute } from 'astro';
 import { z } from 'zod';
-import {
-  findBookingOption,
-  getHomeServiceBookingOptions,
-} from '../../lib/booking/catalog';
-import {
-  calculateHomeServiceSelection,
-  calculateHomeServicePrice,
-  homeServiceTravelFeeEur,
-} from '../../lib/booking/home-service';
+import { findBookingOption } from '../../lib/booking/catalog';
 import {
   calculateCreatorSelection,
   createMassageCreatorBookingDetails,
@@ -32,7 +24,6 @@ import {
 import { localDayInstantRange } from '../../lib/booking/availability';
 import { recordBookingJourneySuccess } from '../../lib/server/website-analytics-repository';
 import { Temporal } from '@js-temporal/polyfill';
-import { isPublicBookingCategoryEnabled } from '../../lib/booking/public-service-availability';
 
 export const prerender = false;
 
@@ -40,72 +31,24 @@ const bookingSchema = z
   .object({
     locale: z.enum(['nl', 'en', 'hu']),
     key: z.enum(['relax', 'neck-shoulder-back', 'facial', 'foot']),
-    category: z.enum(['studio', 'home']),
+    category: z.literal('studio'),
     minutes: z.number().int().min(15).max(240),
     start: z.iso.datetime({ offset: true }),
     customerName: z.string().trim().min(2).max(100),
     customerEmail: z.email().max(200),
     customerPhone: z.string().trim().min(6).max(40),
-    homeAddress: z.string().trim().max(300).optional(),
-    homePostalCode: z.string().trim().min(3).max(20).optional(),
     creatorScent: z.enum(['orange', 'rose', 'lavender', 'any', 'none']).optional(),
     creatorMusic: z.enum(['instrumental', 'nature', 'lofi', 'own', 'any', 'none']).optional(),
     creatorBase: z.enum(['relax', 'relax90', 'back30', 'back']).optional(),
     creatorBack: z.union([z.literal(0), z.literal(30)]).optional(),
     creatorFace: z.union([z.literal(0), z.literal(15), z.literal(30)]).optional(),
     creatorFoot: z.union([z.literal(0), z.literal(15), z.literal(30)]).optional(),
-    homeTreatments: z
-      .array(
-        z.object({
-          key: z.enum(['relax', 'neck-shoulder-back']),
-          minutes: z.union([z.literal(30), z.literal(60), z.literal(90)]),
-        }),
-      )
-      .min(1)
-      .max(3)
-      .optional(),
     notes: z.string().trim().max(1000).optional(),
     website: z.string().max(0).optional(),
     consent: z.literal(true),
     analyticsSessionId: z.uuid().optional(),
   })
   .superRefine((value, context) => {
-    if (value.category === 'home' && !value.homeAddress) {
-      context.addIssue({
-        code: 'custom',
-        path: ['homeAddress'],
-        message: 'Address is required for home appointments.',
-      });
-    }
-    if (value.category === 'home' && !value.homePostalCode) {
-      context.addIssue({
-        code: 'custom',
-        path: ['homePostalCode'],
-        message: 'Postal code is required for home appointments.',
-      });
-    }
-    if (value.category === 'home') {
-      const home = value.homeTreatments
-        ? calculateHomeServiceSelection(value.homeTreatments)
-        : null;
-      if (
-        !home ||
-        value.minutes !== home.treatmentMinutes ||
-        value.key !== value.homeTreatments?.[0]?.key
-      ) {
-        context.addIssue({
-          code: 'custom',
-          path: ['homeTreatments'],
-          message: 'Invalid Home Service configuration.',
-        });
-      }
-    } else if (value.homeTreatments) {
-      context.addIssue({
-        code: 'custom',
-        path: ['homeTreatments'],
-        message: 'Home Service treatments are only valid for home appointments.',
-      });
-    }
     if (value.creatorBase) {
       const creator = calculateCreatorSelection({
         base: value.creatorBase,
@@ -113,7 +56,7 @@ const bookingSchema = z
         face: value.creatorFace,
         foot: value.creatorFoot,
       });
-      if (!creator || value.category !== 'studio' || value.key !== creator.serviceKey || value.minutes !== creator.minutes) {
+      if (!creator || value.key !== creator.serviceKey || value.minutes !== creator.minutes) {
         context.addIssue({
           code: 'custom',
           path: ['creatorBase'],
@@ -183,94 +126,7 @@ const creatorLabels = {
   },
 } as const;
 
-const homeLabels = {
-  nl: {
-    title: 'Home Service',
-    person: 'Persoon',
-    massageTime: 'Totale massagetijd',
-    preparation: 'Voorbereidingstijd',
-    reserved: 'Gereserveerde tijd',
-    travel: 'Eenmalige voorrijkosten',
-    total: 'Totaalprijs',
-  },
-  en: {
-    title: 'Home Service',
-    person: 'Person',
-    massageTime: 'Total massage time',
-    preparation: 'Preparation time',
-    reserved: 'Reserved time',
-    travel: 'One-time travel fee',
-    total: 'Total price',
-  },
-  hu: {
-    title: 'Home Service',
-    person: 'Személy',
-    massageTime: 'Teljes masszázsidő',
-    preparation: 'Előkészítési idő',
-    reserved: 'Lefoglalt idő',
-    travel: 'Egyszeri kiszállási díj',
-    total: 'Végösszeg',
-  },
-} as const;
-
-async function buildHomeBooking(input: z.infer<typeof bookingSchema>) {
-  if (input.category !== 'home' || !input.homeTreatments) return null;
-  const calculation = calculateHomeServiceSelection(input.homeTreatments);
-  if (!calculation) return null;
-
-  const catalog = await getHomeServiceBookingOptions(input.locale);
-  const treatments = input.homeTreatments.map((selection) =>
-    catalog.find(
-      (option) =>
-        option.category === 'home' &&
-        option.key === selection.key &&
-        option.minutes === selection.minutes,
-    ),
-  );
-  if (treatments.some((treatment) => !treatment)) return null;
-
-  const selected = treatments.filter((treatment) => treatment !== undefined);
-  const priceEur = calculateHomeServicePrice(
-    selected.map((treatment) => treatment.priceEur),
-  );
-  if (priceEur === null) return null;
-  const labels = homeLabels[input.locale];
-  const treatmentSummary = selected
-    .map(
-      (treatment, index) =>
-        `${labels.person} ${index + 1}: ${treatment.title} (${treatment.minutes} min, € ${treatment.priceEur})`,
-    )
-    .join(' · ');
-
-  return {
-    option: {
-      id: `home:custom:${selected.map((treatment) => `${treatment.key}:${treatment.minutes}`).join(':')}`,
-      key: selected[0].key,
-      category: 'home' as const,
-      title: `${labels.title} · ${selected.map((treatment) => `${treatment.title} ${treatment.minutes} min`).join(' + ')}`,
-      minutes: calculation.treatmentMinutes,
-      reservedMinutes: calculation.reservedMinutes,
-      priceEur,
-    },
-    note: [
-      treatmentSummary,
-      `${labels.massageTime}: ${calculation.treatmentMinutes} min`,
-      `${labels.preparation}: ${calculation.preparationMinutes} min`,
-      `${labels.reserved}: ${calculation.reservedMinutes} min`,
-      `${labels.travel}: € ${homeServiceTravelFeeEur}`,
-      `${labels.total}: € ${priceEur}`,
-    ].join('\n'),
-  };
-}
-
-function bookingNotes(
-  input: z.infer<typeof bookingSchema>,
-  homeNote?: string,
-): string | undefined {
-  if (input.category === 'home') {
-    return [homeNote, input.notes].filter(Boolean).join('\n') || undefined;
-  }
-
+function bookingNotes(input: z.infer<typeof bookingSchema>): string | undefined {
   const labels = creatorLabels[input.locale];
   const customTreatment = input.creatorBase
     ? calculateCreatorSelection({
@@ -296,21 +152,21 @@ function bookingNotes(
     input.creatorMusic ? `${labels.music}: ${labels.musicOptions[input.creatorMusic]}` : null,
   ].filter(Boolean);
 
-  const preferencesNote = choices.length ? `Studio Visit — ${choices.join(' · ')}` : undefined;
+  const preferencesNote = choices.length ? choices.join(' · ') : undefined;
   return [treatmentNote, preferencesNote, input.notes].filter(Boolean).join('\n') || undefined;
 }
 
 export const POST: APIRoute = async ({ request }) => {
   try {
     assertSameOrigin(request);
-    const parsed = bookingSchema.safeParse(await readJson(request));
+    const body = await readJson(request);
+    if (body && typeof body === 'object' && 'category' in body && body.category === 'home') {
+      return Response.json({ error: 'home_service_unavailable' }, { status: 404 });
+    }
+    const parsed = bookingSchema.safeParse(body);
     if (!parsed.success) {
       return Response.json({ error: 'invalid_request' }, { status: 400 });
     }
-    if (!isPublicBookingCategoryEnabled(parsed.data.category)) {
-      return Response.json({ error: 'home_service_unavailable' }, { status: 404 });
-    }
-
     const allowed = await consumeRateLimit({
       key: requestFingerprint(request, 'public-booking'),
       limit: 8,
@@ -328,9 +184,6 @@ export const POST: APIRoute = async ({ request }) => {
           foot: parsed.data.creatorFoot,
         })
       : null;
-    const homeBooking = parsed.data.category === 'home'
-      ? await buildHomeBooking(parsed.data)
-      : null;
     const option = creator
       ? {
           id: `studio:creator:${creator.base}:${creator.back}:${creator.face}:${creator.foot}`,
@@ -340,9 +193,7 @@ export const POST: APIRoute = async ({ request }) => {
           minutes: creator.minutes,
           priceEur: creator.priceEur,
         }
-      : parsed.data.category === 'home'
-        ? homeBooking?.option
-        : await findBookingOption(parsed.data);
+      : await findBookingOption(parsed.data);
     if (!option) {
       return Response.json({ error: 'invalid_service' }, { status: 400 });
     }
@@ -363,9 +214,7 @@ export const POST: APIRoute = async ({ request }) => {
       customerName: parsed.data.customerName,
       customerEmail: parsed.data.customerEmail,
       customerPhone: parsed.data.customerPhone,
-      homeAddress: parsed.data.homeAddress,
-      homePostalCode: parsed.data.homePostalCode,
-      notes: bookingNotes(parsed.data, homeBooking?.note),
+      notes: bookingNotes(parsed.data),
       serviceDetails: creator
         ? createMassageCreatorBookingDetails(creator)
         : undefined,

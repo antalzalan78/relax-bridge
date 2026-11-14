@@ -2,7 +2,8 @@ import type { Locale } from '../data/site';
 
 const massageCreator = {
   nl: {
-    eyebrow: 'Studio Visit · Massage Creator',
+    eyebrow: 'Relax Bridge · Massage Creator',
+    backToTreatments: 'Alle behandelingen',
     title: 'Stel jouw eigen behandeling samen.',
     intro: 'Kies stap voor stap uit de professioneel samengestelde mogelijkheden.',
     steps: ['Basisbehandeling', 'Aanvullingen', 'Overzicht', 'Tijdstip'],
@@ -37,7 +38,8 @@ const massageCreator = {
     edit: 'Samenstelling aanpassen',
   },
   en: {
-    eyebrow: 'Studio Visit · Massage Creator',
+    eyebrow: 'Relax Bridge · Massage Creator',
+    backToTreatments: 'All treatments',
     title: 'Create your own treatment.',
     intro: 'Choose step by step from professionally selected, compatible options.',
     steps: ['Base treatment', 'Add-ons', 'Review', 'Time'],
@@ -72,7 +74,8 @@ const massageCreator = {
     edit: 'Edit treatment',
   },
   hu: {
-    eyebrow: 'Studio Visit · Massage Creator',
+    eyebrow: 'Relax Bridge · Massage Creator',
+    backToTreatments: 'Összes kezelés',
     title: 'Alkosd meg a saját kezelésedet.',
     intro: 'Haladj lépésről lépésre a szakmailag összeállított, kompatibilis lehetőségek között.',
     steps: ['Alapkezelés', 'Kiegészítők', 'Összegzés', 'Időpont'],

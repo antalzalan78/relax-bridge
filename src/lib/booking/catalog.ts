@@ -25,14 +25,6 @@ export async function getBookingOptions(locale: Locale): Promise<BookingOption[]
     );
 }
 
-/** Home Service treatment prices exclude the one shared travel fee. */
-export async function getHomeServiceBookingOptions(
-  locale: Locale,
-): Promise<BookingOption[]> {
-  const options = await getBookingOptions(locale);
-  return options.filter((option) => option.category === 'home');
-}
-
 export async function findBookingOption(input: {
   locale: Locale;
   key: BookingOption['key'];

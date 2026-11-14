@@ -2,15 +2,7 @@
 import Base from '../layouts/Base.astro';
 import { bookingPath, pathFor, privacyPath, type Locale } from '../data/site';
 import { bookingText } from '../i18n/booking';
-import { getBookingOptions, getHomeServiceBookingOptions } from '../lib/booking/catalog';
-import { homeServiceBookingEnabled } from '../lib/booking/public-service-availability';
-import {
-  homeServiceMaximumGuests,
-  homeServiceMaximumMinutes,
-  homeServiceMinimumMinutes,
-  homeServicePreparationMinutes,
-  homeServiceTravelFeeEur,
-} from '../lib/booking/home-service';
+import { getBookingOptions } from '../lib/booking/catalog';
 import { creatorAddons, creatorBases, creatorMaximumMinutes } from '../lib/booking/massage-creator';
 
 interface Props {
@@ -21,7 +13,6 @@ const { locale } = Astro.props;
 const copy = bookingText(locale);
 const allOptions = await getBookingOptions(locale);
 const options = allOptions.filter((option) => option.category === 'studio');
-const homeOptions = await getHomeServiceBookingOptions(locale);
 const path = bookingPath(locale);
 const privacyHref = privacyPath(locale);
 const alternates = {
@@ -31,13 +22,6 @@ const alternates = {
 };
 const dateLocale = locale === 'nl' ? 'nl-NL' : locale === 'hu' ? 'hu-HU' : 'en-GB';
 const creatorConfig = { bases: creatorBases, addons: creatorAddons, maximumMinutes: creatorMaximumMinutes };
-const homeConfig = {
-  maximumGuests: homeServiceMaximumGuests,
-  minimumMinutes: homeServiceMinimumMinutes,
-  maximumMinutes: homeServiceMaximumMinutes,
-  preparationMinutes: homeServicePreparationMinutes,
-  travelFeeEur: homeServiceTravelFeeEur,
-};
 ---
 
 <Base
@@ -74,8 +58,6 @@ const homeConfig = {
       data-date-locale={dateLocale}
       data-copy={JSON.stringify(copy)}
       data-creator-config={JSON.stringify(creatorConfig)}
-      data-home-options={JSON.stringify(homeOptions)}
-      data-home-config={JSON.stringify(homeConfig)}
     >
       <div class="booking-card booking-card--choice">
         <span class="booking-card__number">01</span>
@@ -88,48 +70,9 @@ const homeConfig = {
                 {option.title} · {option.minutes} min · € {option.priceEur}
               </option>
             ))}
-            {homeServiceBookingEnabled && <option value="home:custom" data-category="home">{copy.home}</option>}
           </select>
           <p class="field-instruction">{copy.serviceInstruction}</p>
         </div>
-
-        <fieldset class="home-builder-fieldset" id="home-builder-fieldset" hidden disabled>
-          <legend>{copy.homeBuilderTitle}</legend>
-          <p>{copy.homeBuilderIntro}</p>
-          <div class="home-builder-count">
-            <label for="home-guest-count">{copy.homeGuestCount}</label>
-            <select id="home-guest-count" name="homeGuestCount">
-              {copy.homeGuestOptions.map((label, index) => (
-                <option value={index + 1}>{label}</option>
-              ))}
-            </select>
-          </div>
-          <div class="home-guest-list" id="home-guest-list">
-            {Array.from({ length: homeServiceMaximumGuests }, (_, index) => (
-              <div class="home-guest-card" data-home-guest={index + 1} hidden={index > 0}>
-                <strong>{copy.homeGuest.replace('{number}', String(index + 1))}</strong>
-                <label for={`home-treatment-${index + 1}`}>{copy.homeTreatment}</label>
-                <select
-                  id={`home-treatment-${index + 1}`}
-                  name={`homeTreatment${index + 1}`}
-                  class="home-treatment-select"
-                  data-home-treatment={index + 1}
-                  disabled={index > 0}
-                >
-                  <option value="">{copy.homeChooseTreatment}</option>
-                  {homeOptions.map((option) => (
-                    <option value={option.id}>
-                      {option.title} · {option.minutes} min · € {option.priceEur}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            ))}
-          </div>
-          <div class="home-builder-summary" id="home-builder-summary" aria-live="polite">
-            {copy.homeChooseAll}
-          </div>
-        </fieldset>
 
         <fieldset class="booking-date-field">
           <legend>{copy.date}</legend>
@@ -206,14 +149,6 @@ const homeConfig = {
             <label for="customer-phone">{copy.phone}</label>
             <input id="customer-phone" name="customerPhone" type="tel" autocomplete="tel" required maxlength="40" />
           </div>
-          <div id="address-field" hidden>
-            <label for="home-address">{copy.address}</label>
-            <input id="home-address" name="homeAddress" autocomplete="street-address" maxlength="300" />
-          </div>
-          <div id="postal-code-field" hidden>
-            <label for="home-postal-code">{copy.postalCode}</label>
-            <input id="home-postal-code" name="homePostalCode" autocomplete="postal-code" maxlength="20" />
-          </div>
         </div>
 
         <label for="notes">{copy.notes}</label>
@@ -261,14 +196,11 @@ const homeConfig = {
 
   if (form) {
     const options = JSON.parse(form.dataset.options || '[]');
-    const homeOptions = JSON.parse(form.dataset.homeOptions || '[]');
-    const homeConfig = JSON.parse(form.dataset.homeConfig || '{}');
     const locale = form.dataset.locale || 'nl';
     const dateLocale = form.dataset.dateLocale || 'nl-NL';
     const copy = JSON.parse(form.dataset.copy || '{}');
     const creatorConfig = JSON.parse(form.dataset.creatorConfig || '{}');
     const service = form.querySelector<HTMLSelectElement>('#service')!;
-    const serviceField = form.querySelector<HTMLElement>('#service-field')!;
     const serviceLabel = form.querySelector<HTMLElement>('#service-label')!;
     const searchParams = new URLSearchParams(window.location.search);
     const requestedCategory = searchParams.get('category');
@@ -316,15 +248,10 @@ const homeConfig = {
       }
     }
 
-    if (!requestedCreator && (requestedCategory === 'studio' || requestedCategory === 'home')) {
+    if (!requestedCreator && requestedCategory === 'studio') {
       service.querySelectorAll<HTMLOptionElement>('option[data-category]').forEach((option) => {
-        if (option.dataset.category !== requestedCategory) option.remove();
+        if (option.dataset.category !== 'studio') option.remove();
       });
-      if (requestedCategory === 'home') {
-        service.value = 'home:custom';
-        service.disabled = true;
-        serviceField.hidden = true;
-      }
     }
     const preselectedOption = requestedCreator || (requestedService
       ? options.find(
@@ -345,22 +272,7 @@ const homeConfig = {
     const start = form.querySelector<HTMLInputElement>('#start')!;
     const details = form.querySelector<HTMLElement>('#details-card')!;
     const summary = form.querySelector<HTMLElement>('#appointment-summary')!;
-    const addressField = form.querySelector<HTMLElement>('#address-field')!;
-    const address = form.querySelector<HTMLInputElement>('#home-address')!;
-    const postalCodeField = form.querySelector<HTMLElement>('#postal-code-field')!;
-    const postalCode = form.querySelector<HTMLInputElement>('#home-postal-code')!;
     const creatorFieldset = form.querySelector<HTMLFieldSetElement>('#creator-fieldset')!;
-    const homeFieldset = form.querySelector<HTMLFieldSetElement>('#home-builder-fieldset')!;
-    const homeGuestCount = form.querySelector<HTMLSelectElement>('#home-guest-count')!;
-    const homeGuestCards = Array.from(form.querySelectorAll<HTMLElement>('[data-home-guest]'));
-    const homeTreatmentSelects = Array.from(form.querySelectorAll<HTMLSelectElement>('.home-treatment-select'));
-    const homeSummary = form.querySelector<HTMLElement>('#home-builder-summary')!;
-    const homeMinimumTreatmentMinutes = Math.min(
-      ...homeOptions.map((option: any) => option.minutes),
-    );
-    const homeMaximumTreatmentMinutes = Math.max(
-      ...homeOptions.map((option: any) => option.minutes),
-    );
     const scentSelect = form.querySelector<HTMLSelectElement>('#creator-scent')!;
     const musicSelect = form.querySelector<HTMLSelectElement>('#creator-music')!;
     const preferencesContinue = form.querySelector<HTMLButtonElement>('#preferences-continue')!;
@@ -429,55 +341,12 @@ const homeConfig = {
       calendarWeekdays.append(weekday);
     }
 
-    const activeHomeSelects = () =>
-      homeTreatmentSelects.slice(0, Number(homeGuestCount.value || 1));
-
-    const buildHomeOption = () => {
-      if (service.value !== 'home:custom') return undefined;
-      const selects = activeHomeSelects();
-      const treatments = selects
-        .map((select) => homeOptions.find((option: any) => option.id === select.value))
-        .filter(Boolean);
-      if (treatments.length !== selects.length) return undefined;
-
-      const minutes = treatments.reduce((total: number, option: any) => total + option.minutes, 0);
-      if (minutes < homeConfig.minimumMinutes || minutes > homeConfig.maximumMinutes) return undefined;
-      const preparationMinutes = (treatments.length - 1) * homeConfig.preparationMinutes;
-      const treatmentPriceEur = treatments.reduce(
-        (total: number, option: any) => total + option.priceEur,
-        0,
-      );
-
-      return {
-        id: 'home:custom',
-        key: treatments[0].key,
-        category: 'home',
-        title: copy.home,
-        minutes,
-        preparationMinutes,
-        reservedMinutes: minutes + preparationMinutes,
-        treatmentPriceEur,
-        priceEur: treatmentPriceEur + homeConfig.travelFeeEur,
-        homeTreatments: treatments.map((option: any) => ({ key: option.key, minutes: option.minutes })),
-      };
-    };
-
     const selectedOption = () =>
-      service.value === 'home:custom'
-        ? buildHomeOption()
-        : options.find((option: any) => option.id === service.value);
+      options.find((option: any) => option.id === service.value);
 
     const calendarOption = () => {
       const selected = selectedOption();
       if (selected) return selected;
-
-      if (requestedCategory === 'home' || service.value === 'home:custom') {
-        return {
-          category: 'home',
-          minutes: homeMinimumTreatmentMinutes,
-          reservedMinutes: homeMinimumTreatmentMinutes,
-        };
-      }
 
       if (requestedCategory === 'studio') {
         return options
@@ -567,7 +436,7 @@ const homeConfig = {
         details.hidden = true;
         preferencesContinue.hidden = true;
         slotGrid.replaceChildren();
-        slotStatus.textContent = service.value === 'home:custom' ? copy.homeChooseAll : copy.chooseFirst;
+        slotStatus.textContent = copy.chooseFirst;
       }
       availableDates = new Set();
       renderCalendar();
@@ -637,90 +506,7 @@ const homeConfig = {
       if (requestId === calendarRequest) calendarController = null;
     };
 
-    const updateHomeBuilder = () => {
-      const guestCount = Number(homeGuestCount.value || 1);
-      homeGuestCards.forEach((card, index) => {
-        const active = index < guestCount;
-        card.hidden = !active;
-        homeTreatmentSelects[index].disabled = !active;
-        if (!active) homeTreatmentSelects[index].value = '';
-      });
-
-      const active = activeHomeSelects();
-      active.forEach((select) => {
-        const otherMinutes = active.reduce((total, other) => {
-          if (other === select) return total;
-          const option = homeOptions.find((item: any) => item.id === other.value);
-          return total + (option?.minutes || 0);
-        }, 0);
-        const unselectedOtherGuests = active.filter(
-          (other) => other !== select && !other.value,
-        ).length;
-        Array.from(select.options).forEach((option) => {
-          if (!option.value) return;
-          const treatment = homeOptions.find((item: any) => item.id === option.value);
-          const minimumPossibleMinutes = treatment
-            ? otherMinutes + treatment.minutes +
-              unselectedOtherGuests * homeMinimumTreatmentMinutes
-            : Number.POSITIVE_INFINITY;
-          const maximumPossibleMinutes = treatment
-            ? otherMinutes + treatment.minutes +
-              unselectedOtherGuests * homeMaximumTreatmentMinutes
-            : Number.NEGATIVE_INFINITY;
-          option.disabled =
-            !treatment ||
-            minimumPossibleMinutes > homeConfig.maximumMinutes ||
-            maximumPossibleMinutes < homeConfig.minimumMinutes;
-        });
-        if (select.selectedOptions[0]?.disabled) select.value = '';
-      });
-
-      const option = buildHomeOption();
-      if (!option) {
-        homeSummary.textContent = copy.homeChooseAll;
-        return;
-      }
-
-      const preparation = option.preparationMinutes
-        ? `<div><dt>${copy.homePreparationTime}</dt><dd>${option.preparationMinutes} min</dd></div>`
-        : '';
-      const treatmentRows = active
-        .map((select, index) => {
-          const treatment = homeOptions.find((item: any) => item.id === select.value);
-          return `
-            <li>
-              <span>
-                <small>${copy.homeGuest.replace('{number}', String(index + 1))}</small>
-                <strong>${treatment.title}</strong>
-              </span>
-              <span class="home-summary-treatment-meta">
-                <span>${treatment.minutes} min</span>
-                <strong>€ ${treatment.priceEur}</strong>
-              </span>
-            </li>
-          `;
-        })
-        .join('');
-      homeSummary.innerHTML = `
-        <h3>${copy.homeSummaryTitle}</h3>
-        <ol class="home-summary-treatments">${treatmentRows}</ol>
-        <dl class="home-summary-totals">
-          <div><dt>${copy.homeMassageTime}</dt><dd>${option.minutes} min</dd></div>
-          ${preparation}
-          <div><dt>${copy.homeReservedTime}</dt><dd>${option.reservedMinutes} min</dd></div>
-          <div><dt>${copy.homeTreatmentSubtotal}</dt><dd>€ ${option.treatmentPriceEur}</dd></div>
-          <div><dt>${copy.homeTravelFee}</dt><dd>€ ${homeConfig.travelFeeEur}</dd></div>
-          <div class="home-summary-total"><dt>${copy.homeTotalPrice}</dt><dd>€ ${option.priceEur}</dd></div>
-        </dl>
-        ${option.preparationMinutes ? `<p class="home-summary-note">${copy.homePreparationNote}</p>` : ''}
-      `;
-    };
-
     const setChoiceVisibility = (option = selectedOption()) => {
-      const home = service.value === 'home:custom';
-      homeFieldset.hidden = !home;
-      homeFieldset.disabled = !home;
-      if (home) updateHomeBuilder();
       const studio = option?.category === 'studio' || (!option && requestedCategory === 'studio');
       creatorFieldset.hidden = !studio;
       creatorFieldset.disabled = !studio;
@@ -744,7 +530,7 @@ const homeConfig = {
       const option = selectedOption();
       setChoiceVisibility(option);
       if (!option || !date.value) {
-        slotStatus.textContent = service.value === 'home:custom' ? copy.homeChooseAll : copy.chooseFirst;
+        slotStatus.textContent = copy.chooseFirst;
         return;
       }
 
@@ -783,28 +569,10 @@ const homeConfig = {
             slotGrid.querySelectorAll('button').forEach((item) => item.removeAttribute('aria-pressed'));
             button.setAttribute('aria-pressed', 'true');
             start.value = slot.start;
-            const optionName = option.category === 'home' ? copy.home : option.title;
-            const homeTreatments = option.category === 'home'
-              ? option.homeTreatments.map((selection: any, index: number) => {
-                  const treatment = homeOptions.find(
-                    (item: any) => item.key === selection.key && item.minutes === selection.minutes,
-                  );
-                  return `${copy.homeGuest.replace('{number}', String(index + 1))}: ${treatment.title} · ${treatment.minutes} min · € ${treatment.priceEur}`;
-                }).join(' · ')
-              : '';
-            const homeDetails = option.category === 'home'
-              ? `${homeTreatments} · ${copy.homeMassageTime}: ${option.minutes} min · ${copy.homeReservedTime}: ${option.reservedMinutes} min · ${copy.homeTotalPrice}: € ${option.priceEur}`
-              : `${optionName} · ${option.minutes} min · € ${option.priceEur}`;
-            summary.innerHTML = `<span>${copy.selected}</span><strong>${readableDate()} · ${slot.label}</strong><small>${homeDetails}</small>`;
-            const home = option.category === 'home';
-            addressField.hidden = !home;
-            address.required = home;
-            postalCodeField.hidden = !home;
-            postalCode.required = home;
+            summary.innerHTML = `<span>${copy.selected}</span><strong>${readableDate()} · ${slot.label}</strong><small>${option.title} · ${option.minutes} min · € ${option.priceEur}</small>`;
             details.hidden = false;
-            preferencesContinue.hidden = home;
-            const nextSection = home ? details : creatorFieldset;
-            nextSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            preferencesContinue.hidden = false;
+            creatorFieldset.scrollIntoView({ behavior: 'smooth', block: 'start' });
           });
           slotGrid.append(button);
         }
@@ -842,41 +610,10 @@ const homeConfig = {
       setChoiceVisibility();
       void loadAvailabilityCalendar(true);
     });
-    homeGuestCount.addEventListener('change', () => {
-      const active = activeHomeSelects();
-      const selectedMinutes = () => active.reduce((total, select) => {
-        const option = homeOptions.find((item: any) => item.id === select.value);
-        return total + (option?.minutes || 0);
-      }, 0);
-      const minimumPossibleMinutes = () =>
-        selectedMinutes() + active.filter((select) => !select.value).length * homeMinimumTreatmentMinutes;
-      while (minimumPossibleMinutes() > homeConfig.maximumMinutes) {
-        const longest = active
-          .map((select) => ({
-            select,
-            option: homeOptions.find((item: any) => item.id === select.value),
-          }))
-          .filter((item) => item.option)
-          .sort((a, b) => b.option.minutes - a.option.minutes)[0];
-        if (!longest) break;
-        longest.select.value = '';
-      }
-      updateHomeBuilder();
-      void loadAvailabilityCalendar(true);
-    });
-    homeTreatmentSelects.forEach((select) => {
-      select.addEventListener('change', () => {
-        updateHomeBuilder();
-        void loadAvailabilityCalendar(true);
-      });
-    });
 
     renderCalendar();
     if (preselectedOption) {
       service.value = preselectedOption.id;
-      setChoiceVisibility();
-      void loadAvailabilityCalendar();
-    } else if (service.value === 'home:custom') {
       setChoiceVisibility();
       void loadAvailabilityCalendar();
     } else if (requestedCategory === 'studio') {
@@ -901,15 +638,12 @@ const homeConfig = {
         customerName: data.get('customerName'),
         customerEmail: data.get('customerEmail'),
         customerPhone: data.get('customerPhone'),
-        homeAddress: option.category === 'home' ? data.get('homeAddress') || undefined : undefined,
-        homePostalCode: option.category === 'home' ? data.get('homePostalCode') || undefined : undefined,
         creatorScent: data.get('creatorScent') || undefined,
         creatorMusic: data.get('creatorMusic') || undefined,
         creatorBase: option.creatorBase || undefined,
         creatorBack: option.creatorBack ?? undefined,
         creatorFace: option.creatorFace ?? undefined,
         creatorFoot: option.creatorFoot ?? undefined,
-        homeTreatments: option.homeTreatments || undefined,
         notes: data.get('notes') || undefined,
         website: data.get('website') || undefined,
         consent: data.get('consent') === 'on',
@@ -949,7 +683,6 @@ const homeConfig = {
 
     another.addEventListener('click', () => {
       form.reset();
-      if (requestedCategory === 'home') service.value = 'home:custom';
       calendarMonth = new Date(Date.UTC(
         utcDate(today).getUTCFullYear(),
         utcDate(today).getUTCMonth(),
@@ -1191,91 +924,6 @@ const homeConfig = {
   .creator-grid { display: grid; gap: 1rem; }
   @media (min-width: 45rem) { .creator-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   .creator-fieldset__actions { display: flex; justify-content: flex-end; margin-top: 1.2rem; }
-  .home-builder-fieldset {
-    grid-column: 1 / -1;
-    margin: 0;
-    padding: clamp(1.1rem, 3vw, 1.6rem);
-    border: 1px solid color-mix(in srgb, var(--clay) 35%, var(--border));
-    border-radius: var(--radius);
-    background: color-mix(in srgb, var(--paper) 72%, #fff);
-  }
-  .home-builder-fieldset > legend { padding-inline: 0.45rem; color: var(--clay-dark); }
-  .home-builder-fieldset > p { max-width: 48rem; margin: 0 0 1.25rem; color: var(--ink-soft); }
-  .home-builder-count { max-width: 18rem; margin-bottom: 1.25rem; }
-  .home-guest-list { display: grid; gap: 0.8rem; }
-  @media (min-width: 50rem) { .home-guest-list { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-  .home-guest-card {
-    padding: 1rem;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    background: #fff;
-  }
-  .home-guest-card > strong {
-    display: block;
-    margin-bottom: 0.85rem;
-    color: var(--pine-dark);
-    font-family: 'Iowan Old Style', Georgia, serif;
-    font-size: 1.15rem;
-  }
-  .home-builder-summary {
-    margin-top: 1.25rem;
-    padding: clamp(1rem, 3vw, 1.5rem);
-    border-radius: var(--radius-sm);
-    background: var(--pine-soft);
-    color: var(--ink-soft);
-  }
-  :global(.home-builder-summary h3) {
-    margin: 0 0 1rem;
-    color: var(--pine-dark);
-    font-size: clamp(1.45rem, 3vw, 2rem);
-  }
-  :global(.home-summary-treatments) { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
-  :global(.home-summary-treatments li) {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 1rem;
-    align-items: center;
-    padding: 0.85rem 0;
-    border-top: 1px solid color-mix(in srgb, var(--logo-green) 18%, var(--border));
-  }
-  :global(.home-summary-treatments li > span:first-child) { display: grid; gap: 0.2rem; }
-  :global(.home-summary-treatments small) {
-    color: var(--ink-soft);
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-  :global(.home-summary-treatments strong) { color: var(--pine-dark); }
-  :global(.home-summary-treatment-meta) {
-    display: flex;
-    gap: 1rem;
-    align-items: baseline;
-    white-space: nowrap;
-  }
-  :global(.home-summary-totals) {
-    display: grid;
-    gap: 0.6rem;
-    margin: 1rem 0 0;
-    padding: 1rem 0 0;
-    border-top: 1px solid color-mix(in srgb, var(--logo-green) 30%, var(--border));
-  }
-  :global(.home-summary-totals > div) { display: flex; gap: 1rem; justify-content: space-between; }
-  :global(.home-summary-totals dt) { color: var(--ink-soft); }
-  :global(.home-summary-totals dd) { margin: 0; color: var(--pine-dark); font-weight: 700; white-space: nowrap; }
-  :global(.home-summary-total) {
-    margin-top: 0.3rem;
-    padding-top: 0.8rem;
-    border-top: 1px solid color-mix(in srgb, var(--logo-green) 30%, var(--border));
-    font-size: 1.08rem;
-  }
-  :global(.home-summary-total dt),
-  :global(.home-summary-total dd) { color: var(--pine-dark); font-weight: 800; }
-  :global(.home-summary-note) { margin: 1rem 0 0; font-size: 0.82rem; line-height: 1.55; }
-  @media (max-width: 32rem) {
-    :global(.home-summary-treatments li) { align-items: start; }
-    :global(.home-summary-treatment-meta) { display: grid; gap: 0.15rem; text-align: right; }
-  }
   .consent { display: flex; gap: 0.65rem; align-items: flex-start; margin-top: 1.25rem; color: var(--ink); font-size: 0.9rem; font-weight: 500; letter-spacing: 0; text-transform: none; }
   .consent input { width: 1.1rem; min-height: 1.1rem; margin-top: 0.25rem; }
   .privacy-note { margin: 0 0 1rem 1.75rem; color: var(--ink-soft); font-size: 0.8rem; }

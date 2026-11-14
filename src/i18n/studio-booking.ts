@@ -2,13 +2,13 @@ import type { Locale } from '../data/site';
 
 const studioBooking = {
   nl: {
-    eyebrow: 'Studio Visit',
-    title: 'Hoe wil je je behandeling kiezen?',
+    eyebrow: 'Online reserveren',
+    title: 'Kies jouw massage.',
     intro:
       'Kies een vaste behandeling in de studio of stel je eigen behandeling samen met de Massage Creator.',
     readyHeading: 'Vaste behandelingen',
     readyCta: 'Ik kies een vaste behandeling',
-    creatorNumber: '02',
+    creatorNumber: '01',
     creatorHeading: 'Wil je jouw behandeling afstemmen op je eigen wensen?',
     creatorIntro:
       'Stel je eigen behandeling samen uit de beschikbare behandelingselementen met de Massage Creator.',
@@ -45,13 +45,13 @@ const studioBooking = {
     },
   },
   en: {
-    eyebrow: 'Studio Visit',
-    title: 'How would you like to choose your treatment?',
+    eyebrow: 'Book online',
+    title: 'Choose your massage.',
     intro:
       'Choose a ready-made treatment in the studio, or build your own with the Massage Creator.',
     readyHeading: 'Ready-made treatments',
     readyCta: 'Choose a ready-made treatment',
-    creatorNumber: '02',
+    creatorNumber: '01',
     creatorHeading: 'Would you like to tailor your treatment to your own needs?',
     creatorIntro:
       'Create your own treatment from the available treatment elements with the Massage Creator.',
@@ -88,13 +88,13 @@ const studioBooking = {
     },
   },
   hu: {
-    eyebrow: 'Studio Visit',
-    title: 'Hogyan szeretnéd kiválasztani a kezelésedet?',
+    eyebrow: 'Online foglalás',
+    title: 'Válaszd ki a masszázsod.',
     intro:
       'Válassz a kész stúdiókezelések közül, vagy állítsd össze a sajátodat a Massage Creator segítségével.',
     readyHeading: 'Kész kezelések',
     readyCta: 'Kész kezelést választok',
-    creatorNumber: '02',
+    creatorNumber: '01',
     creatorHeading: 'A saját igényeid szerint állítanád össze a kezelésedet?',
     creatorIntro:
       'Alkosd meg a sajátodat a rendelkezésre álló kezelési elemekből a Massage Creator segítségével.',

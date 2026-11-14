@@ -24,7 +24,7 @@ const privacy = {
         ],
         items: [
           'naam, e-mailadres en telefoonnummer;',
-          'bij een afspraak aan huis: het opgegeven adres;',
+          'adresgegevens, voor zover opgegeven bij eerdere reserveringen;',
           'de gekozen behandeling, duur, prijs, datum, tijd, reserveringsnummer en status;',
           'een eventuele vrijwillige opmerking bij de reservering;',
           'technische verzendinformatie over de bevestigingsmails;',
@@ -120,7 +120,7 @@ const privacy = {
         ],
         items: [
           'name, email address and telephone number;',
-          'for a home appointment: the address you provide;',
+          'address details, if supplied with an earlier booking;',
           'the selected treatment, duration, price, date, time, booking reference and status;',
           'any optional note added to the booking;',
           'technical delivery information for confirmation emails;',
@@ -216,7 +216,7 @@ const privacy = {
         ],
         items: [
           'név, e-mail-cím és telefonszám;',
-          'házhoz kért kezelésnél a megadott cím;',
+          'korábbi foglalásnál esetleg megadott címadatok;',
           'a kiválasztott kezelés, időtartam, ár, dátum, időpont, foglalási azonosító és állapot;',
           'a foglaláshoz írt nem kötelező megjegyzés;',
           'a visszaigazoló e-mailek technikai kézbesítési adatai;',

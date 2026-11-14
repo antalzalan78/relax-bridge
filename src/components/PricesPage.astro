@@ -62,36 +62,17 @@ const addonRows = [
       <h1>{copy.title}</h1>
       <p class="lead">{copy.intro}</p>
       <nav class="price-overview-nav" aria-label={copy.categoriesLabel}>
-        <a href="#studio">{d.options.studio.label}</a>
         <a href="#creator">{copy.creatorHeading}</a>
+        <a href="#studio">{copy.readyHeading}</a>
       </nav>
     </div>
   </section>
 
   <div class="wrap price-overview-body">
-    <section class="price-overview-section" id="studio">
+    <section class="price-overview-section" id="creator">
       <header class="price-overview-heading">
         <span class="price-overview-number" aria-hidden="true">01</span>
         <div>
-          <span class="eyebrow">Relax Bridge</span>
-          <h2>{d.options.studio.label}</h2>
-          <p>{copy.readyIntro}</p>
-        </div>
-      </header>
-      <div class="price-overview-panel">
-        <PriceTable locale={locale} caption={copy.readyHeading} services={studio} />
-        <div class="price-overview-panel__footer">
-          <span>{d.prices.intro}</span>
-          <a class="btn btn--primary" href={readyBookingHref}>{copy.readyCta}<span aria-hidden="true">&rarr;</span></a>
-        </div>
-      </div>
-    </section>
-
-    <section class="price-overview-section" id="creator">
-      <header class="price-overview-heading">
-        <span class="price-overview-number" aria-hidden="true">02</span>
-        <div>
-          <span class="eyebrow">Studio Visit</span>
           <h2>{copy.creatorHeading}</h2>
           <p>{copy.creatorIntro}</p>
         </div>
@@ -117,6 +98,24 @@ const addonRows = [
       <div class="price-overview-section__footer">
         <p>{copy.creatorRule}</p>
         <a class="btn btn--primary" href={creatorHref}>{copy.creatorCta}<span aria-hidden="true">&rarr;</span></a>
+      </div>
+    </section>
+
+    <section class="price-overview-section" id="studio">
+      <header class="price-overview-heading">
+        <span class="price-overview-number" aria-hidden="true">02</span>
+        <div>
+          <span class="eyebrow">Relax Bridge</span>
+          <h2>{copy.readyHeading}</h2>
+          <p>{copy.readyIntro}</p>
+        </div>
+      </header>
+      <div class="price-overview-panel">
+        <PriceTable locale={locale} caption={copy.readyHeading} services={studio} />
+        <div class="price-overview-panel__footer">
+          <span>{d.prices.intro}</span>
+          <a class="btn btn--primary" href={readyBookingHref}>{copy.readyCta}<span aria-hidden="true">&rarr;</span></a>
+        </div>
       </div>
     </section>
 

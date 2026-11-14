@@ -139,9 +139,9 @@ telepítése előtt kell futtatni:
 npm.cmd run db:migrate
 ```
 
-Az alapbeállítás 15 perces időrács, 12 órás minimum előfoglalás és 60 napos
-foglalási horizont. A stúdióidőpont után 15 perc, az otthoni kezelés előtt és
-után 30–30 perc automatikus puffer foglalódik a közös naptárban.
+A foglalható stúdióidőpontok 15 perces lépésekben jelennek meg. A rendszer a
+kezelések közötti 30 perces stúdiópuffert is figyelembe veszi; az első kezelés
+előtt nincs kötelező puffer.
 
 ### Weboldal-statisztika
 
@@ -241,17 +241,20 @@ node scripts/check-contrast.mjs
 
 ## URL-ek
 
-A holland az alapértelmezett nyelv, előtag nélkül. 21 oldal készül.
+A holland az alapértelmezett nyelv, előtag nélkül.
 
 | | holland | angol | magyar |
 | --- | --- | --- | --- |
 | főoldal | `/` | `/en` | `/hu` |
 | stúdió | `/massage/…` | `/en/massage/…` | `/hu/masszazs/…` |
-| házhoz | `/home-service/…` | `/en/home-service/…` | `/hu/hazhoz/…` |
+| Studio Visit választás | `/studio-visit` | `/en/studio-visit` | `/hu/studio-visit` |
+| Massage Creator | `/massage-creator` | `/en/massage-creator` | `/hu/massage-creator` |
 
 A régi oldal aloldalai (`/relaxmassage`, `/voetmassage`, …) a `vercel.json`
 fájlban 301-es átirányítást kaptak az új helyükre, hogy a meglévő linkek és a
-Google-találatok ne törjenek el.
+Google-találatok ne törjenek el. A már nem kínált házhoz menő kezelések régi
+URL-jei a megfelelő stúdiókezelésre irányítanak; új házhoz menő foglalás nem
+hozható létre.
 
 ## SEO
 

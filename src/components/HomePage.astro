@@ -58,10 +58,8 @@ const jsonLd = [
         <h1>{d.hero.title}</h1>
         <p class="lead hero__intro--desktop">{d.hero.intro}</p>
         <p class="lead hero__intro--mobile">{d.hero.mobileIntro}</p>
-        <div class="hero__meta" aria-label={`${d.nav.studio}, Tilburg`}>
-          <span>{d.nav.studio}</span>
-          <span aria-hidden="true">&middot;</span>
-          <span>Tilburg</span>
+        <div class="hero__meta" aria-label="Tilburg-Reeshof">
+          <span>Tilburg-Reeshof</span>
         </div>
         <div class="btn-row">
           <a class="btn btn--primary" href={bookingHref}>
@@ -151,27 +149,31 @@ const jsonLd = [
           </p>
         </div>
 
-        <p class="location-showcase__subtitle">{d.options.studio.personalization.intro}</p>
+        <p class="location-showcase__subtitle">{d.options.studio.subtitle}</p>
       </div>
-
-      <div class="studio-personalization-highlights">
-        {d.options.studio.personalization.items.map((item, index) => (
-          <article class="studio-personalization-highlight">
-            <span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
-            <div>
-              <h3>{item.title}</h3>
-              <p>{item.body}</p>
-            </div>
-          </article>
-        ))}
-      </div>
-
-      <p class="studio-personalization-highlights__intro">{d.options.studio.subtitle}</p>
 
       <section class="studio-offer-group" id="studio-services">
+        <article class="creator-spotlight" aria-labelledby="creator-spotlight-title">
+          <div class="creator-spotlight__intro">
+            <span class="eyebrow">{d.options.studio.personalization.spotlightEyebrow}</span>
+            <h2 id="creator-spotlight-title">Massage Creator</h2>
+            <p class="lead">{d.options.studio.personalization.spotlightIntro}</p>
+            <a class="btn btn--primary" href={creatorHref}>
+              {d.options.studio.personalization.spotlightCta}<span aria-hidden="true">&rarr;</span>
+            </a>
+          </div>
+          <ol class="creator-spotlight__steps">
+            {d.options.studio.personalization.spotlightSteps.map((step, index) => (
+              <li>
+                <span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+                <div><h3>{step.title}</h3><p>{step.body}</p></div>
+              </li>
+            ))}
+          </ol>
+        </article>
+
         <header class="studio-offer-group__heading">
           <div class="studio-offer-group__heading-copy">
-            <span class="eyebrow">Studio Visit 1</span>
             <h2>{studioCopy.readyHeading}</h2>
           </div>
           <a class="btn btn--primary" href={studioReadyBookingHref}>
@@ -212,15 +214,6 @@ const jsonLd = [
             })}
         </div>
         <p class="studio-offer-group__payment-note" id={anchors.prices}>{d.prices.intro}</p>
-      </section>
-
-      <section class="massage-creator massage-creator--studio-intro">
-        <div class="massage-creator__intro">
-          <span class="eyebrow">Studio Visit 2</span>
-          <h2>{d.options.studio.personalization.title}</h2>
-          <p class="lead">{studioCopy.creatorHeading}</p>
-          <a class="btn btn--primary" href={creatorHref}>{d.hero.primaryCta}</a>
-        </div>
       </section>
 
     </div>
@@ -321,6 +314,12 @@ const jsonLd = [
 
   .hero__intro--mobile {
     display: none;
+  }
+
+  .hero--with-introduction .hero__copy h1 {
+    max-width: 16ch;
+    font-size: clamp(2.9rem, 4vw, 4rem);
+    line-height: 1.03;
   }
 
   @media (max-width: 47.99rem) {
