@@ -49,10 +49,23 @@ const aboutHref = aboutPath(locale);
 
     <nav class="nav" aria-label={d.nav.menu}>
       <details class="nav__dropdown">
-        <summary>{d.nav.services}<span aria-hidden="true">⌄</span></summary>
-        <div class="nav__menu">
-          <a href={massageCreatorPath(locale)}>Massage Creator</a>
-          <a href={treatmentsPath(locale)}>{d.choice.readyTitle}</a>
+        <summary aria-current={[massageCreatorPath(locale), treatmentsPath(locale)].includes(Astro.url.pathname) ? 'page' : undefined}>
+          {d.nav.services}
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></svg>
+        </summary>
+        <div class="nav__menu" role="group" aria-label={d.nav.serviceOptions}>
+          <a class="nav__menu-link nav__menu-link--creator" href={massageCreatorPath(locale)} aria-current={Astro.url.pathname === massageCreatorPath(locale) ? 'page' : undefined}>
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 7h9m4 0h3M4 17h2m4 0h10" /><path d="M13 4v6M6 14v6" />
+            </svg>
+            <span class="nav__menu-copy"><strong>Massage Creator</strong><small>{d.nav.creatorDescription}</small></span>
+          </a>
+          <a class="nav__menu-link nav__menu-link--ready" href={treatmentsPath(locale)} aria-current={Astro.url.pathname === treatmentsPath(locale) ? 'page' : undefined}>
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 21v-8m0 2c-4 0-7-2-7-6 4 0 7 2 7 6Zm0-2c0-4 3-6 7-6 0 4-3 6-7 6ZM5 21h14" />
+            </svg>
+            <span class="nav__menu-copy"><strong>{d.choice.readyTitle}</strong><small>{d.nav.readyDescription}</small></span>
+          </a>
         </div>
       </details>
       <a href={pricesHref} aria-current={Astro.url.pathname === pricesHref ? 'page' : undefined}>{d.nav.prices}</a>

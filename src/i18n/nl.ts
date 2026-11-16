@@ -16,6 +16,9 @@ export default {
   nav: {
     home: 'Home',
     services: 'Behandelingen',
+    serviceOptions: 'Behandelopties',
+    creatorDescription: 'Stel je eigen massage samen',
+    readyDescription: 'Kies een vaste behandeling',
     prices: 'Prijzen',
     blog: 'Blog',
     about: 'Over mij',

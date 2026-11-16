@@ -432,8 +432,19 @@ img {
 }
 
 .nav__dropdown summary::-webkit-details-marker { display: none; }
-.nav__dropdown summary span { color: var(--clay); }
 .nav__dropdown summary:hover { color: var(--pine-dark); }
+.nav__dropdown summary[aria-current='page'] {
+  text-decoration: underline;
+  text-decoration-color: var(--clay);
+  text-underline-offset: 0.5rem;
+}
+.nav__dropdown summary svg {
+  width: 0.85rem;
+  height: 0.85rem;
+  flex: none;
+  transition: transform 160ms ease;
+}
+.nav__dropdown[open] summary svg { transform: rotate(180deg); }
 
 .nav__menu {
   position: absolute;
@@ -441,23 +452,57 @@ img {
   left: -0.85rem;
   z-index: 40;
   display: grid;
-  min-width: 13rem;
-  gap: 0.25rem;
-  padding: 0.6rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--surface);
-  box-shadow: var(--shadow-raised);
+  width: min(19.0625rem, calc(100vw - 2rem));
+  gap: 0.5rem;
+  padding: 0.625rem;
+  border: 1px solid #dcd3bd;
+  border-radius: 1.3125rem;
+  background: #fff9ef;
+  box-shadow: 0 13px 35px rgb(63 69 38 / 13%);
 }
 
-.nav__menu a {
-  display: block;
-  padding: 0.55rem 0.65rem;
-  border-radius: var(--radius-sm);
+.nav .nav__menu-link {
+  display: flex;
+  min-height: 4.75rem;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.8125rem;
+  padding: 0.875rem;
+  border: 1px solid #d6dfc1;
+  border-radius: 0.875rem;
+  background: #eaf0dd;
+  color: #36532d;
+  white-space: normal;
+  transition: background 160ms ease, box-shadow 160ms ease;
 }
 
-.nav__menu a:hover { background: var(--pine-soft); }
+.nav .nav__menu-link--ready {
+  border-color: #e7d0b2;
+  background: #f8e7d1;
+}
+.nav .nav__menu-link:hover {
+  box-shadow: inset 0 0 0 1px rgb(119 147 104 / 33%);
+}
+.nav .nav__menu-link--creator:hover { background: #e2ebd0; }
+.nav .nav__menu-link--ready:hover { background: #f4ddbf; }
 .nav__menu a::after { display: none; }
+.nav__menu-link svg {
+  width: 1.4375rem;
+  height: 1.4375rem;
+  flex: none;
+}
+.nav__menu-copy { display: grid; flex: 1; min-width: 0; gap: 0.2rem; }
+.nav__menu-copy strong {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+.nav__menu-copy small {
+  color: #536248;
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.45;
+}
 
 .booking-status {
   display: inline-flex;
@@ -2661,6 +2706,8 @@ img {
   }
 
   .nav__dropdown summary { min-height: 2.25rem; font-size: 0.68rem; }
+  .nav__menu { top: calc(100% + 0.45rem); left: 0; }
+  .nav .nav__menu-link { min-height: 4.5625rem; padding: 0.8125rem; }
 
   .hero__meta {
     font-size: 0.7rem;
