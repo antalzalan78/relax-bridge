@@ -2,10 +2,10 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { bookingEntryRedirect } from '../../src/lib/booking/entry-route.ts';
 
-test('the former one-choice booking page goes straight to Studio Visit in each language', () => {
-  assert.equal(bookingEntryRedirect('nl', new URL('https://www.relaxbridge.nl/booking')), '/studio-visit');
-  assert.equal(bookingEntryRedirect('en', new URL('https://www.relaxbridge.nl/en/booking')), '/en/studio-visit');
-  assert.equal(bookingEntryRedirect('hu', new URL('https://www.relaxbridge.nl/hu/booking')), '/hu/studio-visit');
+test('a general booking link opens the two studio choices in each language', () => {
+  assert.equal(bookingEntryRedirect('nl', new URL('https://www.relaxbridge.nl/booking')), '/#choice');
+  assert.equal(bookingEntryRedirect('en', new URL('https://www.relaxbridge.nl/en/booking')), '/en#choice');
+  assert.equal(bookingEntryRedirect('hu', new URL('https://www.relaxbridge.nl/hu/booking')), '/hu#choice');
 });
 
 test('existing ready-treatment and Massage Creator links still open the booking form', () => {
@@ -14,13 +14,13 @@ test('existing ready-treatment and Massage Creator links still open the booking 
   assert.equal(bookingEntryRedirect('hu', new URL('https://www.relaxbridge.nl/hu/booking?creator=1&base=relax')), null);
 });
 
-test('retired Home Service links go to Studio Visit and campaign labels survive', () => {
+test('retired Home Service links go to the active choices and campaign labels survive', () => {
   assert.equal(
     bookingEntryRedirect('nl', new URL('https://www.relaxbridge.nl/booking?category=home&utm_source=instagram&utm_medium=organic_social')),
-    '/studio-visit?utm_source=instagram&utm_medium=organic_social',
+    '/?utm_source=instagram&utm_medium=organic_social#choice',
   );
   assert.equal(
     bookingEntryRedirect('en', new URL('https://www.relaxbridge.nl/en/booking?category=studio&service=home:relax')),
-    '/en/studio-visit',
+    '/en#choice',
   );
 });

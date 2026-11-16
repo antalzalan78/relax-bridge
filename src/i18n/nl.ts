@@ -36,7 +36,7 @@ export default {
   hero: {
     title: 'Jouw massage. Jouw moment.',
     intro:
-      'Bij Relax Bridge in Tilburg-Reeshof vind je rust, persoonlijke aandacht en een massage die bij jou past. Met bijna 20 jaar ervaring help ik je even helemaal op adem te komen.',
+      'Bij Relax Bridge in Tilburg-Reeshof vind je rust, persoonlijke aandacht en een massage die bij jou past. Een moment dat helemaal om jou draait.',
     mobileIntro:
       'Rust en persoonlijke aandacht in mijn studio in Tilburg-Reeshof. Een massage die bij jou past.',
     primaryCta: 'Afspraak maken',
@@ -50,19 +50,33 @@ export default {
 
   introduction: {
     title: 'Over mij',
+    homeTitle: 'Ontdek Relax Bridge',
     paragraphs: [
-      'Massage maakt al bijna twintig jaar deel uit van mijn leven. In Hongarije heb ik ervoor geleerd en ben ik als massagetherapeut begonnen. Sindsdien heb ik ook in Nederland veel ervaring opgedaan en nieuwe kennis verworven.',
-      'Uit al die ervaring is Relax Bridge ontstaan. Ik vind het belangrijk dat je niet alleen een behandeling krijgt, maar die ook kunt afstemmen op jouw eigen behoeften.',
+      'Ik ben Brigitta. In mijn rustige studio in Tilburg-Reeshof neem ik de tijd voor jou. Je behandeling en de kleine details van je rustmoment stem ik op je af: van de massage tot de muziek en de geur.',
+      'In Hongarije leerde ik het vak en begon ik als masseur te werken. In Nederland heb ik nieuwe ervaring en kennis opgedaan. Daaruit is Relax Bridge ontstaan, waar ik je behandeling graag op jouw behoeften afstem.',
       'Ben je ook benieuwd naar de persoon achter Relax Bridge? Ik heb een video gemaakt waarin ik iets meer vertel over mezelf, massage en mijn manier van werken.',
     ],
     videoCta: 'Bekijk mijn introductievideo',
+    moreCta: 'Leer mij kennen',
+  },
+
+  choice: {
+    eyebrow: 'Jouw moment',
+    heading: 'Hoeveel weken zeg je al tegen jezelf: volgende week neem ik rust?',
+    intro: 'Kies wat op dit moment het beste bij je past.',
+    creatorTitle: 'Massage Creator',
+    creatorBody: 'Stel je eigen massage samen met een basisbehandeling en aanvullingen die voor jou goed voelen.',
+    creatorCta: 'Stel mijn massage samen',
+    readyTitle: 'Losse massages',
+    readyBody: 'Liever een vaste behandeling? Ontdek de massages en prijzen van de studio.',
+    readyCta: 'Bekijk de behandelingen',
   },
 
   images: {
     profile:
       'Portret van de masseuse van Relax Bridge, zittend op een bankje in het bos.',
     studio:
-      'De massageruimte van Relax Bridge in Tilburg, met massagetafel, handdoeken en massageolie.',
+      'Brigitta in de massageruimte van Relax Bridge in Tilburg, bij de massagetafel.',
   },
 
   options: {

@@ -15,6 +15,7 @@ export const site = {
   phoneDisplay: '+31 6 53964923',
   whatsapp: 'https://wa.me/31653964923',
   googleReview: 'https://g.page/r/CXNtFuk0lC9HEAE/review',
+  googleReviews: 'https://www.google.com/maps/search/?api=1&query=Relax%20Bridge&query_place_id=ChIJqzqaZ_q5lm8Rc20W6TSUL0c',
   introductionVideo: 'https://www.youtube.com/watch?v=34Dls7B6yTw',
 
   email: 'info@relaxbridge.nl' as string | null,
@@ -84,6 +85,24 @@ export function pathFor(locale: Locale, path = ''): string {
 /** A sajat foglalasi oldal teljes, lokalizalt utvonala. */
 export function bookingPath(locale: Locale): string {
   return pathFor(locale, 'booking');
+}
+
+/** Általános foglalási felhívás: előbb a két kezelési út közül választhat a vendég. */
+export function bookingChoicePath(locale: Locale): string {
+  return `${pathFor(locale)}#choice`;
+}
+
+export function aboutPath(locale: Locale): string {
+  if (locale === 'nl') return '/over-mij';
+  if (locale === 'en') return '/en/about';
+  return '/hu/rolam';
+}
+
+/** Négy önálló stúdiókezelés, a meglévő szolgáltatás-adatforrásból. */
+export function treatmentsPath(locale: Locale): string {
+  if (locale === 'nl') return '/behandelingen';
+  if (locale === 'en') return '/en/treatments';
+  return '/hu/kezelesek';
 }
 
 /** A háromnyelvű, összesített árlista helyi útvonala. */

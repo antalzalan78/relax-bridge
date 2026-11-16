@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import logo from '../assets/logo.png';
-import { site, pathFor, privacyPath, massageCreatorPath, type Locale } from '../data/site';
+import { site, pathFor, privacyPath, massageCreatorPath, treatmentsPath, type Locale } from '../data/site';
 import { t } from '../i18n';
 import { getServices, servicePath } from '../lib/services';
 
@@ -29,6 +29,7 @@ const year = new Date().getFullYear();
         <h3>{d.nav.services}</h3>
         <ul>
           <li><a href={massageCreatorPath(locale)}>Massage Creator</a></li>
+          <li><a href={treatmentsPath(locale)}>{d.choice.readyTitle}</a></li>
           {
             studio.map((s) => (
               <li>
@@ -59,6 +60,7 @@ const year = new Date().getFullYear();
               {d.contact.googleReviewCta}
             </a>
           </li>
+          <li><a href={site.googleReviews} target="_blank" rel="noopener noreferrer">{locale === 'hu' ? 'Google-vélemények olvasása' : locale === 'nl' ? 'Lees Google-beoordelingen' : 'Read Google reviews'}</a></li>
           <li>{d.contact.areaBody}</li>
         </ul>
 
@@ -66,6 +68,7 @@ const year = new Date().getFullYear();
         <ul>
           <li><a href={site.social.instagram} rel="noopener">Instagram</a></li>
           <li><a href={site.social.facebook} rel="noopener">Facebook</a></li>
+          <li><a href={site.introductionVideo} target="_blank" rel="noopener noreferrer">YouTube</a></li>
           <li><a href={site.playlists.spotify} rel="noopener">Spotify</a></li>
           <li>
             <a href={site.playlists.youtubeMusic} rel="noopener">

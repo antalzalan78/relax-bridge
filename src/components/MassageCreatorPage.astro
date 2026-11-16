@@ -1,8 +1,9 @@
 ---
 import Base from '../layouts/Base.astro';
-import { bookingPath, massageCreatorPath, studioVisitBookingPath, type Locale } from '../data/site';
+import { bookingPath, massageCreatorPath, treatmentsPath, type Locale } from '../data/site';
 import { bookingText } from '../i18n/booking';
 import { massageCreatorText } from '../i18n/massage-creator';
+import { studioBookingText } from '../i18n/studio-booking';
 import { creatorAddons, creatorBases, creatorMaximumMinutes } from '../lib/booking/massage-creator';
 
 interface Props {
@@ -12,6 +13,7 @@ interface Props {
 const { locale } = Astro.props;
 const copy = massageCreatorText(locale);
 const preferencesCopy = bookingText(locale);
+const guide = studioBookingText(locale);
 const path = massageCreatorPath(locale);
 const alternates = {
   nl: massageCreatorPath('nl'),
@@ -37,10 +39,15 @@ const creatorBaseOptions = [
 >
   <section class="creator-hero">
     <div class="wrap">
-      <a class="back-link" href={studioVisitBookingPath(locale)}><span aria-hidden="true">&larr;</span> {copy.backToTreatments}</a>
+      <a class="back-link" href={treatmentsPath(locale)}><span aria-hidden="true">&larr;</span> {copy.backToTreatments}</a>
       <span class="eyebrow">{copy.eyebrow}</span>
       <h1>{copy.title}</h1>
       <p class="lead">{copy.intro}</p>
+      <div class="creator-hero__guide">
+        <div><h2>{guide.creatorHowTitle}</h2><p>{guide.creatorHowBody}</p></div>
+        <p>{guide.creatorRules}</p>
+        <a class="btn btn--light" href="#creator-builder">{guide.creatorCta}<span aria-hidden="true">→</span></a>
+      </div>
       <ol class="creator-progress" aria-label={copy.eyebrow}>
         {copy.steps.map((step, index) => (
           <li data-progress={index + 1} class:list={{ active: index === 0 }}>
@@ -51,7 +58,7 @@ const creatorBaseOptions = [
     </div>
   </section>
 
-  <section class="wrap creator-shell">
+  <section class="wrap creator-shell" id="creator-builder">
     <form
       class="creator-form"
       id="massage-creator-form"
@@ -177,6 +184,15 @@ const creatorBaseOptions = [
     </form>
   </section>
 </Base>
+
+<style>
+  .creator-hero__guide { display: grid; gap: 1rem 2rem; max-width: 58rem; margin-block: 2rem; padding: clamp(1.25rem, 3vw, 2rem); border: 1px solid #d9e2c9; border-radius: 5rem var(--radius-lg) var(--radius-lg) var(--radius-lg); background: var(--pine-soft); }
+  .creator-hero__guide h2 { margin: 0 0 .4rem; color: var(--ink); font-size: clamp(1.45rem, 2.8vw, 2rem); }
+  .creator-hero__guide p { margin: 0; color: var(--ink-soft); }
+  .creator-hero__guide .btn { width: fit-content; }
+  @media (min-width: 48rem) { .creator-hero__guide { grid-template-columns: 1fr 1fr; } .creator-hero__guide .btn { grid-column: 1 / -1; } }
+  @media (min-width: 62rem) { .creator-hero__guide { grid-template-columns: 1fr; margin-block: 0; } .creator-hero__guide .btn { grid-column: 1; } }
+</style>
 
 <script>
   const creatorForm = document.querySelector<HTMLFormElement>('#massage-creator-form');

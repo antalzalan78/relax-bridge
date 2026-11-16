@@ -36,7 +36,7 @@ export default {
   hero: {
     title: 'Your massage. Your moment.',
     intro:
-      'At Relax Bridge in Tilburg-Reeshof, you will find calm, personal attention and a massage that feels right for you. With nearly 20 years of experience, I help you take a moment to truly unwind.',
+      'At Relax Bridge in Tilburg-Reeshof, you will find calm, personal attention and a massage that feels right for you. A moment that is entirely yours.',
     mobileIntro:
       'Calm and personal attention in my Tilburg-Reeshof studio. A massage that feels right for you.',
     primaryCta: 'Book an appointment',
@@ -50,19 +50,33 @@ export default {
 
   introduction: {
     title: 'About me',
+    homeTitle: 'Discover Relax Bridge',
     paragraphs: [
-      'Massage has been part of my life for nearly twenty years. I trained and began working as a massage therapist in Hungary, and since then I have gained a great deal of experience and new knowledge in the Netherlands as well.',
-      'Relax Bridge grew out of all of that. It matters to me that you not only receive a treatment, but can also tailor it to your own needs.',
+      'I’m Brigitta. I welcome you to a calm, attentive space in Tilburg-Reeshof. Your treatment and the small details of your time to rest are tailored to you: from the massage to the music and scent.',
+      'I trained and began working as a massage therapist in Hungary, then gained new experience and knowledge in the Netherlands. Relax Bridge grew from that journey, with treatments you can tailor to your needs.',
       'If you would also like to know who is behind Relax Bridge, I have made a video in which I share a little more about myself, massage and the way I work.',
     ],
     videoCta: 'Watch my introduction video',
+    moreCta: 'Get to know me',
+  },
+
+  choice: {
+    eyebrow: 'Your moment',
+    heading: 'How many weeks have you told yourself: next week I’ll take a break?',
+    intro: 'Choose the path that feels right for you today.',
+    creatorTitle: 'Massage Creator',
+    creatorBody: 'Build your own massage: choose a base treatment and the additions that feel right for you.',
+    creatorCta: 'Create my massage',
+    readyTitle: 'Individual massages',
+    readyBody: 'Prefer a ready-made treatment? Explore the studio massages and prices.',
+    readyCta: 'See the treatments',
   },
 
   images: {
     profile:
       'Portrait of the Relax Bridge massage therapist, sitting on a bench in the woods.',
     studio:
-      'The Relax Bridge massage room in Tilburg, with massage table, towels and massage oil.',
+      'Brigitta in the Relax Bridge massage room in Tilburg, beside the massage table.',
   },
 
   options: {

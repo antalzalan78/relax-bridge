@@ -36,7 +36,7 @@ export default {
   hero: {
     title: 'A te masszázsod. A te pillanatod.',
     intro:
-      'A Relax Bridge-ben, Tilburg-Reeshofban nyugalom, személyes figyelem és hozzád illő masszázs vár. Közel húsz év tapasztalatával segítek, hogy igazán kikapcsolódj.',
+      'A Relax Bridge-nél, Tilburg-Reeshofban nyugalom, személyes figyelem és hozzád illő masszázs vár. Egy pillanat, amely igazán rólad szól.',
     mobileIntro:
       'Nyugalom és személyes figyelem a tilburgi stúdiómban. Egy masszázs, amely hozzád illik.',
     primaryCta: 'Időpontfoglalás',
@@ -50,19 +50,33 @@ export default {
 
   introduction: {
     title: 'Rólam',
+    homeTitle: 'Ismerd meg a Relax Bridge-et',
     paragraphs: [
-      'A masszázs közel húsz éve része az életemnek. Magyarországon tanultam és kezdtem el masszőrként dolgozni, azóta pedig Hollandiában is sok tapasztalattal és új tudással gazdagodtam.',
-      'Ezekből született meg a Relax Bridge, ahol fontos számomra, hogy ne csak egy kezelést kapj, hanem azt a saját igényeidhez is tudd alakítani.',
+      'Brigitta vagyok. Figyelmes, nyugodt környezetben várlak Tilburg–Reeshofban. Itt a kezelésed és a pihenés apró részletei is hozzád igazodnak: a masszázstól a zenén át az illatválasztásig.',
+      'Magyarországon tanultam és kezdtem el masszőrként dolgozni; Hollandiában új tapasztalatokkal és tudással gazdagodtam. Ebből született meg a Relax Bridge, ahol fontos számomra, hogy a kezelést a saját igényeidhez is tudd alakítani.',
       'Ha pedig arra is kíváncsi vagy, ki áll a Relax Bridge mögött, készítettem egy videót, amelyben egy kicsit többet mesélek magamról, a masszázsról és arról, hogyan dolgozom.',
     ],
     videoCta: 'Bemutatkozó videó megtekintése',
+    moreCta: 'Ismerj meg jobban',
+  },
+
+  choice: {
+    eyebrow: 'A te pillanatod',
+    heading: 'Hány hete mondod magadnak, hogy a jövő héten pihensz?',
+    intro: 'Válaszd ki, hogyan szeretnél megérkezni a saját pillanatodhoz.',
+    creatorTitle: 'Massage Creator',
+    creatorBody: 'Állítsd össze a saját masszázsodat: válassz alapkezelést és azokat a kiegészítőket, amelyek most jól esnek.',
+    creatorCta: 'Összeállítom a masszázsomat',
+    readyTitle: 'Önálló masszázsok',
+    readyBody: 'Inkább egy kész kezelést választanál? Nézd meg a stúdió masszázsait és áraikat.',
+    readyCta: 'Kezelések megtekintése',
   },
 
   images: {
     profile:
       'A Relax Bridge masszőrének portréja, amint egy erdei padon ül.',
     studio:
-      'A Relax Bridge masszázsszobája Tilburgban: masszázságy, törölközők és masszázsolaj.',
+      'Brigitta a Relax Bridge tilburgi masszázsszobájában, a masszázságy mellett.',
   },
 
   options: {

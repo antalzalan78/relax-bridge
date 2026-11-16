@@ -15,8 +15,18 @@ test('maps localized public service pages to the same safe journey category', ()
   assert.equal(journeyPageKey('/prijzen'), 'prices');
   assert.equal(journeyPageKey('/en/prices'), 'prices');
   assert.equal(journeyPageKey('/hu/arak'), 'prices');
+  assert.equal(journeyPageKey('/over-mij'), 'about');
+  assert.equal(journeyPageKey('/behandelingen'), 'treatments');
+  assert.equal(journeyPageKey('/en/treatments'), 'treatments');
+  assert.equal(journeyPageKey('/hu/kezelesek'), 'treatments');
+  assert.equal(journeyPageKey('/en/about'), 'about');
+  assert.equal(journeyPageKey('/hu/rolam'), 'about');
   assert.equal(isBookingDestination('/en/booking'), true);
   assert.equal(isBookingDestination('/hu/studio-visit'), true);
+  assert.equal(isBookingDestination('/#choice'), true);
+  assert.equal(isBookingDestination('/en#choice'), true);
+  assert.equal(isBookingDestination('/hu?utm_source=instagram#choice'), true);
+  assert.equal(isBookingDestination('/#contact'), false);
   assert.equal(isBookingDestination('/en/massage-creator'), false);
 });
 

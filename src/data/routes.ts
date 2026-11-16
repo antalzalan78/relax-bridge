@@ -12,6 +12,7 @@ export const categoryPath: Record<Locale, Record<'studio', string>> = {
  * meg a keresoben, viszont igy a nyelvvalto ugyanarra a szakaszra tud ugrani.
  */
 export const anchors = {
+  choice: 'choice',
   services: 'behandelingen',
   prices: 'prijzen',
   contact: 'contact',

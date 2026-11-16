@@ -93,7 +93,7 @@ if (trackingAllowed) {
         : null;
       if (!link || link.hasAttribute('data-language-link')) return;
       const destination = new URL(link.href, window.location.href);
-      if (destination.origin === window.location.origin && isBookingDestination(destination.pathname)) {
+      if (destination.origin === window.location.origin && isBookingDestination(destination.pathname + destination.search + destination.hash)) {
         recordJourneyEvent('booking_click', window.location.pathname);
       }
     }, { capture: true });

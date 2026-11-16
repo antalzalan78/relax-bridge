@@ -3,7 +3,7 @@ import { Image } from 'astro:assets';
 import logoMark from '../assets/logo-mark.png';
 import logoTagline from '../assets/logo-tagline.png';
 import logoWordmark from '../assets/logo-wordmark.png';
-import { blogPath, pricesPath, questionnairePath, site, locales, pathFor, localeNames, studioVisitBookingPath, type Locale } from '../data/site';
+import { aboutPath, blogPath, bookingChoicePath, massageCreatorPath, pricesPath, questionnairePath, treatmentsPath, site, locales, pathFor, localeNames, type Locale } from '../data/site';
 import { anchors } from '../data/routes';
 import { t } from '../i18n';
 
@@ -15,8 +15,9 @@ interface Props {
 const { locale, alternates } = Astro.props;
 const d = t(locale);
 const home = pathFor(locale);
-const bookingHref = studioVisitBookingPath(locale);
+const bookingHref = bookingChoicePath(locale);
 const pricesHref = pricesPath(locale);
+const aboutHref = aboutPath(locale);
 ---
 
 <header class="site-header">
@@ -47,8 +48,15 @@ const pricesHref = pricesPath(locale);
     </a>
 
     <nav class="nav" aria-label={d.nav.menu}>
-      <a href={`${home}#${anchors.services}`}>{d.nav.services}</a>
+      <details class="nav__dropdown">
+        <summary>{d.nav.services}<span aria-hidden="true">⌄</span></summary>
+        <div class="nav__menu">
+          <a href={massageCreatorPath(locale)}>Massage Creator</a>
+          <a href={treatmentsPath(locale)}>{d.choice.readyTitle}</a>
+        </div>
+      </details>
       <a href={pricesHref} aria-current={Astro.url.pathname === pricesHref ? 'page' : undefined}>{d.nav.prices}</a>
+      <a href={aboutHref} aria-current={Astro.url.pathname === aboutHref ? 'page' : undefined}>{d.nav.about}</a>
       <a href={blogPath(locale)} aria-current={Astro.url.pathname.startsWith(blogPath(locale)) ? 'page' : undefined}>{d.nav.blog}</a>
       <a href={`${home}#${anchors.contact}`}>{d.nav.contact}</a>
       <a href={questionnairePath(locale)}>{d.nav.questionnaire}</a>
@@ -107,6 +115,21 @@ const pricesHref = pricesPath(locale);
   }
 
   const status = document.querySelector<HTMLElement>('[data-booking-status]');
+
+  document.querySelectorAll<HTMLDetailsElement>('.nav__dropdown').forEach((dropdown) => {
+    dropdown.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        dropdown.open = false;
+        dropdown.querySelector('summary')?.focus();
+      }
+    });
+    dropdown.addEventListener('focusout', (event) => {
+      if (!dropdown.contains(event.relatedTarget as Node | null)) dropdown.open = false;
+    });
+    document.addEventListener('pointerdown', (event) => {
+      if (!dropdown.contains(event.target as Node)) dropdown.open = false;
+    });
+  });
 
   const normalizedPath = window.location.pathname.replace(/\/+$/, '') || '/';
   const bookingPaths = new Set(['/booking', '/en/booking', '/hu/booking']);
