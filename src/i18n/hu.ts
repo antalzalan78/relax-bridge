@@ -16,6 +16,9 @@ export default {
   nav: {
     home: 'Főoldal',
     services: 'Kezelések',
+    serviceOptions: 'Kezelési lehetőségek',
+    creatorDescription: 'Saját masszázs összeállítása',
+    readyDescription: 'Kész kezelések kiválasztása',
     prices: 'Árak',
     blog: 'Blog',
     about: 'Rólam',

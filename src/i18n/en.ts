@@ -16,6 +16,9 @@ export default {
   nav: {
     home: 'Home',
     services: 'Services',
+    serviceOptions: 'Treatment options',
+    creatorDescription: 'Build your own massage',
+    readyDescription: 'Choose a ready-made treatment',
     prices: 'Prices',
     blog: 'Blog',
     about: 'About me',
