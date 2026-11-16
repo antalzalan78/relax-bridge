@@ -1,0 +1,59 @@
+---
+import { site, type Locale } from '../data/site';
+
+interface Props { locale: Locale; compact?: boolean }
+const { locale, compact = false } = Astro.props;
+const copy = {
+  nl: {
+    eyebrow: 'Persoonlijke ervaringen', title: 'Van mensen die hier al waren.',
+    read: 'Lees meer beoordelingen op Google', note: 'Google-beoordeling · vertaald fragment',
+    quotes: [
+      { name: 'Marilisa Pimentel', text: 'Ik hield van de muziek en van de manier waarop al mijn zintuigen werden aangesproken.' },
+      { name: 'Agustina', text: 'Brigitta was heel professioneel en attent; ik voelde me de hele tijd op mijn gemak en ontspannen.' },
+    ],
+  },
+  en: {
+    eyebrow: 'Personal experiences', title: 'From people who have been here.',
+    read: 'Read more reviews on Google', note: 'Google review · translated excerpt',
+    quotes: [
+      { name: 'Marilisa Pimentel', text: 'I loved the music and the way it engaged all my senses.' },
+      { name: 'Agustina', text: 'Brigitta was very professional and attentive; I felt comfortable and relaxed throughout.' },
+    ],
+  },
+  hu: {
+    eyebrow: 'Személyes tapasztalatok', title: 'Akik már jártak nálam.',
+    read: 'További vélemények a Google-on', note: 'Google-vélemény · magyar fordítás, részlet',
+    quotes: [
+      { name: 'Marilisa Pimentel', text: 'Imádtam a zenét és azt, ahogyan minden érzékemre hatott.' },
+      { name: 'Agustina', text: 'Brigitta nagyon profi és figyelmes volt; végig kényelmesen és ellazulva éreztem magam.' },
+    ],
+  },
+}[locale];
+---
+
+<section class:list={['wrap', 'guest-reviews', { 'guest-reviews--compact': compact }]} aria-labelledby="guest-reviews-title">
+  <span class="eyebrow">{copy.eyebrow}</span>
+  <h2 id="guest-reviews-title">{copy.title}</h2>
+  <div class="guest-reviews__grid">
+    {copy.quotes.map((quote) => <figure class="guest-reviews__card">
+      <span class="guest-reviews__stars" aria-label="5 / 5">★★★★★</span>
+      <blockquote>“{quote.text}”</blockquote>
+      <figcaption><strong>{quote.name}</strong><span>{copy.note}</span></figcaption>
+    </figure>)}
+  </div>
+  <a class="guest-reviews__link" href={site.googleReviews} target="_blank" rel="noopener noreferrer">{copy.read} <span aria-hidden="true">↗</span></a>
+</section>
+
+<style>
+  .guest-reviews { padding-block: clamp(3.5rem, 7vw, 6rem); }
+  .guest-reviews--compact { padding-block: clamp(2.5rem, 5vw, 4.5rem); }
+  .guest-reviews h2 { margin: .5rem 0 1.5rem; }
+  .guest-reviews__grid { display: grid; gap: 1rem; }
+  .guest-reviews__card { min-width: 0; margin: 0; padding: clamp(1.2rem, 3vw, 2rem); border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); }
+  .guest-reviews__stars { color: var(--clay); letter-spacing: .16em; }
+  .guest-reviews blockquote { margin: .8rem 0 1.3rem; font-family: Georgia, serif; font-size: clamp(1.2rem, 2vw, 1.55rem); line-height: 1.5; }
+  .guest-reviews figcaption { display: grid; gap: .15rem; font-size: .85rem; }
+  .guest-reviews figcaption span { color: var(--ink-soft); }
+  .guest-reviews__link { display: inline-flex; gap: .5rem; margin-top: 1.3rem; color: var(--pine-dark); font-weight: 700; }
+  @media (min-width: 40rem) { .guest-reviews__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>

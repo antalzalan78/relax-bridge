@@ -42,6 +42,12 @@ const localizedPagePaths: Record<string, string> = {
   '/prices': 'prices',
   '/arak': 'prices',
   '/blog': 'blog',
+  '/over-mij': 'about',
+  '/about': 'about',
+  '/rolam': 'about',
+  '/behandelingen': 'treatments',
+  '/treatments': 'treatments',
+  '/kezelesek': 'treatments',
   '/studio-visit': 'studio-visit',
   '/massage-creator': 'massage-creator',
   '/privacy': 'privacy',
@@ -86,6 +92,8 @@ export function blogArticleRoute(value: string): { locale: Locale; slug: string 
 }
 
 export function isBookingDestination(value: string): boolean {
+  const [path, fragment] = value.split('#');
+  if (fragment === 'choice' && journeyPageKey(path) === 'home') return true;
   return ['booking', 'studio-visit'].includes(journeyPageKey(value) ?? '');
 }
 

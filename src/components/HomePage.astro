@@ -1,11 +1,14 @@
 ---
 import {
+  aboutPath,
   bookingPath,
+  bookingChoicePath,
+  blogPath,
   massageCreatorPath,
   questionnairePath,
   site,
   pathFor,
-  studioVisitBookingPath,
+  treatmentsPath,
   type Locale,
 } from '../data/site';
 import { anchors } from '../data/routes';
@@ -14,11 +17,11 @@ import { studioBookingText } from '../i18n/studio-booking';
 import { getServices, homeAlternates } from '../lib/services';
 import { localBusinessSchema, faqSchema } from '../lib/schema';
 import { Image } from 'astro:assets';
-import profileImage from '../assets/profile-forest.jpg';
 import studioImage from '../assets/studio-tilburg.jpg';
 import greenTowelTexture from '../assets/towel-green-section.png';
 import Base from '../layouts/Base.astro';
 import WaveDivider from './WaveDivider.astro';
+import Reviews from './Reviews.astro';
 
 interface Props {
   locale: Locale;
@@ -29,8 +32,7 @@ const d = t(locale);
 const studioCopy = studioBookingText(locale);
 
 const studio = await getServices(locale, 'studio');
-const bookingHref = studioVisitBookingPath(locale);
-const studioBookingHref = studioVisitBookingPath(locale);
+const bookingHref = bookingChoicePath(locale);
 const studioReadyBookingHref = `${bookingPath(locale)}?category=studio`;
 const creatorHref = massageCreatorPath(locale);
 
@@ -41,6 +43,23 @@ const jsonLd = [
   localBusinessSchema(locale, d.meta.description),
   faqSchema(d.goodToKnow.items),
 ];
+const designCopy = {
+  nl: {
+    philosophy: 'Een massage is één van de manieren om bewust voor jezelf te zorgen. Bij Relax Bridge begint dat met aandacht voor wat jij nodig hebt.',
+    focus: 'Ik merk het op.', connect: 'Ik neem het serieus.', balance: 'Ik doe er iets mee.',
+    googleRead: 'Lees Google-beoordelingen',
+  },
+  en: {
+    philosophy: 'A massage is one of many ways to care for yourself. At Relax Bridge, it starts with noticing what you need.',
+    focus: 'I notice it.', connect: 'I take it seriously.', balance: 'I act on it.',
+    googleRead: 'Read Google reviews',
+  },
+  hu: {
+    philosophy: 'A masszázs az önmagunkról való gondoskodás egyik lehetősége. A Relax Bridge-nél ez azzal kezdődik, hogy figyelünk arra, mire van szükséged.',
+    focus: 'Észreveszem.', connect: 'Komolyan veszem.', balance: 'Teszek érte.',
+    googleRead: 'Google-vélemények olvasása',
+  },
+}[locale];
 ---
 
 <Base
@@ -69,87 +88,71 @@ const jsonLd = [
         </div>
       </div>
 
-      <section class="homepage-introduction" id="about" aria-labelledby="homepage-introduction-title">
+      <section class="homepage-introduction" aria-labelledby="homepage-introduction-title">
         <div class="homepage-introduction__card">
           <div class="homepage-introduction__media">
             <Image
               class="homepage-introduction__image"
-              src={profileImage}
-              alt={d.images.profile}
-              widths={[360, 600]}
-              sizes="(min-width: 52rem) 18vw, 100vw"
+              src={studioImage}
+              alt={d.images.studio}
+              widths={[480, 720, 960]}
+              sizes="(min-width: 52rem) 34vw, 100vw"
               loading="eager"
               fetchpriority="high"
             />
-            <div class="hero__caption">
-              <span>{d.heroProfile.name}</span>
-              <strong>{d.heroProfile.role}</strong>
-            </div>
           </div>
           <div class="homepage-introduction__content">
             <header class="homepage-introduction__heading">
               <span class="eyebrow">Relax Bridge</span>
-              <h2 id="homepage-introduction-title">{d.introduction.title}</h2>
+              <h2 id="homepage-introduction-title">{d.introduction.homeTitle}</h2>
             </header>
             <div class="homepage-introduction__copy">
-              {d.introduction.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+              <p>{d.introduction.paragraphs[0]}</p>
             </div>
-            <a
-              class="btn btn--primary homepage-introduction__video"
-              href={site.introductionVideo}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {d.introduction.videoCta}
+            <a class="btn btn--ghost homepage-introduction__video" href={aboutPath(locale)}>
+              {d.introduction.moreCta}
               <span aria-hidden="true">&rarr;</span>
             </a>
+          </div>
+        </div>
+        <div class="homepage-philosophy">
+          <p>{designCopy.philosophy}</p>
+          <div class="homepage-philosophy__steps">
+            <span><strong>foCus</strong>{designCopy.focus}</span>
+            <span><strong>ConneCt</strong>{designCopy.connect}</span>
+            <span><strong>balanCe</strong>{designCopy.balance}</span>
           </div>
         </div>
       </section>
     </div>
   </section>
 
-  <div class="wrap">
-    <WaveDivider animate />
-  </div>
+  <section class="wrap treatment-choice" id={anchors.choice} aria-labelledby="treatment-choice-title">
+    <span class="eyebrow">{d.choice.eyebrow}</span>
+    <h2 id="treatment-choice-title">{d.choice.heading}</h2>
+    <p class="lead">{d.choice.intro}</p>
+    <div class="treatment-choice__cards">
+      <article class="treatment-choice__card treatment-choice__card--creator">
+        <span class="eyebrow">01</span>
+        <h3>{d.choice.creatorTitle}</h3>
+        <p>{d.choice.creatorBody}</p>
+        <a class="btn btn--primary" href={creatorHref}>{d.choice.creatorCta}<span aria-hidden="true">&rarr;</span></a>
+      </article>
+      <article class="treatment-choice__card">
+        <span class="eyebrow">02</span>
+        <h3>{d.choice.readyTitle}</h3>
+        <p>{d.choice.readyBody}</p>
+        <a class="btn btn--ghost" href={treatmentsPath(locale)}>{d.choice.readyCta}<span aria-hidden="true">&rarr;</span></a>
+      </article>
+    </div>
+  </section>
+
+  <div class="wrap"><WaveDivider animate /></div>
 
   <section class="section location-section location-section--studio" id={anchors.services}>
     <div class="wrap">
       <div class="section-heading section-heading--wide services-heading">
         <h2>{d.nav.services}</h2>
-      </div>
-
-      <div class="location-showcase location-showcase--studio">
-        <div class="location-showcase__media">
-          <Image
-            class="location-showcase__image location-showcase__image--studio"
-            src={studioImage}
-            alt={d.images.studio}
-            widths={[640, 960, 1440]}
-            sizes="(min-width: 52rem) 54vw, 100vw"
-            loading="lazy"
-          />
-          <span class="location-showcase__number" aria-hidden="true">01</span>
-        </div>
-
-        <div class="location-showcase__intro">
-          <span class="eyebrow">Relax Bridge · 01</span>
-          <h2>{d.options.studio.label}</h2>
-          <h3>{d.options.studio.title}</h3>
-          <p class="lead">{d.options.studio.body}</p>
-          <div class="studio-location-note">
-            <strong>{d.options.studio.location.title}</strong>
-            <span>{d.options.studio.location.body}</span>
-          </div>
-          <a class="btn btn--primary" href={studioBookingHref}>
-            {d.options.studio.bookingCta}<span aria-hidden="true">&rarr;</span>
-          </a>
-          <p class="location-showcase__practical">
-            <a class="text-link" href="#practical-info">{d.goodToKnow.practicalCta} <span aria-hidden="true">&rarr;</span></a>
-          </p>
-        </div>
-
-        <p class="location-showcase__subtitle">{d.options.studio.subtitle}</p>
       </div>
 
       <section class="studio-offer-group" id="studio-services">
@@ -172,7 +175,7 @@ const jsonLd = [
           </ol>
         </article>
 
-        <header class="studio-offer-group__heading">
+        <header class="studio-offer-group__heading" id="ready-treatments">
           <div class="studio-offer-group__heading-copy">
             <h2>{studioCopy.readyHeading}</h2>
           </div>
@@ -217,6 +220,17 @@ const jsonLd = [
       </section>
 
     </div>
+  </section>
+
+  <Reviews locale={locale} compact />
+
+  <section class="wrap home-blog-promo" aria-labelledby="home-blog-title">
+    <div>
+      <span class="eyebrow">{d.nav.blog}</span>
+      <h2 id="home-blog-title">{locale === 'hu' ? 'Egy kis idő a felfedezésre.' : locale === 'nl' ? 'Even tijd om te ontdekken.' : 'Take a moment to explore.'}</h2>
+      <p>{locale === 'hu' ? 'Történetek, gyakorlati tudnivalók és inspiráció a masszázs világából.' : locale === 'nl' ? 'Verhalen, praktische tips en inspiratie uit de wereld van massage.' : 'Stories, practical tips and inspiration from the world of massage.'}</p>
+    </div>
+    <a class="btn btn--ghost" href={blogPath(locale)}>{locale === 'hu' ? 'Témák megtekintése' : locale === 'nl' ? 'Bekijk de onderwerpen' : 'Explore the topics'} <span aria-hidden="true">→</span></a>
   </section>
 
   <section class="wrap section knowledge-grid" id="practical-info">
@@ -272,6 +286,7 @@ const jsonLd = [
           >
             <span aria-hidden="true">★</span>{d.contact.googleReviewCta}
           </a>
+          <a class="btn btn--review" href={site.googleReviews} target="_blank" rel="noopener noreferrer">{designCopy.googleRead}<span aria-hidden="true">↗</span></a>
         </div>
       </div>
 
@@ -290,6 +305,8 @@ const jsonLd = [
             <a href={site.social.instagram} rel="noopener">Instagram</a>
             <span aria-hidden="true"> &middot; </span>
             <a href={site.social.facebook} rel="noopener">Facebook</a>
+            <span aria-hidden="true"> &middot; </span>
+            <a href={site.introductionVideo} target="_blank" rel="noopener noreferrer">YouTube</a>
           </p>
         </div>
       </div>
@@ -312,6 +329,17 @@ const jsonLd = [
     color: var(--ink-soft);
   }
 
+  .homepage-philosophy { margin-top: 1rem; padding: clamp(1.1rem, 2.5vw, 1.75rem); border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--pine-soft); }
+  .homepage-philosophy > p { max-width: 42rem; margin: 0 0 1.1rem; color: var(--ink); }
+  .homepage-philosophy__steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; }
+  .homepage-philosophy__steps span { display: grid; gap: .12rem; padding: .75rem .9rem; border: 1px solid rgb(66 107 62 / .14); border-radius: .8rem; background: rgb(255 253 248 / .65); color: var(--ink-soft); font-size: .84rem; }
+  .homepage-philosophy__steps strong { color: var(--pine-dark); font-size: 1rem; }
+  .homepage-philosophy__steps span:first-child strong { color: var(--orange-accent); }
+  .homepage-philosophy__steps span:last-child strong { color: var(--purple-accent); }
+  .home-blog-promo { display: flex; flex-wrap: wrap; gap: 1rem 2rem; align-items: center; justify-content: space-between; padding-block: clamp(2.5rem, 5vw, 4rem); border-block: 1px solid var(--border); }
+  .home-blog-promo h2 { margin: .5rem 0; }
+  .home-blog-promo p { margin: 0; color: var(--ink-soft); }
+
   .hero__intro--mobile {
     display: none;
   }
@@ -320,6 +348,25 @@ const jsonLd = [
     max-width: 16ch;
     font-size: clamp(2.9rem, 4vw, 4rem);
     line-height: 1.03;
+  }
+
+  .hero--with-introduction { position: relative; isolation: isolate; overflow: clip; }
+  .hero--with-introduction::before,
+  .hero--with-introduction::after {
+    position: absolute;
+    z-index: -1;
+    width: min(55vw, 34rem);
+    height: 9rem;
+    border-bottom: .38rem solid;
+    border-radius: 50%;
+    pointer-events: none;
+    content: '';
+  }
+  .hero--with-introduction::before { left: -11rem; bottom: 2rem; border-color: rgb(216 126 42 / .27); transform: rotate(12deg); }
+  .hero--with-introduction::after { right: -10rem; bottom: 6rem; border-color: rgb(130 80 155 / .2); transform: rotate(-9deg); }
+
+  @media (max-width: 38rem) {
+    .homepage-philosophy__steps { grid-template-columns: 1fr; }
   }
 
   @media (max-width: 47.99rem) {

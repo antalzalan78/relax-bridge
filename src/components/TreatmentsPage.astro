@@ -1,0 +1,97 @@
+---
+import Base from '../layouts/Base.astro';
+import { bookingPath, massageCreatorPath, treatmentsPath, type Locale } from '../data/site';
+import { t } from '../i18n';
+import { studioBookingText } from '../i18n/studio-booking';
+import { getServices } from '../lib/services';
+
+interface Props { locale: Locale }
+
+const { locale } = Astro.props;
+const d = t(locale);
+const studioCopy = studioBookingText(locale);
+const services = await getServices(locale, 'studio');
+const path = treatmentsPath(locale);
+const alternates = { nl: treatmentsPath('nl'), en: treatmentsPath('en'), hu: treatmentsPath('hu') };
+const copy = {
+  nl: {
+    eyebrow: 'Ontspanning op jouw manier',
+    title: 'Losse massages, met persoonlijke aandacht.',
+    intro: 'Kies een behandeling en een duur. Tijdens het boeken kun je ook kiezen voor muziek of stilte, geur of geurvrij.',
+    details: 'Meer over deze massage',
+    book: 'Kies dit moment',
+    creator: 'Liever combineren? Ontdek de Massage Creator',
+  },
+  en: {
+    eyebrow: 'Rest, your way',
+    title: 'Individual massages, with personal attention.',
+    intro: 'Choose a treatment and duration. When booking, you can also choose music or silence, scent or no scent.',
+    details: 'More about this massage',
+    book: 'Choose this appointment',
+    creator: 'Prefer a combination? Explore the Massage Creator',
+  },
+  hu: {
+    eyebrow: 'Pihenés a te igényeid szerint',
+    title: 'Önálló masszázsok, személyes figyelemmel.',
+    intro: 'Válassz kezelést és időtartamot. Foglaláskor zenét vagy csendet, illatot vagy illatmentes kezelést is kérhetsz.',
+    details: 'További részletek a kezelésről',
+    book: 'Időpont kiválasztása',
+    creator: 'Inkább kombinálnál? Ismerd meg a Massage Creatort',
+  },
+}[locale];
+---
+
+<Base locale={locale} title={`${copy.title} — Relax Bridge`} description={copy.intro} path={path} alternates={alternates}>
+  <section class="wrap treatments-page">
+    <header class="treatments-page__intro">
+      <span class="eyebrow">{copy.eyebrow}</span>
+      <h1>{copy.title}</h1>
+      <p class="lead">{copy.intro}</p>
+    </header>
+    <div class="treatments-page__list">
+      {services.map((service, index) => {
+        const details = studioCopy.services[service.data.key as keyof typeof studioCopy.services];
+        return <article class="treatments-page__card">
+          <span class="treatments-page__number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+          <div class="treatments-page__body">
+            <h2>{service.data.title}</h2>
+            <p>{details?.headline || service.data.summary}</p>
+            {details?.detail && <details><summary>{copy.details}</summary><p>{details.detail}</p></details>}
+          </div>
+          <div class="treatments-page__options" aria-label={service.data.title}>
+            {service.data.prices.map((price) => <a href={`${bookingPath(locale)}?service=${encodeURIComponent(`studio:${service.data.key}:${price.minutes}`)}&category=studio`}>
+              <span>{price.minutes} {d.prices.minutes}</span>
+              <strong>€ {price.eur}</strong>
+              <span class="visually-hidden">— {copy.book}</span>
+              <span aria-hidden="true">→</span>
+            </a>)}
+          </div>
+        </article>;
+      })}
+    </div>
+    <a class="treatments-page__creator" href={massageCreatorPath(locale)}>{copy.creator} <span aria-hidden="true">→</span></a>
+  </section>
+</Base>
+
+<style>
+  .treatments-page { padding-block: clamp(3rem, 6vw, 6rem); }
+  .treatments-page__intro { max-width: 53rem; margin-bottom: clamp(2rem, 4vw, 3rem); }
+  .treatments-page__intro h1 { max-width: 23ch; margin-block: .5rem 1rem; font-size: clamp(2.6rem, 5.3vw, 4.8rem); }
+  .treatments-page__intro p { max-width: 45rem; }
+  .treatments-page__list { display: grid; gap: 1rem; }
+  .treatments-page__card { display: grid; grid-template-columns: 2rem minmax(0, 1fr) minmax(13rem, 17rem); gap: clamp(1rem, 3vw, 2rem); align-items: start; padding: clamp(1.25rem, 3vw, 2rem); border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow-soft); }
+  .treatments-page__number { color: var(--clay-dark); font-size: .75rem; font-weight: 800; letter-spacing: .13em; }
+  .treatments-page__body h2 { margin: -.35rem 0 .7rem; font-size: clamp(1.8rem, 3vw, 2.6rem); }
+  .treatments-page__body > p { max-width: 38rem; margin: 0; color: var(--pine-dark); font-weight: 650; }
+  .treatments-page__body details { max-width: 38rem; margin-top: .8rem; color: var(--ink-soft); }
+  .treatments-page__body summary { width: fit-content; color: var(--clay-dark); cursor: pointer; font-size: .9rem; font-weight: 700; }
+  .treatments-page__body details p { margin: .5rem 0 0; }
+  .treatments-page__options { display: grid; gap: .5rem; }
+  .treatments-page__options a { display: flex; gap: .7rem; align-items: center; justify-content: space-between; min-height: 3rem; padding: .6rem .8rem; border: 1px solid #cbd8c9; border-radius: .75rem; background: #edf2e8; color: var(--ink); font-size: .9rem; text-decoration: none; transition: background-color 180ms ease, transform 180ms ease; }
+  .treatments-page__options a:hover, .treatments-page__options a:focus-visible { background: #dcebcf; transform: translateY(-2px); }
+  .treatments-page__options a strong { margin-left: auto; white-space: nowrap; }
+  .treatments-page__options a > span:last-child { color: var(--pine-dark); font-size: 1.2rem; }
+  .treatments-page__creator { display: inline-flex; gap: .7rem; margin-top: 2rem; color: var(--pine-dark); font-weight: 700; }
+  @media (max-width: 48rem) { .treatments-page__card { grid-template-columns: 1.6rem minmax(0, 1fr); } .treatments-page__options { grid-column: 2; } }
+  @media (max-width: 24rem) { .treatments-page__card { grid-template-columns: 1fr; } .treatments-page__number, .treatments-page__options { grid-column: 1; } }
+</style>

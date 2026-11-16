@@ -2,9 +2,9 @@
 import Base from '../layouts/Base.astro';
 import PriceTable from './PriceTable.astro';
 import {
-  bookingPath,
   massageCreatorPath,
   pricesPath,
+  treatmentsPath,
   type Locale,
 } from '../data/site';
 import { t } from '../i18n';
@@ -28,7 +28,7 @@ const alternates = {
   en: pricesPath('en'),
   hu: pricesPath('hu'),
 };
-const readyBookingHref = `${bookingPath(locale)}?category=studio`;
+const readyBookingHref = treatmentsPath(locale);
 const creatorHref = massageCreatorPath(locale);
 const baseRows = [
   { label: creatorCopy.relaxTitle, priceEur: creatorBases.relax.priceEur },
@@ -127,7 +127,8 @@ const addonRows = [
   .price-overview-hero h1 { max-width: 14ch; margin-block: 0.4rem 1.2rem; }
   .price-overview-hero .lead { max-width: 42rem; }
   .price-overview-nav { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 2rem; }
-  .price-overview-nav a { padding: 0.65rem 0.9rem; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); color: var(--pine-dark); font-size: 0.82rem; font-weight: 700; text-decoration: none; }
+  .price-overview-nav a { padding: 0.65rem 0.9rem; border: 1px solid var(--border); border-radius: 999px; background: var(--pine-soft); color: var(--pine-dark); font-size: 0.82rem; font-weight: 700; text-decoration: none; }
+  .price-overview-nav a:nth-child(2) { background: #fff0e1; }
   .price-overview-nav a:hover { border-color: var(--pine); background: var(--pine-soft); }
   .price-overview-body { padding-bottom: clamp(4rem, 8vw, 7rem); }
   .price-overview-section { scroll-margin-top: 7rem; padding-top: clamp(3.5rem, 7vw, 6rem); }
@@ -137,6 +138,8 @@ const addonRows = [
   .price-overview-heading h2 { max-width: none; margin-block: 0.25rem 0.6rem; font-size: clamp(2.2rem, 5vw, 3.8rem); }
   .price-overview-heading p { max-width: 43rem; margin: 0; color: var(--ink-soft); line-height: 1.65; }
   .price-overview-panel { min-width: 0; padding: clamp(1.2rem, 4vw, 2.3rem); border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow-raised); }
+  .price-overview-grid .price-overview-panel:first-child { background: var(--pine-soft); }
+  .price-overview-grid .price-overview-panel:last-child { background: #fff0e1; }
   .price-overview-panel :global(.prices) { margin-top: 0; }
   .price-overview-panel :global(.prices caption) { padding-bottom: 0.7rem; }
   .price-overview-panel__footer { display: flex; flex-wrap: wrap; gap: 1rem 2rem; align-items: center; justify-content: space-between; margin-top: 1.5rem; }

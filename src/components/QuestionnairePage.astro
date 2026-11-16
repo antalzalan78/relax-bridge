@@ -249,32 +249,33 @@ const weekendTiming = copy.timing.filter((option) => option.key.startsWith('week
   .questionnaire-hero {
     position: relative;
     overflow: hidden;
-    padding: clamp(4rem, 10vw, 7rem) 0 clamp(6rem, 12vw, 9rem);
-    background: var(--pine);
-    color: var(--paper);
+    padding: clamp(2.5rem, 5vw, 4rem) 0 clamp(4.5rem, 7vw, 6rem);
+    border-bottom: 1px solid var(--border);
+    background: rgb(252 247 238 / 0.8);
+    color: var(--ink);
   }
   .questionnaire-hero::after {
     position: absolute;
     right: -8rem;
-    bottom: -12rem;
+    bottom: -1rem;
     width: 28rem;
-    height: 28rem;
-    border: 1px solid rgb(255 255 255 / 0.16);
+    height: 7rem;
+    border-bottom: 0.35rem solid rgb(130 80 155 / 0.2);
     border-radius: 50%;
     content: '';
   }
   .questionnaire-hero__inner { position: relative; z-index: 1; max-width: 50rem; }
-  .questionnaire-hero .back-link { color: rgb(255 255 255 / 0.72); }
-  .questionnaire-hero .eyebrow { display: block; margin-top: 2.5rem; color: var(--sand); }
-  .questionnaire-hero h1 { max-width: 11ch; margin: 0.65rem 0 1.2rem; }
-  .questionnaire-hero .lead { max-width: 45rem; color: rgb(255 255 255 / 0.8); }
+  .questionnaire-hero .back-link { color: var(--pine-dark); }
+  .questionnaire-hero .eyebrow { display: block; margin-top: 1.5rem; color: var(--clay-dark); }
+  .questionnaire-hero h1 { max-width: 17ch; margin: 0.65rem 0 1.2rem; font-size: clamp(3rem, 4.5vw, 4.5rem); }
+  .questionnaire-hero .lead { max-width: 45rem; color: var(--ink-soft); }
   .questionnaire-anonymous {
     display: flex;
     gap: 0.75rem;
     align-items: flex-start;
     max-width: 43rem;
     margin-top: 1.8rem;
-    color: rgb(255 255 255 / 0.76);
+    color: var(--ink-soft);
     font-size: 0.92rem;
   }
   .questionnaire-anonymous span {
@@ -284,8 +285,8 @@ const weekendTiming = copy.timing.filter((option) => option.key.startsWith('week
     height: 1.45rem;
     place-items: center;
     border-radius: 50%;
-    background: var(--sand);
-    color: var(--pine);
+    background: var(--pine-soft);
+    color: var(--pine-dark);
     font-weight: 800;
   }
   .questionnaire-layout { position: relative; z-index: 2; margin-top: clamp(-3.5rem, -6vw, -2.5rem); padding-bottom: clamp(5rem, 10vw, 8rem); }
@@ -296,8 +297,8 @@ const weekendTiming = copy.timing.filter((option) => option.key.startsWith('week
     margin: 0;
     padding: clamp(1.5rem, 5vw, 3rem);
     border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: var(--paper);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
     box-shadow: var(--shadow-soft);
   }
   .question-card--invalid { border-color: var(--clay); }
@@ -306,7 +307,7 @@ const weekendTiming = copy.timing.filter((option) => option.key.startsWith('week
     top: 1rem;
     right: 1.5rem;
     color: var(--pine-soft);
-    font-family: var(--font-display);
+    font-family: 'Iowan Old Style', Georgia, serif;
     font-size: clamp(2.8rem, 7vw, 5rem);
     line-height: 1;
   }
@@ -317,9 +318,9 @@ const weekendTiming = copy.timing.filter((option) => option.key.startsWith('week
     margin-left: -0.75rem;
     padding: 0.25rem 4.5rem 0.35rem 0.75rem;
     border-radius: 0.5rem;
-    background: var(--paper);
+    background: var(--surface);
     color: var(--ink);
-    font-family: var(--font-display);
+    font-family: 'Iowan Old Style', Georgia, serif;
     font-size: clamp(1.45rem, 3.5vw, 2rem);
     font-weight: 700;
     line-height: 1.2;
@@ -333,22 +334,22 @@ const weekendTiming = copy.timing.filter((option) => option.key.startsWith('week
     padding: 0.9rem 1rem;
     border: 1px solid var(--border);
     border-radius: 0.85rem;
-    background: var(--cream);
+    background: #fffaf2;
     color: var(--ink);
     cursor: pointer;
     transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
   }
-  .option-card:hover { border-color: var(--logo-green); transform: translateY(-1px); }
-  .option-card:has(input:checked) { border-color: var(--logo-green); background: var(--pine-soft); }
-  .option-card input { flex: 0 0 auto; width: 1.05rem; height: 1.05rem; margin: 0.15rem 0 0; accent-color: var(--logo-green); }
+  .option-card:hover { border-color: var(--pine-dark); transform: translateY(-1px); }
+  .option-card:has(input:checked) { border-color: var(--pine-dark); background: var(--pine-soft); }
+  .option-card input { flex: 0 0 auto; width: 1.05rem; height: 1.05rem; margin: 0.15rem 0 0; accent-color: var(--pine-dark); }
   .option-card span { line-height: 1.45; }
   .option-list--compact { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .timing-grid { display: grid; gap: 1.5rem; }
-  .timing-grid h2 { margin: 0 0 0.75rem; font-family: var(--font-body); font-size: 0.82rem; letter-spacing: 0.12em; text-transform: uppercase; }
+  .timing-grid h2 { margin: 0 0 0.75rem; font-family: 'Segoe UI', Arial, sans-serif; font-size: 0.82rem; letter-spacing: 0.12em; text-transform: uppercase; }
   .other-answer { margin-top: 1rem; }
   .other-answer label { display: block; margin-bottom: 0.45rem; font-weight: 700; }
   .other-answer input { width: 100%; min-height: 3.2rem; padding: 0.8rem 0.9rem; border: 1px solid var(--border); border-radius: 0.75rem; background: var(--paper); font: inherit; }
-  .other-answer input:focus { border-color: var(--logo-green); outline: 3px solid color-mix(in srgb, var(--logo-green) 14%, transparent); }
+  .other-answer input:focus { border-color: var(--pine-dark); outline: 3px solid color-mix(in srgb, var(--pine-dark) 14%, transparent); }
   .other-answer small { display: block; margin-top: 0.45rem; color: var(--ink-soft); }
   .question-error, .form-status { color: var(--clay-dark); font-weight: 700; }
   .question-error { margin: 1rem 0 0; }
@@ -362,8 +363,8 @@ const weekendTiming = copy.timing.filter((option) => option.key.startsWith('week
     margin-inline: auto;
     padding: clamp(2.5rem, 8vw, 5rem);
     border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: var(--paper);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
     box-shadow: var(--shadow-soft);
     text-align: center;
   }

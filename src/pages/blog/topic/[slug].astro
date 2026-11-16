@@ -1,13 +1,18 @@
 ---
 import BlogTopic from '../../../components/BlogTopic.astro';
 import { listTopics, resolveTopicRedirect } from '../../../lib/server/blog';
+import { publicTopics } from '../../../lib/blog-public';
 import { blogPath, blogTopicPath } from '../../../data/site';
 export const prerender = false;
-const topic = (await listTopics()).find((item) => item.id === Astro.params.slug);
+if (Astro.params.slug === 'preparing-for-massage') {
+  const successor = await resolveTopicRedirect('preparing-for-massage');
+  return Astro.redirect(successor === null ? blogPath('nl') : blogTopicPath('nl', successor || 'everyday-rest'), 308);
+}
+const topic = publicTopics(await listTopics()).find((item) => item.id === Astro.params.slug);
 if (!topic) {
   const successor = await resolveTopicRedirect(Astro.params.slug || '');
   if (successor !== undefined) {
-    const next = successor && (await listTopics()).find((item) => item.id === successor)?.names.nl
+    const next = successor && publicTopics(await listTopics()).find((item) => item.id === successor)?.names.nl
       ? blogTopicPath('nl', successor) : blogPath('nl');
     return Astro.redirect(next, 308);
   }

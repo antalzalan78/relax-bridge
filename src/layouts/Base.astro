@@ -1,5 +1,5 @@
 ---
-import { localeTags, studioVisitBookingPath, type Locale } from '../data/site';
+import { bookingChoicePath, localeTags, studioVisitBookingPath, type Locale } from '../data/site';
 import { t } from '../i18n';
 import Seo from '../components/Seo.astro';
 import Header from '../components/Header.astro';
@@ -26,7 +26,8 @@ interface Props {
 
 const { locale, title, description, path, alternates, jsonLd, showMobileBooking = true, image, indexAllLocales, noIndex, contentType, publishedAt, author, quietBackdrop = false } = Astro.props;
 const d = t(locale);
-const bookingHref = studioVisitBookingPath(locale);
+const bookingHref = bookingChoicePath(locale);
+const legacyChooserPath = studioVisitBookingPath(locale);
 ---
 
 <!doctype html>
@@ -51,14 +52,14 @@ const bookingHref = studioVisitBookingPath(locale);
       author={author}
     />
   </head>
-  <body class:list={{ 'has-mobile-booking': showMobileBooking && path !== bookingHref }}>
+  <body class:list={{ 'has-mobile-booking': showMobileBooking && path !== legacyChooserPath }}>
     <a class="skip-link" href="#main">{d.accessibility.skipToContent}</a>
     <Header locale={locale} alternates={alternates} />
     {!quietBackdrop && <BotanicalBackdrop />}
     <main id="main">
       <slot />
     </main>
-    {showMobileBooking && path !== bookingHref && (
+    {showMobileBooking && path !== legacyChooserPath && (
       <nav class="mobile-booking-dock" aria-label={d.service.bookCta}>
         <a class="mobile-booking" href={bookingHref}>
           <span>{d.service.bookCta}</span>

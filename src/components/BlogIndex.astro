@@ -3,13 +3,14 @@ import Base from '../layouts/Base.astro';
 import BlogVisual from './BlogVisual.astro';
 import { blogPath, blogTopicPath, locales, type Locale } from '../data/site';
 import { blogText } from '../i18n/blog';
-import { listPublished, listTopics, topicCoverUrl, topicDescription } from '../lib/server/blog';
+import { listPublished, listTopics } from '../lib/server/blog';
+import { publicTopics } from '../lib/blog-public';
 import '../styles/blog.css';
 interface Props { locale: Locale }
 const { locale } = Astro.props;
 const c = blogText(locale);
 const [publishedPosts, topics] = await Promise.all([listPublished(locale, undefined, 1), listTopics()]);
-const visibleTopics = topics.filter((topic) => topic.names[locale]);
+const visibleTopics = publicTopics(topics).filter((topic) => topic.names[locale]);
 const alternates = Object.fromEntries(locales.map((lang) => [lang, blogPath(lang)]));
 ---
 <Base locale={locale} title={`${c.title} — Relax Bridge`} description={c.description} path={blogPath(locale)} alternates={alternates} indexAllLocales noIndex={publishedPosts.length === 0} quietBackdrop>
@@ -23,8 +24,8 @@ const alternates = Object.fromEntries(locales.map((lang) => [lang, blogPath(lang
       <h2 class="blog-topics__label">{c.topics}</h2>
       <div class="blog-topics__grid">
         {visibleTopics.map((topic) => <a class="blog-topic-card" href={blogTopicPath(locale, topic.id)}>
-          <BlogVisual topicId={topic.id} image={topicCoverUrl(topic)} topicCover />
-          <span class="blog-topic-card__body"><strong>{topic.names[locale]}</strong>{topicDescription(topic, locale) && <span>{topicDescription(topic, locale)}</span>}<span class="blog-topic-card__arrow" aria-hidden="true">→</span></span>
+          <BlogVisual topicId={topic.id} image={topic.cover} topicCover />
+          <span class="blog-topic-card__body"><strong>{topic.names[locale]}</strong>{topic.descriptions[locale] && <span>{topic.descriptions[locale]}</span>}<span class="blog-topic-card__arrow" aria-hidden="true">→</span></span>
         </a>)}
       </div>
     </nav>}

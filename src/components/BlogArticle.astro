@@ -6,6 +6,7 @@ import { blogText } from '../i18n/blog';
 import { blogDate, isSafeExternalUrl, parseBlogBody, readingMinutes, youtubeEmbed } from '../lib/blog';
 import { getPublishedAlternates, getRelated, getSeries, type BlogPost } from '../lib/server/blog';
 import BlogVisual from './BlogVisual.astro';
+import { publicTopicId, publicTopicName } from '../lib/blog-public';
 import '../styles/blog.css';
 interface Props { locale: Locale; post: BlogPost; preview?: boolean }
 const { locale, post, preview = false } = Astro.props;
@@ -34,7 +35,7 @@ const videoEmbed = post.video_url ? youtubeEmbed(post.video_url) : null;
   <article class="blog-article blog-wrap">
     <nav class="blog-breadcrumb" aria-label="Breadcrumb"><a href={blogPath(locale)}>← {c.backToAll}</a></nav>
     <header class="blog-article__header">
-      <a class="blog-eyebrow blog-article__topic" href={blogTopicPath(locale, post.topic_id)}>{post.topic_name || c.topicLabel}</a>
+      <a class="blog-eyebrow blog-article__topic" href={blogTopicPath(locale, publicTopicId(post.topic_id))}>{publicTopicName(locale, post.topic_id, post.topic_name || c.topicLabel)}</a>
       <h1>{post.title}</h1>
       <div class="blog-article__meta"><span>{c.byline} {post.author}</span><span aria-hidden="true">·</span><span>Relax Bridge</span>{post.published_at && <><span aria-hidden="true">·</span><time datetime={post.published_at.toISOString()}>{blogDate(post.published_at, locale)}</time></>}<span aria-hidden="true">·</span><span>{readingMinutes(post.body)} {c.readTime}</span></div>
     </header>
