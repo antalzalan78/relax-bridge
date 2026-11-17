@@ -37,11 +37,12 @@ export default {
   },
 
   hero: {
-    title: 'Your massage. Your moment.',
+    eyebrow: 'Your massage. Your moment.',
+    title: 'Attention, choice, a moment for yourself.',
     intro:
-      'At Relax Bridge in Tilburg-Reeshof, you will find calm, personal attention and a massage that feels right for you. A moment that is entirely yours.',
+      'At Relax Bridge, personal attention and the experience of rest matter just as much as the treatment itself. Massage is one of many ways to take care of yourself.',
     mobileIntro:
-      'Calm and personal attention in my Tilburg-Reeshof studio. A massage that feels right for you.',
+      'Personal attention and rest in Tilburg–Reeshof. A moment for yourself, shaped around your needs.',
     primaryCta: 'Book an appointment',
     secondaryCta: 'See the prices',
   },
@@ -53,26 +54,30 @@ export default {
 
   introduction: {
     title: 'About me',
-    homeTitle: 'Discover Relax Bridge',
+    homeTitle: 'I’m Brigitta.',
+    homeBody: 'I welcome you to a calm, attentive space in Tilburg–Reeshof. It matters to me that you can shape both your treatment and the small details of your rest time around your own needs.',
     paragraphs: [
-      'I’m Brigitta. I welcome you to a calm, attentive space in Tilburg-Reeshof. Your treatment and the small details of your time to rest are tailored to you: from the massage to the music and scent.',
-      'I trained and began working as a massage therapist in Hungary, then gained new experience and knowledge in the Netherlands. Relax Bridge grew from that journey, with treatments you can tailor to your needs.',
-      'If you would also like to know who is behind Relax Bridge, I have made a video in which I share a little more about myself, massage and the way I work.',
+      'I trained and began working as a massage therapist in Hungary. Since then, I have gained a great deal of experience and new knowledge in the Netherlands.',
+      'That journey led to Relax Bridge. I want you to receive more than a treatment: I want you to be able to shape it around your own needs.',
+      'If you would like to know who is behind Relax Bridge, I have made a video in which I share more about myself, massage and how I work.',
     ],
-    videoCta: 'Watch my introduction video',
+    videoCta: 'My introduction video on YouTube',
     moreCta: 'Get to know me',
   },
 
   choice: {
     eyebrow: 'Your moment',
-    heading: 'How many weeks have you told yourself: next week I’ll take a break?',
-    intro: 'Choose the path that feels right for you today.',
-    creatorTitle: 'Massage Creator',
-    creatorBody: 'Build your own massage: choose a base treatment and the additions that feel right for you.',
+    heading: 'Choose what feels right for you',
+    intro: 'How many weeks have you been telling yourself you will rest next week?',
+    creatorLabel: 'Massage Creator',
+    creatorTitle: 'Create your own massage.',
+    creatorBody: 'Choose a base massage and matching additions. You will see the total duration and price in advance.',
     creatorCta: 'Create my massage',
-    readyTitle: 'Individual massages',
-    readyBody: 'Prefer a ready-made treatment? Explore the studio massages and prices.',
+    readyLabel: 'Individual massages',
+    readyTitle: 'Choose a ready-made treatment.',
+    readyBody: 'Relaxation, neck-shoulder-back, facial or foot massage. Choose a treatment and duration; we will tailor the details to you.',
     readyCta: 'See the treatments',
+    sharedNote: 'You can choose music and scent with either treatment option.',
   },
 
   images: {
@@ -85,11 +90,11 @@ export default {
   options: {
     studio: {
       label: 'The studio',
-      title: 'You are welcome in my home.',
-      body: 'A quiet place in Tilburg where you do not have to do anything.',
+      title: 'You are welcome in my studio.',
+      body: 'My home studio is a quiet place in Tilburg where you do not have to do anything.',
       location: {
         title: 'Studio location: Tilburg – Reeshof',
-        body: 'The exact address will be sent after your booking has been confirmed.',
+        body: 'You will receive the exact address after your booking is confirmed.',
       },
       subtitle:
         'A peaceful place in Tilburg-Reeshof, made for your moment of relaxation.',
@@ -125,7 +130,7 @@ export default {
     items: [
       {
         title: 'Booking an appointment',
-        body: 'Start with the booking button. Then pick a ready-made treatment or create your own with the Massage Creator. Prefer personal contact? Feel free to send me a message on WhatsApp.',
+        body: 'After pressing the booking button, you can choose a ready-made treatment or the Massage Creator.',
       },
       {
         title: 'Changing or cancelling an appointment',
@@ -137,7 +142,7 @@ export default {
       },
       {
         title: 'Prices and payment',
-        body: 'Payment takes place after the treatment and can easily be made by card on location.',
+        body: 'You can see the duration and price before booking. Payment is by card after the treatment.',
       },
       {
         title: 'When is it better to postpone a massage?',

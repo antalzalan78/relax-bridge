@@ -37,11 +37,12 @@ export default {
   },
 
   hero: {
-    title: 'Jouw massage. Jouw moment.',
+    eyebrow: 'Jouw massage. Jouw moment.',
+    title: 'Aandacht, keuze, een moment voor jezelf.',
     intro:
-      'Bij Relax Bridge in Tilburg-Reeshof vind je rust, persoonlijke aandacht en een massage die bij jou past. Een moment dat helemaal om jou draait.',
+      'Bij Relax Bridge zijn persoonlijke aandacht en de ervaring van rust net zo belangrijk als de behandeling zelf. Een massage is één van de manieren om bewust iets voor jezelf te doen.',
     mobileIntro:
-      'Rust en persoonlijke aandacht in mijn studio in Tilburg-Reeshof. Een massage die bij jou past.',
+      'Persoonlijke aandacht en rust in Tilburg–Reeshof. Een moment voor jezelf, afgestemd op wat jij nodig hebt.',
     primaryCta: 'Afspraak maken',
     secondaryCta: 'Bekijk de prijzen',
   },
@@ -53,26 +54,30 @@ export default {
 
   introduction: {
     title: 'Over mij',
-    homeTitle: 'Ontdek Relax Bridge',
+    homeTitle: 'Ik ben Brigitta.',
+    homeBody: 'Ik ontvang je met aandacht in een rustige omgeving in Tilburg–Reeshof. Ik vind het belangrijk dat je zowel de behandeling als de kleine details van je rustmoment op jouw wensen kunt afstemmen.',
     paragraphs: [
-      'Ik ben Brigitta. In mijn rustige studio in Tilburg-Reeshof neem ik de tijd voor jou. Je behandeling en de kleine details van je rustmoment stem ik op je af: van de massage tot de muziek en de geur.',
-      'In Hongarije leerde ik het vak en begon ik als masseur te werken. In Nederland heb ik nieuwe ervaring en kennis opgedaan. Daaruit is Relax Bridge ontstaan, waar ik je behandeling graag op jouw behoeften afstem.',
-      'Ben je ook benieuwd naar de persoon achter Relax Bridge? Ik heb een video gemaakt waarin ik iets meer vertel over mezelf, massage en mijn manier van werken.',
+      'In Hongarije leerde ik het vak en begon ik als masseur te werken. Sindsdien heb ik in Nederland veel ervaring en nieuwe kennis opgedaan.',
+      'Daaruit is Relax Bridge ontstaan. Ik vind het belangrijk dat je niet alleen een behandeling krijgt, maar die ook kunt afstemmen op wat jij nodig hebt.',
+      'Wil je weten wie er achter Relax Bridge staat? In mijn video vertel ik iets meer over mezelf, massage en hoe ik werk.',
     ],
-    videoCta: 'Bekijk mijn introductievideo',
-    moreCta: 'Leer mij kennen',
+    videoCta: 'Mijn introductievideo op YouTube',
+    moreCta: 'Leer me kennen',
   },
 
   choice: {
     eyebrow: 'Jouw moment',
-    heading: 'Hoeveel weken zeg je al tegen jezelf: volgende week neem ik rust?',
-    intro: 'Kies wat op dit moment het beste bij je past.',
-    creatorTitle: 'Massage Creator',
-    creatorBody: 'Stel je eigen massage samen met een basisbehandeling en aanvullingen die voor jou goed voelen.',
+    heading: 'Kies wat voor jou goed voelt',
+    intro: 'Hoeveel weken zeg je al tegen jezelf dat je volgende week tijd neemt om te ontspannen?',
+    creatorLabel: 'Massage Creator',
+    creatorTitle: 'Stel je eigen massage samen.',
+    creatorBody: 'Kies een basismassage en passende aanvullingen. De totale duur en prijs zie je vooraf.',
     creatorCta: 'Stel mijn massage samen',
-    readyTitle: 'Losse massages',
-    readyBody: 'Liever een vaste behandeling? Ontdek de massages en prijzen van de studio.',
+    readyLabel: 'Losse massages',
+    readyTitle: 'Kies uit onze vaste behandelingen.',
+    readyBody: 'Relax-, nek-schouder-rug-, gezichts- of voetmassage. Kies je behandeling en de duur; de details stemmen we op jou af.',
     readyCta: 'Bekijk de behandelingen',
+    sharedNote: 'Muziek en geur kun je bij beide behandelopties kiezen.',
   },
 
   images: {
@@ -85,11 +90,11 @@ export default {
   options: {
     studio: {
       label: 'De studio',
-      title: 'Je bent welkom bij mij thuis.',
-      body: 'Een rustige plek in Tilburg waar je niets hoeft te doen.',
+      title: 'Je bent welkom in mijn studio.',
+      body: 'Mijn studio aan huis is een rustige plek in Tilburg waar je niets hoeft te doen.',
       location: {
         title: 'Locatie van de studio: Tilburg – Reeshof',
-        body: 'Het exacte adres ontvang je na de bevestiging van je boeking.',
+        body: 'Het exacte adres ontvang je nadat je boeking is bevestigd.',
       },
       subtitle:
         'Een rustige plek in Tilburg-Reeshof, voor jouw moment van ontspanning.',
@@ -125,7 +130,7 @@ export default {
     items: [
       {
         title: 'Afspraak maken',
-        body: 'Begin met de knop Afspraak maken. Kies daarna een vaste behandeling of stel je jouw massage samen met de Massage Creator. Liever persoonlijk contact? Stuur me gerust een WhatsApp-bericht.',
+        body: 'Na de knop Afspraak maken kun je kiezen tussen een vaste behandeling en de Massage Creator.',
       },
       {
         title: 'Wijzigen of annuleren',
@@ -137,7 +142,7 @@ export default {
       },
       {
         title: 'Prijzen en betaling',
-        body: 'De betaling vindt plaats na de behandeling en kan eenvoudig met pin op locatie worden gedaan.',
+        body: 'De duur en prijs van je behandeling zie je voordat je boekt. Betalen doe je na de behandeling met pin.',
       },
       {
         title: 'Wanneer kun je een massage beter uitstellen?',

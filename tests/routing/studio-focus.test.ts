@@ -22,6 +22,23 @@ test('the homepage introduces Relax Bridge before the featured Massage Creator a
   }
 });
 
+test('the design handoff copy stays localized without turning card headlines into navigation labels', async () => {
+  const expected = [
+    ['hu', 'Figyelem, választás, egy kis idő magadra.', 'Válassz úgy, ahogy neked jólesik'],
+    ['nl', 'Aandacht, keuze, een moment voor jezelf.', 'Kies wat voor jou goed voelt'],
+    ['en', 'Attention, choice, a moment for yourself.', 'Choose what feels right for you'],
+  ];
+  for (const [locale, hero, choice] of expected) {
+    const copy = await source(`src/i18n/${locale}.ts`);
+    assert.ok(copy.includes(hero));
+    assert.ok(copy.includes(choice));
+    assert.match(copy, /sharedNote:/);
+  }
+  assert.match(await source('src/components/HomePage.astro'), /\{d\.choice\.sharedNote\}/);
+  assert.match(await source('src/components/Header.astro'), /\{d\.choice\.readyLabel\}/);
+  assert.match(await source('src/components/Footer.astro'), /\{d\.choice\.readyLabel\}/);
+});
+
 test('Massage Creator and ready-made treatments are both bookable, with Creator shown first', async () => {
   const choice = await source('src/components/StudioVisitBookingPage.astro');
   assert.ok(choice.indexOf('id="massage-creator"') < choice.indexOf('id="ready-treatments"'));

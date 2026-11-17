@@ -29,7 +29,7 @@ const year = new Date().getFullYear();
         <h3>{d.nav.services}</h3>
         <ul>
           <li><a href={massageCreatorPath(locale)}>Massage Creator</a></li>
-          <li><a href={treatmentsPath(locale)}>{d.choice.readyTitle}</a></li>
+          <li><a href={treatmentsPath(locale)}>{d.choice.readyLabel}</a></li>
           {
             studio.map((s) => (
               <li>

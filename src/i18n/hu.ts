@@ -37,11 +37,12 @@ export default {
   },
 
   hero: {
-    title: 'A te masszázsod. A te pillanatod.',
+    eyebrow: 'A te masszázsod. A te pillanatod.',
+    title: 'Figyelem, választás, egy kis idő magadra.',
     intro:
-      'A Relax Bridge-nél, Tilburg-Reeshofban nyugalom, személyes figyelem és hozzád illő masszázs vár. Egy pillanat, amely igazán rólad szól.',
+      'A Relax Bridge-nél a személyes figyelem és a pihenés élménye ugyanolyan fontos, mint maga a kezelés. A masszázs egy lehetőség a sok közül arra, hogy tegyünk magunkért.',
     mobileIntro:
-      'Nyugalom és személyes figyelem a tilburgi stúdiómban. Egy masszázs, amely hozzád illik.',
+      'Személyes figyelem és pihenés Tilburg–Reeshofban. Egy kis idő magadra, a saját igényeid szerint.',
     primaryCta: 'Időpontfoglalás',
     secondaryCta: 'Árak megtekintése',
   },
@@ -53,26 +54,30 @@ export default {
 
   introduction: {
     title: 'Rólam',
-    homeTitle: 'Ismerd meg a Relax Bridge-et',
+    homeTitle: 'Brigitta vagyok.',
+    homeBody: 'Figyelmes, nyugodt környezetben várlak Tilburg–Reeshofban. Fontos nekem, hogy a kezelésedet és a pihenés apró részleteit is a saját igényeidhez tudd alakítani.',
     paragraphs: [
-      'Brigitta vagyok. Figyelmes, nyugodt környezetben várlak Tilburg–Reeshofban. Itt a kezelésed és a pihenés apró részletei is hozzád igazodnak: a masszázstól a zenén át az illatválasztásig.',
-      'Magyarországon tanultam és kezdtem el masszőrként dolgozni; Hollandiában új tapasztalatokkal és tudással gazdagodtam. Ebből született meg a Relax Bridge, ahol fontos számomra, hogy a kezelést a saját igényeidhez is tudd alakítani.',
+      'Magyarországon tanultam és kezdtem el masszőrként dolgozni, azóta pedig Hollandiában is sok tapasztalattal és új tudással gazdagodtam.',
+      'Ebből született meg a Relax Bridge, ahol fontos számomra, hogy ne csak egy kezelést kapj, hanem azt a saját igényeidhez is tudd alakítani.',
       'Ha pedig arra is kíváncsi vagy, ki áll a Relax Bridge mögött, készítettem egy videót, amelyben egy kicsit többet mesélek magamról, a masszázsról és arról, hogyan dolgozom.',
     ],
-    videoCta: 'Bemutatkozó videó megtekintése',
-    moreCta: 'Ismerj meg jobban',
+    videoCta: 'Bemutatkozó videóm a YouTube-on',
+    moreCta: 'Ismerj meg',
   },
 
   choice: {
     eyebrow: 'A te pillanatod',
-    heading: 'Hány hete mondod magadnak, hogy a jövő héten pihensz?',
-    intro: 'Válaszd ki, hogyan szeretnél megérkezni a saját pillanatodhoz.',
-    creatorTitle: 'Massage Creator',
-    creatorBody: 'Állítsd össze a saját masszázsodat: válassz alapkezelést és azokat a kiegészítőket, amelyek most jól esnek.',
+    heading: 'Válassz úgy, ahogy neked jólesik',
+    intro: 'Hány hete mondod magadnak, hogy a jövő héten pihensz?',
+    creatorLabel: 'Massage Creator',
+    creatorTitle: 'Állítsd össze a saját masszázsodat.',
+    creatorBody: 'Válassz alapmasszázst és hozzá illő kiegészítéseket. A teljes időtartamot és árat előre látod.',
     creatorCta: 'Összeállítom a masszázsomat',
-    readyTitle: 'Önálló masszázsok',
-    readyBody: 'Inkább egy kész kezelést választanál? Nézd meg a stúdió masszázsait és áraikat.',
-    readyCta: 'Kezelések megtekintése',
+    readyLabel: 'Önálló masszázsok',
+    readyTitle: 'Válassz kész kezeléseink közül.',
+    readyBody: 'Relax-, nyak–váll–hát-, arc- vagy talpmasszázs. Válassz kezelést és időtartamot, a részleteket hozzád igazítjuk.',
+    readyCta: 'Megnézem a kezeléseket',
+    sharedNote: 'A zene- és illatválasztás mindkét kezelési lehetőségnél elérhető.',
   },
 
   images: {
@@ -85,11 +90,11 @@ export default {
   options: {
     studio: {
       label: 'A stúdió',
-      title: 'Szívesen látlak az otthonomban.',
-      body: 'Egy csendes hely Tilburgban, ahol semmit nem kell csinálnod.',
+      title: 'Szívesen látlak a stúdiómban.',
+      body: 'Az otthonomban kialakított stúdió egy csendes hely Tilburgban, ahol semmit nem kell csinálnod.',
       location: {
         title: 'Stúdió helyszíne: Tilburg – Reeshof',
-        body: 'A pontos címet a visszaigazolt foglalás után küldjük el.',
+        body: 'A pontos címet a visszaigazolt foglalás után kapod meg.',
       },
       subtitle:
         'Nyugodt hely Tilburg-Reeshofban, ahol igazán magadra figyelhetsz.',
@@ -125,7 +130,7 @@ export default {
     items: [
       {
         title: 'Időpontfoglalás',
-        body: 'Az időpontfoglalás gomb után kész kezelés vagy a Massage Creator közül választhatsz. Ha inkább személyesen egyeztetnél, nyugodtan írj üzenetet WhatsAppon.',
+        body: 'Az időpontfoglalás gomb után kész kezelés vagy a Massage Creator közül választhatsz.',
       },
       {
         title: 'Módosítás és lemondás',
@@ -137,7 +142,7 @@ export default {
       },
       {
         title: 'Árak és fizetés',
-        body: 'A fizetés a kezelés után történik, egyszerűen a helyszínen, bankkártyával.',
+        body: 'A kezelés időtartamát és árát a foglalás előtt látod. A fizetés a kezelés után bankkártyával történik.',
       },
       {
         title: 'Mikor érdemes elhalasztani a masszázst?',

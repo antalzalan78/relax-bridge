@@ -13,7 +13,7 @@ const { locale } = Astro.props;
 const d = t(locale);
 const path = aboutPath(locale);
 const alternates = { nl: aboutPath('nl'), en: aboutPath('en'), hu: aboutPath('hu') };
-const aboutLead = d.introduction.paragraphs[0].replace(/^(Brigitta vagyok\.|Ik ben Brigitta\.|I’m Brigitta\.)\s*/, '');
+const aboutLead = d.introduction.paragraphs[0];
 const philosophy = {
   nl: { title: 'Aandacht is de eerste stap.', body: 'Een massage is één van de manieren om bewust voor jezelf te zorgen. Bij Relax Bridge begint dat met aandacht voor wat jij nodig hebt.', focus: 'Ik merk het op.', connect: 'Ik neem het serieus.', balance: 'Ik doe er iets mee.' },
   en: { title: 'Attention is the first step.', body: 'A massage is one of many ways to care for yourself. At Relax Bridge, it starts with noticing what you need.', focus: 'I notice it.', connect: 'I take it seriously.', balance: 'I act on it.' },
@@ -59,9 +59,11 @@ const philosophy = {
     <div class="about-page__studio">
       <Image src={studio} alt={d.images.studio} widths={[480, 720, 960]} sizes="(min-width: 52rem) 42vw, 100vw" loading="lazy" />
       <div>
-        <span class="eyebrow">Tilburg–Reeshof</span>
-        <h2>{d.options.studio.location.title}</h2>
-        <p>{d.options.studio.location.body}</p>
+        <span class="eyebrow">{d.options.studio.label}</span>
+        <h2>{d.options.studio.title}</h2>
+        <p>{d.options.studio.body}</p>
+        <p class="about-page__location"><strong>{d.options.studio.location.title}</strong><br />{d.options.studio.location.body}</p>
+        <a class="btn btn--primary" href={bookingChoicePath(locale)}>{d.hero.primaryCta}<span aria-hidden="true">&rarr;</span></a>
       </div>
     </div>
   </section>
@@ -72,6 +74,7 @@ const philosophy = {
   .about-page__intro, .about-page__studio { display: grid; align-items: center; gap: clamp(2rem, 5vw, 5rem); }
   .about-page__intro h1 { font-size: clamp(3.15rem, 5vw, 4.5rem); }
   .about-page__studio { margin-top: clamp(4rem, 8vw, 8rem); }
+  .about-page__location { padding-left: 1rem; border-left: 3px solid var(--clay); }
   .about-page img { width: 100%; border-radius: var(--radius-lg); object-fit: cover; box-shadow: var(--shadow-soft); }
   .about-page__intro img { max-height: 38rem; border-radius: 38% var(--radius-lg) var(--radius-lg) var(--radius-lg) / 22% var(--radius-lg) var(--radius-lg) var(--radius-lg); }
   .about-page__studio img { max-height: 30rem; }
