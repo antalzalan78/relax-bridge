@@ -14,9 +14,9 @@ const studioBooking = {
       'Stel je eigen behandeling samen uit de beschikbare behandelingselementen met de Massage Creator.',
     creatorHowTitle: 'Hoe werkt het?',
     creatorHowBody:
-      'Kies eerst hoeveel tijd je aan je behandeling wilt besteden. Daarna leidt de Massage Creator je stap voor stap door de mogelijkheden en laat hij zien uit welke behandelingselementen je jouw massage kunt samenstellen.',
+      'Kies een relaxmassage of een gerichte nek-schouder-rugmassage als basis. Voeg daarna passende elementen toe en bekijk de volledige duur en prijs.',
     creatorRules:
-      'Je ziet alleen combinaties die ik als massagetherapeut vooraf als professioneel verantwoord en goed combineerbaar heb geselecteerd. Zo kun je vrij kiezen zonder zelf te hoeven uitzoeken wat goed bij elkaar past.',
+      'Je ziet alleen combinaties die ik als massagetherapeut professioneel verantwoord en goed combineerbaar vind. Zo kun je je behandeling vrij samenstellen.',
     creatorReview:
       'Aan het einde controleer je jouw complete behandeling nog één keer, inclusief de totale duur en prijs.',
     creatorCta: 'Massage Creator openen',
@@ -57,9 +57,9 @@ const studioBooking = {
       'Create your own treatment from the available treatment elements with the Massage Creator.',
     creatorHowTitle: 'How does it work?',
     creatorHowBody:
-      'First choose how much time you would like to spend on your treatment. The Massage Creator then guides you through the possibilities step by step and shows you which treatment elements you can use to build your massage.',
+      'Choose a relaxing massage or focused neck, shoulder and back massage as your base. Then add suitable elements and review the full duration and price.',
     creatorRules:
-      'You will only see combinations that I have selected as professionally appropriate and compatible as a massage therapist. This gives you freedom without having to work out what combines well.',
+      'You will only see combinations that I consider professionally appropriate and compatible as a massage therapist, so you can shape your treatment with confidence.',
     creatorReview:
       'At the end you can review your complete treatment once more, including its total duration and price.',
     creatorCta: 'Open Massage Creator',
@@ -100,9 +100,9 @@ const studioBooking = {
       'Alkosd meg a sajátodat a rendelkezésre álló kezelési elemekből a Massage Creator segítségével.',
     creatorHowTitle: 'Hogyan működik?',
     creatorHowBody:
-      'Először válaszd ki, mennyi időt szeretnél a kezelésedre szánni. Ezután a Massage Creator lépésről lépésre végigvezet a lehetőségeken, és megmutatja, milyen kezelési elemekből állíthatod össze a saját masszázsodat.',
+      'Indulj relaxmasszázzsal vagy célzott nyak–váll–hátmasszázzsal, majd egészítsd ki a kezelést hozzá illő elemekkel. A teljes időtartamot és árat előre látod.',
     creatorRules:
-      'Csak olyan kombinációkat fogsz látni, amelyeket masszázsterapeutaként szakmailag megfelelőnek és egymással jól kombinálhatónak tartok. Így szabadon alakíthatod a kezelésedet anélkül, hogy neked kellene azon gondolkodnod, mi mivel működik jól együtt.',
+      'Csak olyan kombinációkat látsz, amelyeket masszázsterapeutaként szakmailag megfelelőnek és egymással jól kombinálhatónak tartok. Így szabadon alakíthatod a kezelésedet.',
     creatorReview:
       'A végén pedig még egyszer átnézheted az összeállított kezelésedet az időtartammal és az árral együtt.',
     creatorCta: 'Massage Creator megnyitása',

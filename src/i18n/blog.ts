@@ -2,7 +2,7 @@ import type { Locale } from '../data/site';
 
 const copy = {
   nl: {
-    title: 'Blog', description: 'Wat kun je verwachten van een massage? Hoe kies je een behandeling? Ik deel mijn ervaring, praktische tips en bijzondere verhalen met je.',
+    title: 'Blog', description: 'Wat kun je verwachten van een massage? Hoe kies je een behandeling? Ervaringen, praktische tips en bijzondere verhalen — even tijd om te lezen.',
     indexEyebrow: 'Relax Bridge · Blog', indexHeadline: 'Meer weten.\nMeer ontspannen.', backToAll: 'Alle onderwerpen', byline: 'Door',
     topics: 'Onderwerpen', latest: 'Nieuwste artikelen', empty: 'De eerste artikelen komen binnenkort online.',
     topicEmpty: 'Over dit onderwerp verschijnen binnenkort artikelen.', read: 'Lees artikel',
@@ -12,7 +12,7 @@ const copy = {
     topicLabel: 'Onderwerp', articleNotFound: 'Dit artikel is niet beschikbaar.',
   },
   en: {
-    title: 'Blog', description: 'What can you expect from a massage? How do you choose a treatment? I share my experience, practical tips, and stories with you.',
+    title: 'Blog', description: 'What can you expect from a massage? How do you choose a treatment? Experiences, practical tips and interesting stories — a moment to read.',
     indexEyebrow: 'Relax Bridge · Blog', indexHeadline: 'Learn more.\nRelax more.', backToAll: 'All topics', byline: 'By',
     topics: 'Topics', latest: 'Latest articles', empty: 'The first articles are coming soon.',
     topicEmpty: 'Articles on this topic are coming soon.', read: 'Read article',
@@ -22,7 +22,7 @@ const copy = {
     topicLabel: 'Topic', articleNotFound: 'This article is not available.',
   },
   hu: {
-    title: 'Blog', description: 'Mire számíthatsz egy masszázson? Hogyan válassz kezelést? Megosztom veled a tapasztalataimat, gyakorlati tanácsaimat és érdekes történeteimet.',
+    title: 'Blog', description: 'Mire számíthatsz egy masszázson? Hogyan válassz kezelést? Tapasztalatok, gyakorlati tanácsok és érdekes történetek – egy kis idő az olvasásra.',
     indexEyebrow: 'Relax Bridge · Blog', indexHeadline: 'Több tudás.\nTöbb pihenés.', backToAll: 'Összes téma', byline: 'Szerző:',
     topics: 'Témák', latest: 'Legfrissebb cikkek', empty: 'Az első cikkek hamarosan megjelennek.',
     topicEmpty: 'Ebben a témában hamarosan lesznek cikkek.', read: 'Cikk olvasása',

@@ -45,17 +45,14 @@ const jsonLd = [
 ];
 const designCopy = {
   nl: {
-    philosophy: 'Een massage is één van de manieren om bewust voor jezelf te zorgen. Bij Relax Bridge begint dat met aandacht voor wat jij nodig hebt.',
     focus: 'Ik merk het op.', connect: 'Ik neem het serieus.', balance: 'Ik doe er iets mee.',
     googleRead: 'Lees Google-beoordelingen',
   },
   en: {
-    philosophy: 'A massage is one of many ways to care for yourself. At Relax Bridge, it starts with noticing what you need.',
     focus: 'I notice it.', connect: 'I take it seriously.', balance: 'I act on it.',
     googleRead: 'Read Google reviews',
   },
   hu: {
-    philosophy: 'A masszázs az önmagunkról való gondoskodás egyik lehetősége. A Relax Bridge-nél ez azzal kezdődik, hogy figyelünk arra, mire van szükséged.',
     focus: 'Észreveszem.', connect: 'Komolyan veszem.', balance: 'Teszek érte.',
     googleRead: 'Google-vélemények olvasása',
   },
@@ -73,7 +70,7 @@ const designCopy = {
   <section class="wrap hero hero--with-introduction">
     <div class="hero__grid">
       <div class="hero__copy">
-        <span class="eyebrow">{d.tagline}</span>
+        <span class="eyebrow">{d.hero.eyebrow}</span>
         <h1>{d.hero.title}</h1>
         <p class="lead hero__intro--desktop">{d.hero.intro}</p>
         <p class="lead hero__intro--mobile">{d.hero.mobileIntro}</p>
@@ -107,7 +104,7 @@ const designCopy = {
               <h2 id="homepage-introduction-title">{d.introduction.homeTitle}</h2>
             </header>
             <div class="homepage-introduction__copy">
-              <p>{d.introduction.paragraphs[0]}</p>
+              <p>{d.introduction.homeBody}</p>
             </div>
             <a class="btn btn--ghost homepage-introduction__video" href={aboutPath(locale)}>
               {d.introduction.moreCta}
@@ -116,7 +113,6 @@ const designCopy = {
           </div>
         </div>
         <div class="homepage-philosophy">
-          <p>{designCopy.philosophy}</p>
           <div class="homepage-philosophy__steps">
             <span><strong>foCus</strong>{designCopy.focus}</span>
             <span><strong>ConneCt</strong>{designCopy.connect}</span>
@@ -129,22 +125,23 @@ const designCopy = {
 
   <section class="wrap treatment-choice" id={anchors.choice} aria-labelledby="treatment-choice-title">
     <span class="eyebrow">{d.choice.eyebrow}</span>
+    <p class="lead treatment-choice__prompt">{d.choice.intro}</p>
     <h2 id="treatment-choice-title">{d.choice.heading}</h2>
-    <p class="lead">{d.choice.intro}</p>
     <div class="treatment-choice__cards">
       <article class="treatment-choice__card treatment-choice__card--creator">
-        <span class="eyebrow">01</span>
+        <span class="eyebrow">01 · {d.choice.creatorLabel}</span>
         <h3>{d.choice.creatorTitle}</h3>
         <p>{d.choice.creatorBody}</p>
         <a class="btn btn--primary" href={creatorHref}>{d.choice.creatorCta}<span aria-hidden="true">&rarr;</span></a>
       </article>
       <article class="treatment-choice__card">
-        <span class="eyebrow">02</span>
+        <span class="eyebrow">02 · {d.choice.readyLabel}</span>
         <h3>{d.choice.readyTitle}</h3>
         <p>{d.choice.readyBody}</p>
         <a class="btn btn--ghost" href={treatmentsPath(locale)}>{d.choice.readyCta}<span aria-hidden="true">&rarr;</span></a>
       </article>
     </div>
+    <p class="treatment-choice__shared-note">{d.choice.sharedNote}</p>
   </section>
 
   <div class="wrap"><WaveDivider animate /></div>
@@ -330,7 +327,6 @@ const designCopy = {
   }
 
   .homepage-philosophy { margin-top: 1rem; padding: clamp(1.1rem, 2.5vw, 1.75rem); border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--pine-soft); }
-  .homepage-philosophy > p { max-width: 42rem; margin: 0 0 1.1rem; color: var(--ink); }
   .homepage-philosophy__steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; }
   .homepage-philosophy__steps span { display: grid; gap: .12rem; padding: .75rem .9rem; border: 1px solid rgb(66 107 62 / .14); border-radius: .8rem; background: rgb(255 253 248 / .65); color: var(--ink-soft); font-size: .84rem; }
   .homepage-philosophy__steps strong { color: var(--pine-dark); font-size: 1rem; }
@@ -339,6 +335,8 @@ const designCopy = {
   .home-blog-promo { display: flex; flex-wrap: wrap; gap: 1rem 2rem; align-items: center; justify-content: space-between; padding-block: clamp(2.5rem, 5vw, 4rem); border-block: 1px solid var(--border); }
   .home-blog-promo h2 { margin: .5rem 0; }
   .home-blog-promo p { margin: 0; color: var(--ink-soft); }
+  .treatment-choice__prompt { max-width: 42rem; margin: .9rem auto .4rem; text-align: center; }
+  .treatment-choice__shared-note { margin: 1.25rem 0 0; color: var(--ink-soft); font-size: .9rem; text-align: center; }
 
   .hero__intro--mobile {
     display: none;
