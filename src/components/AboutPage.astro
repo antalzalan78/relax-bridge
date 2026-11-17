@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import portrait from '../assets/profile-forest.jpg';
-import studio from '../assets/studio-tilburg.jpg';
+import studio from '../assets/studio-table-handoff.webp';
 import { aboutPath, bookingChoicePath, site, type Locale } from '../data/site';
 import { t } from '../i18n';
 import Base from '../layouts/Base.astro';
@@ -14,6 +14,7 @@ const d = t(locale);
 const path = aboutPath(locale);
 const alternates = { nl: aboutPath('nl'), en: aboutPath('en'), hu: aboutPath('hu') };
 const aboutLead = d.introduction.paragraphs[0];
+const studioAlt = locale === 'hu' ? 'A Relax Bridge stúdió előkészített masszázságya' : locale === 'nl' ? 'De klaargemaakte massagetafel in de Relax Bridge-studio' : 'The prepared massage table in the Relax Bridge studio';
 const philosophy = {
   nl: { title: 'Aandacht is de eerste stap.', body: 'Een massage is één van de manieren om bewust voor jezelf te zorgen. Bij Relax Bridge begint dat met aandacht voor wat jij nodig hebt.', focus: 'Ik merk het op.', connect: 'Ik neem het serieus.', balance: 'Ik doe er iets mee.' },
   en: { title: 'Attention is the first step.', body: 'A massage is one of many ways to care for yourself. At Relax Bridge, it starts with noticing what you need.', focus: 'I notice it.', connect: 'I take it seriously.', balance: 'I act on it.' },
@@ -27,6 +28,7 @@ const philosophy = {
   description={d.introduction.paragraphs[0]}
   path={path}
   alternates={alternates}
+  quietBackdrop
 >
   <section class="wrap about-page">
     <div class="about-page__intro">
@@ -39,7 +41,7 @@ const philosophy = {
         <a class="btn btn--ghost" href={site.introductionVideo} target="_blank" rel="noopener noreferrer">{d.introduction.videoCta}<span aria-hidden="true">↗</span></a>
         <a class="btn btn--primary" href={bookingChoicePath(locale)}>{d.hero.primaryCta}<span aria-hidden="true">&rarr;</span></a>
       </div>
-      <Image src={portrait} alt={d.images.profile} widths={[480, 720, 960]} sizes="(min-width: 52rem) 40vw, 100vw" loading="eager" />
+      <figure class="about-page__portrait"><Image src={portrait} alt={d.images.profile} widths={[480, 720, 960]} sizes="(min-width: 52rem) 28vw, 100vw" loading="eager" /><figcaption>Brigitta · {locale === 'hu' ? 'alapító és masszőr' : locale === 'nl' ? 'oprichter en masseuse' : 'founder and massage therapist'}</figcaption></figure>
     </div>
 
     <section class="about-page__philosophy" aria-labelledby="about-philosophy-title">
@@ -57,7 +59,7 @@ const philosophy = {
     <Reviews locale={locale} />
 
     <div class="about-page__studio">
-      <Image src={studio} alt={d.images.studio} widths={[480, 720, 960]} sizes="(min-width: 52rem) 42vw, 100vw" loading="lazy" />
+      <Image src={studio} alt={studioAlt} widths={[480, 720, 960]} sizes="(min-width: 52rem) 42vw, 100vw" loading="lazy" />
       <div>
         <span class="eyebrow">{d.options.studio.label}</span>
         <h2>{d.options.studio.title}</h2>
@@ -70,14 +72,16 @@ const philosophy = {
 </Base>
 
 <style>
-  .about-page { padding-block: clamp(3rem, 6vw, 6rem); }
+  .about-page { max-width: 82rem; padding-block: clamp(2rem, 4vw, 3rem); }
   .about-page__intro, .about-page__studio { display: grid; align-items: center; gap: clamp(2rem, 5vw, 5rem); }
   .about-page__intro h1 { font-size: clamp(3.15rem, 5vw, 4.5rem); }
-  .about-page__studio { margin-top: clamp(4rem, 8vw, 8rem); }
+  .about-page__studio { margin-top: clamp(3rem, 6vw, 5rem); }
   .about-page__location { padding-left: 1rem; border-left: 3px solid var(--clay); }
   .about-page img { width: 100%; border-radius: var(--radius-lg); object-fit: cover; box-shadow: var(--shadow-soft); }
-  .about-page__intro img { max-height: 38rem; border-radius: 38% var(--radius-lg) var(--radius-lg) var(--radius-lg) / 22% var(--radius-lg) var(--radius-lg) var(--radius-lg); }
-  .about-page__studio img { max-height: 30rem; }
+  .about-page__portrait { margin: 0; }
+  .about-page__portrait figcaption { padding: .65rem .2rem 0; color: var(--ink-soft); font-size: .8rem; }
+  .about-page__portrait img { height: clamp(25rem, 37vw, 30rem); border-radius: 8rem 1.6rem 1.6rem 1.6rem; object-position: 50% 30%; }
+  .about-page__studio img { height: clamp(17rem, 28vw, 21rem); object-position: 55% 60%; }
   .about-page p { max-width: 58ch; color: var(--ink-soft); }
   .about-page__philosophy { display: grid; gap: clamp(1.25rem, 4vw, 4rem); margin-top: clamp(3rem, 6vw, 5rem); padding: clamp(1.5rem, 3vw, 2.5rem); border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--pine-soft); }
   .about-page__philosophy h2 { margin: 0; font-size: clamp(1.8rem, 2.5vw, 2.5rem); }
@@ -91,11 +95,11 @@ const philosophy = {
   .about-page__intro .btn + .btn { margin-left: .6rem; }
   @media (max-width: 32rem) { .about-page__intro .btn { width: 100%; justify-content: center; } .about-page__intro .btn + .btn { margin-left: 0; } }
   @media (min-width: 52rem) {
-    .about-page__intro { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); }
+    .about-page__intro { grid-template-columns: minmax(0, 22rem) minmax(0, 1fr); }
     .about-page__studio { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-    .about-page__intro img { order: -1; }
+    .about-page__portrait { order: -1; }
     .about-page__philosophy { grid-template-columns: 1fr 1.5fr; }
     .about-page__three-words { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .about-page__studio img { order: 2; }
   }
+  @media (max-width: 51.99rem) { .about-page__portrait img { height: 21rem; border-radius: 5rem 1.5rem 1.5rem 1.5rem; } .about-page__studio img { height: 13rem; } }
 </style>

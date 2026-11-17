@@ -41,7 +41,7 @@ const copy = {
 }[locale];
 ---
 
-<Base locale={locale} title={`${copy.title} — Relax Bridge`} description={copy.intro} path={path} alternates={alternates}>
+<Base locale={locale} title={`${copy.title} — Relax Bridge`} description={copy.intro} path={path} alternates={alternates} quietBackdrop>
   <section class="wrap treatments-page">
     <header class="treatments-page__intro">
       <span class="eyebrow">{copy.eyebrow}</span>
@@ -52,19 +52,21 @@ const copy = {
       {services.map((service, index) => {
         const details = studioCopy.services[service.data.key as keyof typeof studioCopy.services];
         return <article class="treatments-page__card">
-          <span class="treatments-page__number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
           <div class="treatments-page__body">
+            <span class="eyebrow">{String(index + 1).padStart(2, '0')} · {copy.eyebrow}</span>
             <h2>{service.data.title}</h2>
             <p>{details?.headline || service.data.summary}</p>
             {details?.detail && <details><summary>{copy.details}</summary><p>{details.detail}</p></details>}
           </div>
-          <div class="treatments-page__options" aria-label={service.data.title}>
-            {service.data.prices.map((price) => <a href={`${bookingPath(locale)}?service=${encodeURIComponent(`studio:${service.data.key}:${price.minutes}`)}&category=studio`}>
+          <div class="treatments-page__booking" aria-label={service.data.title}>
+            <span class="treatments-page__price-label">{d.prices.duration} · {d.prices.price}</span>
+            <div class="treatments-page__options">
+            {service.data.prices.map((price, priceIndex) => <button type="button" aria-pressed={priceIndex === 0} data-booking-url={`${bookingPath(locale)}?service=${encodeURIComponent(`studio:${service.data.key}:${price.minutes}`)}&category=studio`}>
               <span>{price.minutes} {d.prices.minutes}</span>
               <strong>€ {price.eur}</strong>
-              <span class="visually-hidden">— {copy.book}</span>
-              <span aria-hidden="true">→</span>
-            </a>)}
+            </button>)}
+            </div>
+            <a class="btn btn--primary treatments-page__book" href={`${bookingPath(locale)}?service=${encodeURIComponent(`studio:${service.data.key}:${service.data.prices[0].minutes}`)}&category=studio`}>{copy.book}<span aria-hidden="true">→</span></a>
           </div>
         </article>;
       })}
@@ -74,24 +76,38 @@ const copy = {
 </Base>
 
 <style>
-  .treatments-page { padding-block: clamp(3rem, 6vw, 6rem); }
-  .treatments-page__intro { max-width: 53rem; margin-bottom: clamp(2rem, 4vw, 3rem); }
-  .treatments-page__intro h1 { max-width: 23ch; margin-block: .5rem 1rem; font-size: clamp(2.6rem, 5.3vw, 4.8rem); }
+  .treatments-page { max-width: 84rem; padding-block: clamp(2rem, 4vw, 3rem); }
+  .treatments-page__intro { max-width: 59rem; margin-bottom: clamp(1.5rem, 3vw, 2.2rem); }
+  .treatments-page__intro h1 { max-width: 23ch; margin-block: .35rem .9rem; font-size: clamp(2.5rem, 4.5vw, 4.2rem); }
   .treatments-page__intro p { max-width: 45rem; }
-  .treatments-page__list { display: grid; gap: 1rem; }
-  .treatments-page__card { display: grid; grid-template-columns: 2rem minmax(0, 1fr) minmax(13rem, 17rem); gap: clamp(1rem, 3vw, 2rem); align-items: start; padding: clamp(1.25rem, 3vw, 2rem); border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow-soft); }
-  .treatments-page__number { color: var(--clay-dark); font-size: .75rem; font-weight: 800; letter-spacing: .13em; }
-  .treatments-page__body h2 { margin: -.35rem 0 .7rem; font-size: clamp(1.8rem, 3vw, 2.6rem); }
+  .treatments-page__list { display: grid; gap: 1.1rem; }
+  .treatments-page__card { display: grid; grid-template-columns: minmax(0, 1fr) minmax(14rem, 20rem); gap: clamp(1.5rem, 4vw, 3rem); align-items: start; padding: clamp(1.3rem, 2.5vw, 2rem); border: 1px solid var(--border); border-radius: 1.5rem; background: var(--surface); box-shadow: 0 5px 16px rgb(73 59 27 / .05); }
+  .treatments-page__body h2 { margin: .3rem 0 .75rem; font-size: clamp(1.8rem, 3vw, 2.2rem); }
   .treatments-page__body > p { max-width: 38rem; margin: 0; color: var(--pine-dark); font-weight: 650; }
   .treatments-page__body details { max-width: 38rem; margin-top: .8rem; color: var(--ink-soft); }
   .treatments-page__body summary { width: fit-content; color: var(--clay-dark); cursor: pointer; font-size: .9rem; font-weight: 700; }
   .treatments-page__body details p { margin: .5rem 0 0; }
-  .treatments-page__options { display: grid; gap: .5rem; }
-  .treatments-page__options a { display: flex; gap: .7rem; align-items: center; justify-content: space-between; min-height: 3rem; padding: .6rem .8rem; border: 1px solid #cbd8c9; border-radius: .75rem; background: #edf2e8; color: var(--ink); font-size: .9rem; text-decoration: none; transition: background-color 180ms ease, transform 180ms ease; }
-  .treatments-page__options a:hover, .treatments-page__options a:focus-visible { background: #dcebcf; transform: translateY(-2px); }
-  .treatments-page__options a strong { margin-left: auto; white-space: nowrap; }
-  .treatments-page__options a > span:last-child { color: var(--pine-dark); font-size: 1.2rem; }
+  .treatments-page__booking { display: grid; gap: .75rem; }
+  .treatments-page__price-label { color: var(--ink-soft); font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+  .treatments-page__options { display: flex; gap: .55rem; }
+  .treatments-page__options button { display: grid; flex: 1; gap: .15rem; min-width: 0; padding: .65rem .8rem; border: 1px solid #e8c69e; border-radius: .9rem; background: #f8e4d2; color: var(--ink); font: inherit; font-size: .84rem; line-height: 1.4; text-align: left; cursor: pointer; transition: background-color 180ms ease, transform 180ms ease; }
+  .treatments-page__options button:nth-child(2) { border-color: #ddcde4; background: #eee4f1; }
+  .treatments-page__options button[aria-pressed='true'] { border-color: #77965e; background: #e6edda; box-shadow: inset 0 0 0 1px rgb(119 150 94 / .2); }
+  .treatments-page__options button:hover, .treatments-page__options button:focus-visible { transform: translateY(-2px); }
+  .treatments-page__options button strong { font-size: 1.1rem; white-space: nowrap; }
+  .treatments-page__book { justify-self: stretch; min-height: 2.9rem; }
   .treatments-page__creator { display: inline-flex; gap: .7rem; margin-top: 2rem; color: var(--pine-dark); font-weight: 700; }
-  @media (max-width: 48rem) { .treatments-page__card { grid-template-columns: 1.6rem minmax(0, 1fr); } .treatments-page__options { grid-column: 2; } }
-  @media (max-width: 24rem) { .treatments-page__card { grid-template-columns: 1fr; } .treatments-page__number, .treatments-page__options { grid-column: 1; } }
+  @media (max-width: 48rem) { .treatments-page__card { grid-template-columns: 1fr; gap: 1.25rem; } }
 </style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.treatments-page__booking').forEach((booking) => {
+    const bookLink = booking.querySelector<HTMLAnchorElement>('.treatments-page__book');
+    booking.querySelectorAll<HTMLButtonElement>('.treatments-page__options button').forEach((option) => {
+      option.addEventListener('click', () => {
+        booking.querySelectorAll<HTMLButtonElement>('.treatments-page__options button').forEach((item) => item.setAttribute('aria-pressed', String(item === option)));
+        if (bookLink && option.dataset.bookingUrl) bookLink.href = option.dataset.bookingUrl;
+      });
+    });
+  });
+</script>

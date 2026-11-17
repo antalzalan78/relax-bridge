@@ -31,6 +31,7 @@ const creatorConfig = { bases: creatorBases, addons: creatorAddons, maximumMinut
   path={path}
   alternates={alternates}
   showMobileBooking={false}
+  quietBackdrop
 >
   <div id="booking-flow">
   <section class="booking-hero">
@@ -708,40 +709,34 @@ const creatorConfig = { bases: creatorBases, addons: creatorAddons, maximumMinut
   .booking-hero {
     position: relative;
     overflow: hidden;
-    padding-block: clamp(3rem, 7vw, 6rem);
-    background: var(--pine-dark);
-    color: #fff;
+    padding-block: clamp(1.5rem, 3vw, 2.4rem);
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(115deg, #fcf7ee 42%, #f8eddf 100%);
+    color: var(--ink);
   }
 
-  .booking-hero::after {
-    position: absolute;
-    inset: 20% -12% -135%;
-    border: 1px solid rgb(255 255 255 / 0.16);
-    border-radius: 50% 50% 0 0;
-    content: '';
-  }
-
-  .booking-hero__inner { position: relative; z-index: 1; }
+  .booking-hero__inner { position: relative; z-index: 1; max-width: 84rem; }
   .booking-hero .back-link,
-  .booking-hero .eyebrow,
-  .booking-hero .lead { color: #fff; }
-  .booking-hero .back-link { margin-bottom: 2.5rem; opacity: 0.72; }
-  .booking-hero .lead { max-width: 44rem; opacity: 0.76; }
+  .booking-hero .lead { color: var(--ink-soft); }
+  .booking-hero .eyebrow { color: var(--clay-dark); }
+  .booking-hero .back-link { display: block; width: max-content; margin-bottom: 1.5rem; color: var(--pine-dark); font-size: 0.82rem; text-decoration: none; }
+  .booking-hero h1 { max-width: none; margin: 0.55rem 0 0.8rem; font-size: clamp(2.1rem, 3.4vw, 2.9rem); line-height: 1.12; }
+  .booking-hero .lead { max-width: 57rem; margin: 0; font-size: clamp(1rem, 1.5vw, 1.125rem); line-height: 1.7; }
 
   .booking-steps {
     display: flex;
     flex-wrap: wrap;
     gap: 0.75rem 2rem;
-    margin: 2.5rem 0 0;
-    padding: 1.25rem 0 0;
-    border-top: 1px solid rgb(255 255 255 / 0.2);
+    margin: 1.7rem 0 0;
+    padding: 0.9rem 0 0;
+    border-top: 1px solid var(--border);
     list-style: none;
   }
 
   .booking-steps li { display: flex; align-items: center; gap: 0.65rem; font-size: 0.86rem; }
-  .booking-steps span { color: var(--sand); font-family: 'Iowan Old Style', Georgia, serif; }
+  .booking-steps span { color: var(--clay-dark); font-family: 'Iowan Old Style', Georgia, serif; }
 
-  .booking-shell { padding-block: clamp(3rem, 7vw, 6rem); }
+  .booking-shell { max-width: 84rem; padding-block: clamp(2rem, 4vw, 3.5rem); }
   .booking-form { display: grid; gap: 1.25rem; }
 
   .booking-card,

@@ -1,16 +1,20 @@
-.blog-wrap{width:min(90vw,70rem);margin-inline:auto}
+.blog-wrap{width:min(90vw,79rem);margin-inline:auto}
 .blog-page{min-height:65vh;padding-bottom:clamp(3rem,6vw,5rem)}
 .blog-eyebrow{display:inline-block;color:var(--clay-dark);font-size:.78rem;font-weight:700;letter-spacing:.18em;line-height:1.4;text-decoration:none;text-transform:uppercase}
-.blog-hero{padding:clamp(3.5rem,7vw,5.5rem) 0 clamp(1.5rem,3vw,2.5rem)}
+.blog-hero{padding:clamp(2rem,4vw,3rem) 0 clamp(1.5rem,3vw,2.5rem)}
 .blog-hero h1,.blog-article h1{max-width:none;margin:1rem 0 1.65rem;color:var(--ink);font-family:'Iowan Old Style',Georgia,serif;font-size:clamp(3rem,6.5vw,5.5rem);font-weight:500;line-height:1.02;letter-spacing:-.045em}
 .blog-hero h1 span{display:block}
+.blog-page .blog-hero h1{font-size:clamp(2.6rem,4.5vw,3.6rem);line-height:1.12}
 .blog-lead{max-width:58rem;margin:0;color:var(--ink-soft);font-size:clamp(1.1rem,1.6vw,1.3rem);line-height:1.8}
 .blog-topics{display:block;padding-block:.5rem 2.5rem}
 .blog-topics__label{margin:0 0 1rem;color:var(--clay-dark);font-size:.78rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase}
 .blog-topics__grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(1rem,2vw,1.75rem)}
 .blog-topic-card{display:flex;min-width:0;flex-direction:column;overflow:hidden;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--surface);box-shadow:var(--shadow-soft);color:var(--ink);text-decoration:none;transition:transform 180ms ease,border-color 180ms ease,box-shadow 180ms ease}
+.blog-page .blog-topic-card{background:#f9ecd9;border-color:#e5d4b9}
+.blog-page .blog-topic-card:nth-child(2){background:#eaf0df;border-color:#d7dfc7}
+.blog-page .blog-topic-card:nth-child(3){background:#f0e6ed;border-color:#dfcfe2}
 .blog-topic-card:hover{border-color:var(--pine);box-shadow:var(--shadow-soft);color:var(--ink);transform:translateY(-3px)}
-.blog-topic-card__body{display:flex;flex:1;flex-direction:column;gap:.7rem;padding:1.25rem 1.4rem;line-height:1.55}
+.blog-topic-card__body{display:flex;flex:1;flex-direction:column;gap:.7rem;padding:1.5rem;line-height:1.65}
 .blog-topic-card__body strong{font-family:'Iowan Old Style',Georgia,serif;font-size:clamp(1.45rem,2vw,1.8rem);font-weight:500;line-height:1.2}
 .blog-topic-card__body>span:not(.blog-topic-card__arrow){color:var(--ink-soft);font-size:.9rem}
 .blog-topic-card__arrow{margin-top:auto;color:var(--clay-dark);font-weight:700}
