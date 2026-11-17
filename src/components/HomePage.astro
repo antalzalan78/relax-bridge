@@ -18,7 +18,6 @@ import { getServices, homeAlternates } from '../lib/services';
 import { localBusinessSchema, faqSchema } from '../lib/schema';
 import { Image } from 'astro:assets';
 import studioImage from '../assets/studio-tilburg.jpg';
-import greenTowelTexture from '../assets/towel-green-section.png';
 import Base from '../layouts/Base.astro';
 import WaveDivider from './WaveDivider.astro';
 import Reviews from './Reviews.astro';
@@ -46,15 +45,18 @@ const jsonLd = [
 const designCopy = {
   nl: {
     focus: 'Ik merk het op.', connect: 'Ik neem het serieus.', balance: 'Ik doe er iets mee.',
-    googleRead: 'Lees Google-beoordelingen',
+    googleRead: 'Lees Google-beoordelingen', founder: 'Oprichter en masseuse', about: 'Leer mij kennen',
+    details: ['Muziek of stilte', 'Met of zonder geur', 'Een massage op maat', 'Een rustige, persoonlijke plek'],
   },
   en: {
     focus: 'I notice it.', connect: 'I take it seriously.', balance: 'I act on it.',
-    googleRead: 'Read Google reviews',
+    googleRead: 'Read Google reviews', founder: 'Founder and massage therapist', about: 'Get to know me',
+    details: ['Music or silence', 'With or without scent', 'A tailored massage', 'A calm, personal space'],
   },
   hu: {
     focus: 'Észreveszem.', connect: 'Komolyan veszem.', balance: 'Teszek érte.',
-    googleRead: 'Google-vélemények olvasása',
+    googleRead: 'Google-vélemények olvasása', founder: 'alapító és masszőr', about: 'Ismerj meg',
+    details: ['Zene vagy csend', 'Illattal vagy illatmentesen', 'Rád szabott kezelés', 'Nyugodt, személyes környezet'],
   },
 }[locale];
 ---
@@ -74,52 +76,30 @@ const designCopy = {
         <h1>{d.hero.title}</h1>
         <p class="lead hero__intro--desktop">{d.hero.intro}</p>
         <p class="lead hero__intro--mobile">{d.hero.mobileIntro}</p>
-        <div class="hero__meta" aria-label="Tilburg-Reeshof">
-          <span>Tilburg-Reeshof</span>
+        <div class="homepage-philosophy" aria-label="Relax Bridge">
+          <span><strong>foCus</strong>{designCopy.focus}</span>
+          <span><strong>ConneCt</strong>{designCopy.connect}</span>
+          <span><strong>balanCe</strong>{designCopy.balance}</span>
+        </div>
+        <div class="homepage-founder">
+          <h2>{d.introduction.homeTitle}</h2>
+          <p>{d.introduction.homeBody}</p>
         </div>
         <div class="btn-row">
           <a class="btn btn--primary" href={bookingHref}>
             {d.hero.primaryCta}
             <span aria-hidden="true">&rarr;</span>
           </a>
+          <a class="btn btn--ghost" href={aboutPath(locale)}>{designCopy.about}<span aria-hidden="true">&rarr;</span></a>
         </div>
       </div>
 
-      <section class="homepage-introduction" aria-labelledby="homepage-introduction-title">
-        <div class="homepage-introduction__card">
-          <div class="homepage-introduction__media">
-            <Image
-              class="homepage-introduction__image"
-              src={studioImage}
-              alt={d.images.studio}
-              widths={[480, 720, 960]}
-              sizes="(min-width: 52rem) 34vw, 100vw"
-              loading="eager"
-              fetchpriority="high"
-            />
-          </div>
-          <div class="homepage-introduction__content">
-            <header class="homepage-introduction__heading">
-              <span class="eyebrow">Relax Bridge</span>
-              <h2 id="homepage-introduction-title">{d.introduction.homeTitle}</h2>
-            </header>
-            <div class="homepage-introduction__copy">
-              <p>{d.introduction.homeBody}</p>
-            </div>
-            <a class="btn btn--ghost homepage-introduction__video" href={aboutPath(locale)}>
-              {d.introduction.moreCta}
-              <span aria-hidden="true">&rarr;</span>
-            </a>
-          </div>
+      <figure class="homepage-photo">
+        <div class="homepage-photo__clip">
+          <Image src={studioImage} alt={d.images.studio} widths={[480, 720, 960]} sizes="(min-width: 52rem) 44vw, 100vw" loading="eager" fetchpriority="high" />
         </div>
-        <div class="homepage-philosophy">
-          <div class="homepage-philosophy__steps">
-            <span><strong>foCus</strong>{designCopy.focus}</span>
-            <span><strong>ConneCt</strong>{designCopy.connect}</span>
-            <span><strong>balanCe</strong>{designCopy.balance}</span>
-          </div>
-        </div>
-      </section>
+        <figcaption><strong>Brigitta</strong><span>{designCopy.founder}</span></figcaption>
+      </figure>
     </div>
   </section>
 
@@ -129,18 +109,21 @@ const designCopy = {
     <h2 id="treatment-choice-title">{d.choice.heading}</h2>
     <div class="treatment-choice__cards">
       <article class="treatment-choice__card treatment-choice__card--creator">
+        <svg class="treatment-choice__icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/><path d="M9 4v4M16 10v4M7 16v4"/></svg>
         <span class="eyebrow">01 · {d.choice.creatorLabel}</span>
         <h3>{d.choice.creatorTitle}</h3>
         <p>{d.choice.creatorBody}</p>
         <a class="btn btn--primary" href={creatorHref}>{d.choice.creatorCta}<span aria-hidden="true">&rarr;</span></a>
       </article>
       <article class="treatment-choice__card">
+        <svg class="treatment-choice__icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-9M12 16c-4 0-7-2-7-6 4 0 7 2 7 6ZM12 13c0-4 2-7 6-8 1 4-1 7-6 8ZM7 21h10"/></svg>
         <span class="eyebrow">02 · {d.choice.readyLabel}</span>
         <h3>{d.choice.readyTitle}</h3>
         <p>{d.choice.readyBody}</p>
         <a class="btn btn--ghost" href={treatmentsPath(locale)}>{d.choice.readyCta}<span aria-hidden="true">&rarr;</span></a>
       </article>
     </div>
+    <div class="treatment-choice__details">{designCopy.details.map((item) => <span>{item}</span>)}</div>
     <p class="treatment-choice__shared-note">{d.choice.sharedNote}</p>
   </section>
 
@@ -252,15 +235,6 @@ const designCopy = {
   </section>
 
   <section class="booking-section" id={anchors.contact}>
-    <Image
-      class="booking-section__texture"
-      src={greenTowelTexture}
-      alt=""
-      width={1600}
-      loading="lazy"
-      aria-hidden="true"
-    />
-    <div class="booking-section__overlay" aria-hidden="true"></div>
     <div class="wrap booking-section__grid">
       <div>
         <span class="eyebrow">{d.tagline}</span>
@@ -268,7 +242,7 @@ const designCopy = {
         <p class="lead">{d.contact.intro}</p>
         <div class="booking-section__actions">
           <a
-            class="btn btn--light"
+            class="btn btn--primary"
             href={site.whatsapp}
             target="_blank"
             rel="noopener noreferrer"
@@ -312,6 +286,7 @@ const designCopy = {
 </Base>
 
 <style>
+  .hero--with-introduction, .treatment-choice, .location-section > .wrap, .home-blog-promo, .knowledge-grid, .booking-section__grid { max-width: 88rem; }
   .location-showcase__practical {
     margin: 0.8rem 0 0;
   }
@@ -326,26 +301,47 @@ const designCopy = {
     color: var(--ink-soft);
   }
 
-  .homepage-philosophy { margin-top: 1rem; padding: clamp(1.1rem, 2.5vw, 1.75rem); border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--pine-soft); }
-  .homepage-philosophy__steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; }
-  .homepage-philosophy__steps span { display: grid; gap: .12rem; padding: .75rem .9rem; border: 1px solid rgb(66 107 62 / .14); border-radius: .8rem; background: rgb(255 253 248 / .65); color: var(--ink-soft); font-size: .84rem; }
-  .homepage-philosophy__steps strong { color: var(--pine-dark); font-size: 1rem; }
-  .homepage-philosophy__steps span:first-child strong { color: var(--orange-accent); }
-  .homepage-philosophy__steps span:last-child strong { color: var(--purple-accent); }
+  .hero--with-introduction { padding-block: clamp(2rem, 4vw, 3rem); }
+  .hero--with-introduction .hero__grid { gap: clamp(1.5rem, 3vw, 3rem); }
+  .hero--with-introduction .hero__copy { display: flex; flex-direction: column; align-items: flex-start; gap: clamp(.8rem, 1.3vw, 1.25rem); }
+  .hero--with-introduction .hero__copy > * { margin-block: 0; }
+  .hero--with-introduction .hero__copy h1 { max-width: 18ch; font-size: clamp(2.8rem, 4vw, 3.5rem); line-height: 1.1; }
+  .hero--with-introduction .hero__copy .lead { max-width: 58ch; font-size: clamp(1rem, 1.3vw, 1.13rem); }
+  .homepage-philosophy { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; gap: .85rem; }
+  .homepage-philosophy span { display: grid; color: var(--ink-soft); font-size: .8rem; line-height: 1.35; }
+  .homepage-philosophy strong { color: var(--orange-accent); font-family: 'Iowan Old Style', Georgia, serif; font-size: clamp(1.25rem, 2vw, 1.55rem); font-weight: 500; }
+  .homepage-philosophy span:nth-child(2) strong { color: var(--pine); }
+  .homepage-philosophy span:nth-child(3) strong { color: var(--purple-accent); }
+  .homepage-founder { width: 100%; padding-top: 1rem; border-top: 1px solid var(--border); }
+  .homepage-founder h2 { margin: 0 0 .25rem; font-size: clamp(1.35rem, 2vw, 1.8rem); }
+  .homepage-founder p { max-width: 55ch; margin: 0; color: var(--ink-soft); font-size: .95rem; }
+  .hero--with-introduction .btn-row { margin-top: .3rem; }
+  .homepage-photo { position: relative; margin: 0; min-width: 0; }
+  .homepage-photo__clip { height: clamp(20rem, 30vw, 26rem); overflow: hidden; border-radius: 45% 42% 31% 35% / 47% 40% 36% 30%; background: #e0e4d4; }
+  .homepage-photo__clip img { width: 100%; height: 100%; object-fit: cover; object-position: 47% 0%; }
+  .homepage-photo figcaption { position: absolute; right: 1.1rem; bottom: 1.1rem; display: grid; padding: .7rem 1.4rem; border: 1px solid rgb(255 255 255 / .5); border-radius: 99px; background: rgb(255 250 240 / .96); box-shadow: var(--shadow-soft); line-height: 1.3; }
+  .homepage-photo figcaption strong { font-size: 1.1rem; }
+  .homepage-photo figcaption span { color: var(--ink-soft); font-size: .78rem; }
   .home-blog-promo { display: flex; flex-wrap: wrap; gap: 1rem 2rem; align-items: center; justify-content: space-between; padding-block: clamp(2.5rem, 5vw, 4rem); border-block: 1px solid var(--border); }
   .home-blog-promo h2 { margin: .5rem 0; }
   .home-blog-promo p { margin: 0; color: var(--ink-soft); }
+  .treatment-choice { padding-block: 1.5rem clamp(2.5rem, 5vw, 4rem); }
+  .treatment-choice > .eyebrow { display: none; }
   .treatment-choice__prompt { max-width: 42rem; margin: .9rem auto .4rem; text-align: center; }
+  .treatment-choice > h2 { max-width: none; margin: .25rem 0 1.4rem; text-align: center; font-size: clamp(2rem, 3vw, 2.7rem); }
+  .treatment-choice__cards { margin-top: 1.25rem; }
+  .treatment-choice__card { position: relative; min-height: 15rem; padding: clamp(1.25rem, 2.5vw, 2rem); border-radius: 1.6rem; box-shadow: 0 5px 16px rgb(73 59 27 / .05); }
+  .treatment-choice__card .eyebrow { color: var(--pine-dark); }
+  .treatment-choice__card h3 { max-width: 17ch; font-size: clamp(1.6rem, 2.4vw, 2rem); }
+  .treatment-choice__card .btn { min-height: 2.8rem; font-size: .9rem; }
+  .treatment-choice__icon { position: absolute; top: 1.1rem; right: 1.35rem; width: 1.9rem; height: 1.9rem; color: var(--pine); }
+  .treatment-choice__details { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; margin: 1.5rem 1rem .5rem; }
+  .treatment-choice__details span { display: flex; align-items: center; justify-content: center; min-height: 2.5rem; padding: .3rem .6rem; color: var(--ink-soft); font-size: .8rem; text-align: center; }
+  .treatment-choice__details span + span { border-left: 1px solid var(--border); }
   .treatment-choice__shared-note { margin: 1.25rem 0 0; color: var(--ink-soft); font-size: .9rem; text-align: center; }
 
   .hero__intro--mobile {
     display: none;
-  }
-
-  .hero--with-introduction .hero__copy h1 {
-    max-width: 16ch;
-    font-size: clamp(2.9rem, 4vw, 4rem);
-    line-height: 1.03;
   }
 
   .hero--with-introduction { position: relative; isolation: isolate; overflow: clip; }
@@ -363,11 +359,33 @@ const designCopy = {
   .hero--with-introduction::before { left: -11rem; bottom: 2rem; border-color: rgb(216 126 42 / .27); transform: rotate(12deg); }
   .hero--with-introduction::after { right: -10rem; bottom: 6rem; border-color: rgb(130 80 155 / .2); transform: rotate(-9deg); }
 
-  @media (max-width: 38rem) {
-    .homepage-philosophy__steps { grid-template-columns: 1fr; }
-  }
+  .knowledge-grid { padding-block: clamp(2.5rem, 5vw, 4rem); }
+  .knowledge-grid :global(.faq) { margin-bottom: .7rem; padding-inline: 1.2rem; border: 1px solid var(--border); border-radius: 1rem; background: var(--surface); }
+  .knowledge-grid :global(.faq:last-child) { border-bottom: 1px solid var(--border); }
+  .knowledge-grid :global(.faq summary) { padding-block: 1rem; }
+  .booking-section { padding-block: clamp(2.5rem, 5vw, 3.5rem); border-block: 1px solid #dedac9; background: linear-gradient(115deg, #edf1e3 0%, #f7ead8 59%, #eee5f0 100%); color: var(--ink); }
+  .booking-section::before, .booking-section::after { display: none; }
+  .booking-section .eyebrow { color: var(--clay-dark); }
+  .booking-section .lead { color: var(--ink-soft); opacity: 1; }
+  .booking-section__details { border-top-color: var(--border); }
+  .booking-section__details > div { border-bottom-color: var(--border); }
+  .booking-section__details .detail-label { color: var(--clay-dark); opacity: 1; }
+  .booking-section__details a, .booking-section__details p { color: var(--ink); }
+  .booking-section .btn--review { border-color: var(--border); background: var(--surface); color: var(--ink); }
+  .booking-section .btn--review:hover { border-color: var(--pine); background: var(--pine-soft); }
 
   @media (max-width: 47.99rem) {
+    .homepage-photo__clip { height: clamp(15rem, 59vw, 23rem); }
+    .treatment-choice__cards { gap: .8rem; }
+    .treatment-choice__card { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: .25rem .8rem; min-height: 0; padding: 1rem 1.1rem; border-radius: 1.2rem; }
+    .treatment-choice__icon, .treatment-choice__card .eyebrow { display: none; }
+    .treatment-choice__card h3 { grid-column: 1; margin: 0; font-family: inherit; font-size: 1.05rem; font-weight: 700; letter-spacing: 0; }
+    .treatment-choice__card p { grid-column: 1; margin: 0; font-size: .76rem; line-height: 1.4; }
+    .treatment-choice__card .btn { grid-column: 2; grid-row: 1 / 3; width: 2.4rem; min-height: 2.4rem; padding: 0; overflow: hidden; font-size: 0; }
+    .treatment-choice__card .btn span { font-size: 1rem; }
+    .treatment-choice__details { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6rem; margin-inline: 0; }
+    .treatment-choice__details span { justify-content: flex-start; text-align: left; }
+    .treatment-choice__details span + span { border-left: 0; }
     #practical-info {
       scroll-margin-top: 9rem;
     }
@@ -388,11 +406,7 @@ const designCopy = {
       gap: clamp(2rem, 5vw, 3rem);
     }
 
-    .hero--with-introduction .hero__copy h1 {
-      max-width: 20ch;
-      font-size: clamp(2.4rem, 7vw, 3.4rem);
-      line-height: 1.06;
-    }
+    .hero--with-introduction .hero__copy h1 { max-width: 20ch; font-size: clamp(2.2rem, 8vw, 3rem); line-height: 1.1; }
 
     .hero--with-introduction .hero__copy .lead {
       margin-top: 0.75rem;
@@ -407,5 +421,11 @@ const designCopy = {
     .hero--with-introduction .btn-row {
       margin-top: 1.2rem;
     }
+  }
+  @media (max-width: 26rem) {
+    .homepage-philosophy { gap: .35rem; }
+    .homepage-philosophy strong { font-size: 1.05rem; }
+    .homepage-philosophy span { font-size: .7rem; }
+    .hero--with-introduction .btn-row .btn { flex: 1 1 100%; }
   }
 </style>

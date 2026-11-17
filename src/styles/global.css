@@ -64,7 +64,7 @@ body {
   position: relative;
   isolation: isolate;
   margin: 0;
-  background: var(--paper);
+  background: radial-gradient(ellipse at 90% 0%, #f5e7d6, transparent 38%), var(--paper);
   color: var(--ink);
   font-family: 'Avenir Next', Avenir, 'Segoe UI', Helvetica, Arial, sans-serif;
   font-size: clamp(1rem, 0.965rem + 0.16vw, 1.075rem);
@@ -75,18 +75,6 @@ body {
 main {
   position: relative;
   z-index: 1;
-}
-
-body::before {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  content: '';
-  opacity: 0.36;
-  background-image: radial-gradient(rgb(40 82 71 / 0.12) 0.6px, transparent 0.6px);
-  background-size: 7px 7px;
-  mask-image: linear-gradient(to bottom, black, transparent 38rem);
 }
 
 h1,
@@ -322,6 +310,12 @@ img {
   min-height: 4.75rem;
   align-items: center;
   gap: clamp(0.8rem, 2vw, 1.6rem);
+}
+
+@media (min-width: 80rem) {
+  .site-header__inner { max-width: 84rem; min-height: 6rem; }
+  .site-header .brand__wordmark { width: 10rem; }
+  .site-header .brand__tagline { width: 14.2rem; }
 }
 
 .brand {
