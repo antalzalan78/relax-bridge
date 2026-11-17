@@ -52,8 +52,7 @@ const weekendTiming = copy.timing.filter((option) => option.key.startsWith('week
       novalidate
     >
       <fieldset class="question-card" data-required-group="situations">
-        <span class="question-card__number" aria-hidden="true">01</span>
-        <legend>{copy.questions.situations}</legend>
+        <legend><span class="question-card__number" aria-hidden="true">01</span>{copy.questions.situations}</legend>
         <p class="question-hint" id="situations-hint">{copy.requiredHint}</p>
         <div class="option-list" aria-describedby="situations-hint situations-error">
           {copy.situations.map((option) => (
@@ -72,8 +71,7 @@ const weekendTiming = copy.timing.filter((option) => option.key.startsWith('week
       </fieldset>
 
       <fieldset class="question-card" data-required-group="priorities">
-        <span class="question-card__number" aria-hidden="true">02</span>
-        <legend>{copy.questions.priorities}</legend>
+        <legend><span class="question-card__number" aria-hidden="true">02</span>{copy.questions.priorities}</legend>
         <p class="question-hint" id="priorities-hint">{copy.requiredHint}</p>
         <div class="option-list" aria-describedby="priorities-hint priorities-error">
           {copy.priorities.map((option) => (
@@ -92,8 +90,7 @@ const weekendTiming = copy.timing.filter((option) => option.key.startsWith('week
       </fieldset>
 
       <fieldset class="question-card" data-required-group="timing">
-        <span class="question-card__number" aria-hidden="true">03</span>
-        <legend>{copy.questions.timing}</legend>
+        <legend><span class="question-card__number" aria-hidden="true">03</span>{copy.questions.timing}</legend>
         <p class="question-hint" id="timing-hint">{copy.requiredHint}</p>
         <div class="timing-grid" aria-describedby="timing-hint timing-error">
           <div>
@@ -275,7 +272,11 @@ const weekendTiming = copy.timing.filter((option) => option.key.startsWith('week
     align-items: flex-start;
     max-width: 43rem;
     margin-top: 1.8rem;
-    color: var(--ink-soft);
+    padding: 1rem 1.25rem;
+    border: 1px solid #d9e0c7;
+    border-radius: 1.0625rem;
+    background: #edf0df;
+    color: #536248;
     font-size: 0.92rem;
   }
   .questionnaire-anonymous span {
@@ -289,58 +290,70 @@ const weekendTiming = copy.timing.filter((option) => option.key.startsWith('week
     color: var(--pine-dark);
     font-weight: 800;
   }
-  .questionnaire-layout { position: relative; z-index: 2; margin-top: clamp(-3.5rem, -6vw, -2.5rem); padding-bottom: clamp(5rem, 10vw, 8rem); }
+  .questionnaire-layout { position: relative; z-index: 2; margin-top: clamp(1.5rem, 3vw, 2.5rem); padding-bottom: clamp(5rem, 10vw, 8rem); }
   .questionnaire-form { display: grid; gap: 1.25rem; max-width: 58rem; margin-inline: auto; }
   .question-card {
     position: relative;
     min-width: 0;
     margin: 0;
-    padding: clamp(1.5rem, 5vw, 3rem);
-    border: 1px solid var(--border);
+    padding: clamp(1.4rem, 4vw, 2rem);
+    border: 1px solid #dfd1b9;
     border-radius: var(--radius-lg);
-    background: var(--surface);
+    background: #fff9ee;
     box-shadow: var(--shadow-soft);
   }
-  .question-card--invalid { border-color: var(--clay); }
+  .question-card:nth-of-type(2) { border-color: #ddcde4; background: #f6f0f7; }
+  .question-card:nth-of-type(3) { border-color: #d7dfc7; background: #f2f5e8; }
+  .question-card.question-card--invalid { border-color: var(--clay); }
   .question-card__number {
-    position: absolute;
-    top: 1rem;
-    right: 1.5rem;
-    color: var(--pine-soft);
-    font-family: 'Iowan Old Style', Georgia, serif;
-    font-size: clamp(2.8rem, 7vw, 5rem);
+    display: inline-flex;
+    width: 2.25rem;
+    height: 2.25rem;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+    border: 1px solid #ddc3a3;
+    border-radius: 50%;
+    background: #f8e4ca;
+    color: #6a5137;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
     line-height: 1;
+    vertical-align: middle;
   }
   .question-card legend {
     position: relative;
     z-index: 1;
-    max-width: 40rem;
-    margin-left: -0.75rem;
-    padding: 0.25rem 4.5rem 0.35rem 0.75rem;
-    border-radius: 0.5rem;
-    background: var(--surface);
-    color: var(--ink);
+    float: left;
+    width: 100%;
+    margin-bottom: 0.7rem;
+    padding: 0;
+    color: #34502d;
     font-family: 'Iowan Old Style', Georgia, serif;
-    font-size: clamp(1.45rem, 3.5vw, 2rem);
-    font-weight: 700;
-    line-height: 1.2;
+    font-size: clamp(1.5rem, 2.5vw, 1.75rem);
+    font-weight: 600;
+    line-height: 1.25;
   }
-  .question-hint { margin: 0.65rem 0 1.35rem; color: var(--ink-soft); font-size: 0.86rem; }
+  .question-hint { clear: both; margin: 0.65rem 0 1.35rem; color: var(--ink-soft); font-size: 0.86rem; }
   .option-list { display: grid; gap: 0.65rem; }
+  .question-card > .option-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .option-card {
     display: flex;
     gap: 0.85rem;
     align-items: flex-start;
     padding: 0.9rem 1rem;
-    border: 1px solid var(--border);
+    border: 1px solid #dfd1b9;
     border-radius: 0.85rem;
-    background: #fffaf2;
-    color: var(--ink);
+    background: #f7e8d5;
+    color: #485f3e;
     cursor: pointer;
     transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
   }
+  .option-card:nth-child(even) { border-color: #d8c8df; background: #eee5f0; }
   .option-card:hover { border-color: var(--pine-dark); transform: translateY(-1px); }
-  .option-card:has(input:checked) { border-color: var(--pine-dark); background: var(--pine-soft); }
+  .option-card:has(input:checked) { border-color: #7b9c63; background: #e0ebd0; box-shadow: inset 0 0 0 1px rgb(120 147 90 / 27%); }
+  .option-card:has(input:focus-visible) { outline: 3px solid var(--purple-accent); outline-offset: 2px; }
   .option-card input { flex: 0 0 auto; width: 1.05rem; height: 1.05rem; margin: 0.15rem 0 0; accent-color: var(--pine-dark); }
   .option-card span { line-height: 1.45; }
   .option-list--compact { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -364,7 +377,7 @@ const weekendTiming = copy.timing.filter((option) => option.key.startsWith('week
     padding: clamp(2.5rem, 8vw, 5rem);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    background: var(--surface);
+    background: #ebf1df;
     box-shadow: var(--shadow-soft);
     text-align: center;
   }
@@ -375,8 +388,8 @@ const weekendTiming = copy.timing.filter((option) => option.key.startsWith('week
     .timing-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
   @media (max-width: 35rem) {
+    .question-card > .option-list { grid-template-columns: 1fr; }
     .option-list--compact { grid-template-columns: 1fr; }
-    .question-card legend { padding-right: 2.5rem; }
-    .question-card__number { right: 1rem; font-size: 2.8rem; }
+    .question-card__number { display: flex; width: 1.95rem; height: 1.95rem; margin: 0 0 0.65rem; font-size: 0.7rem; }
   }
 </style>
