@@ -4,7 +4,7 @@ key: facial
 category: studio
 slug: facial-massage
 title: Facial Massage
-summary: Relaxes the facial muscles, refreshes the skin and restores its natural glow.
+summary: Helps relax the facial muscles, refreshes the skin and leaves you feeling refreshed and rested.
 order: 3
 prices:
   - minutes: 30

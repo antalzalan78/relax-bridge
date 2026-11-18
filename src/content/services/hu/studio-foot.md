@@ -4,7 +4,7 @@ key: foot
 category: studio
 slug: talpmasszazs
 title: Talpmasszázs
-summary: Pihentető törődés a fáradt lábfejeknek és lábszáraknak. Ideális hosszas állás, sok gyaloglás után, vagy amikor a lábad egyszerűen egy kis extra pihenést érdemel.
+summary: Pihentető törődés a fáradt lábfejeknek és lábszáraknak.
 order: 4
 prices:
   - minutes: 30

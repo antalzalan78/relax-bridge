@@ -4,7 +4,7 @@ export default {
   meta: {
     title: 'Relax Bridge — Massage in Tilburg',
     description:
-      'Ontspanningsmassage, nek-schouder-rugmassage, gezichts- en voetmassage in de studio in Tilburg-Reeshof. Vanaf € 40.',
+      'Ontspanningsmassage, nek-, schouder- en rugmassage, gezichts- en voetmassage in de studio in Tilburg-Reeshof. Vanaf € 40.',
   },
 
   tagline: 'De brug tussen spanning en ontspanning.',
@@ -37,12 +37,12 @@ export default {
   },
 
   hero: {
-    eyebrow: 'Jouw massage. Jouw moment.',
+    eyebrow: 'De filosofie van Relax Bridge',
     title: 'Aandacht, keuze, een moment voor jezelf.',
     intro:
       'Bij Relax Bridge zijn persoonlijke aandacht en de ervaring van rust net zo belangrijk als de behandeling zelf. Een massage is één van de manieren om bewust iets voor jezelf te doen.',
     mobileIntro:
-      'Persoonlijke aandacht en rust in Tilburg–Reeshof. Een moment voor jezelf, afgestemd op wat jij nodig hebt.',
+      'Bij Relax Bridge zijn persoonlijke aandacht en de ervaring van rust net zo belangrijk als de behandeling zelf. Een massage is één van de manieren om bewust iets voor jezelf te doen.',
     primaryCta: 'Afspraak maken',
     secondaryCta: 'Bekijk de prijzen',
   },
@@ -54,10 +54,11 @@ export default {
 
   introduction: {
     title: 'Over mij',
+    kicker: 'Achter Relax Bridge',
     homeTitle: 'Ik ben Brigitta.',
     homeBody: 'Ik ontvang je met aandacht in een rustige omgeving in Tilburg–Reeshof. Ik vind het belangrijk dat je zowel de behandeling als de kleine details van je rustmoment op jouw wensen kunt afstemmen.',
     paragraphs: [
-      'In Hongarije leerde ik het vak en begon ik als masseur te werken. Sindsdien heb ik in Nederland veel ervaring en nieuwe kennis opgedaan.',
+      'In Hongarije leerde ik het vak en begon ik als masseuse te werken. Sindsdien heb ik in Nederland veel ervaring en nieuwe kennis opgedaan.',
       'Daaruit is Relax Bridge ontstaan. Ik vind het belangrijk dat je niet alleen een behandeling krijgt, maar die ook kunt afstemmen op wat jij nodig hebt.',
       'Wil je weten wie er achter Relax Bridge staat? In mijn video vertel ik iets meer over mezelf, massage en hoe ik werk.',
     ],
@@ -75,7 +76,7 @@ export default {
     creatorCta: 'Stel mijn massage samen',
     readyLabel: 'Losse massages',
     readyTitle: 'Kies uit onze vaste behandelingen.',
-    readyBody: 'Relax-, nek-schouder-rug-, gezichts- of voetmassage. Kies je behandeling en de duur; de details stemmen we op jou af.',
+    readyBody: 'Kies uit een relaxmassage, nek-, schouder- en rugmassage, gezichts- of voetmassage. Kies de duur; de details stemmen we op jou af.',
     readyCta: 'Bekijk de behandelingen',
     sharedNote: 'Muziek en geur kun je bij beide behandelopties kiezen.',
   },
@@ -89,7 +90,7 @@ export default {
 
   options: {
     studio: {
-      label: 'De studio',
+      label: 'Hier ontvang ik je',
       title: 'Je bent welkom in mijn studio.',
       body: 'Mijn studio aan huis is een rustige plek in Tilburg waar je niets hoeft te doen.',
       location: {
@@ -103,7 +104,7 @@ export default {
       personalization: {
         title: 'Massage Creator',
         spotlightEyebrow: 'Jouw massage, jouw keuze',
-        spotlightIntro: 'Geen standaard behandeling, maar een massage die je zelf samenstelt. Kies een basis, voeg toe wat bij je past en zie meteen de tijd en prijs.',
+        spotlightIntro: 'Liever geen vaste behandeling? Stel je eigen massage samen: kies een basisbehandeling, voeg passende elementen toe en zie meteen de duur en prijs.',
         spotlightCta: 'Stel jouw massage samen',
         spotlightSteps: [
           { title: 'Kies je basis', body: 'Begin met een relaxmassage of een gerichte rugmassage.' },
@@ -181,6 +182,7 @@ export default {
   },
 
   footer: {
+    tagline: 'Een brug tussen spanning en rust.',
     rights: 'Alle rechten voorbehouden.',
     cookies: 'Cookiebeleid',
     privacy: 'Privacyverklaring',

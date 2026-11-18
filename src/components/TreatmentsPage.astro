@@ -18,25 +18,34 @@ const copy = {
     eyebrow: 'Vaste behandelingen, met persoonlijke aandacht',
     title: 'Losse massages',
     intro: 'Kies een behandeling en de duur; de details stemmen we op jou af. Tijdens het boeken kun je muziek en geur kiezen, of juist stilte en een geurvrije behandeling.',
-    details: 'Meer over deze massage',
-    book: 'Kies een tijdstip',
-    creator: 'Liever combineren? Ontdek de Massage Creator',
+    details: 'Meer informatie',
+    book: 'Ik kies een tijdstip',
+    creatorPrompt: 'Liever je eigen massage samenstellen?',
+    creatorBody: 'Met de Massage Creator stel je een behandeling samen uit elementen die bij elkaar passen.',
+    creatorCta: 'Bekijk de Massage Creator',
+    serviceEyebrows: { relax: 'Rust en ontspanning', 'neck-shoulder-back': 'Gerichte aandacht', facial: 'Verfrissing en verzorging', foot: 'Rust voor je voeten' },
   },
   en: {
     eyebrow: 'Ready-made treatments, with personal attention',
     title: 'Individual massages',
     intro: 'Choose a treatment and duration; we will tailor the details to you. When booking, you can choose music and scent, or silence and a scent-free treatment.',
-    details: 'More about this massage',
-    book: 'Choose an appointment time',
-    creator: 'Prefer a combination? Explore the Massage Creator',
+    details: 'More details',
+    book: 'Choose a time',
+    creatorPrompt: 'Prefer to create your own massage?',
+    creatorBody: 'With the Massage Creator, you can build a treatment from elements that work well together.',
+    creatorCta: 'Explore the Massage Creator',
+    serviceEyebrows: { relax: 'Rest and relaxation', 'neck-shoulder-back': 'Focused attention', facial: 'Refreshment and care', foot: 'Rest for your feet' },
   },
   hu: {
     eyebrow: 'Kész kezelések, személyes figyelemmel',
     title: 'Önálló masszázsok',
     intro: 'Válassz kezelést és időtartamot, a részleteket hozzád igazítjuk. A foglalásnál zenét és illatot is választhatsz, vagy kérhetsz csendet és illatmentes kezelést.',
-    details: 'További részletek a kezelésről',
-    book: 'Időpont kiválasztása',
-    creator: 'Inkább kombinálnál? Ismerd meg a Massage Creatort',
+    details: 'Részletesebben',
+    book: 'Időpontot választok',
+    creatorPrompt: 'Inkább összeállítanád a sajátodat?',
+    creatorBody: 'A Massage Creatorral hozzá illő elemekből alakíthatod ki a kezelésed.',
+    creatorCta: 'Megnézem a Massage Creatort',
+    serviceEyebrows: { relax: 'Pihenés és kikapcsolódás', 'neck-shoulder-back': 'Célzott figyelem', facial: 'Frissesség és törődés', foot: 'Pihenés a lábaknak' },
   },
 }[locale];
 ---
@@ -53,7 +62,7 @@ const copy = {
         const details = studioCopy.services[service.data.key as keyof typeof studioCopy.services];
         return <article class="treatments-page__card">
           <div class="treatments-page__body">
-            <span class="eyebrow">{String(index + 1).padStart(2, '0')} · {copy.eyebrow}</span>
+            <span class="eyebrow">{String(index + 1).padStart(2, '0')} · {copy.serviceEyebrows[service.data.key as keyof typeof copy.serviceEyebrows]}</span>
             <h2>{service.data.title}</h2>
             <p>{details?.headline || service.data.summary}</p>
             {details?.detail && <details><summary>{copy.details}</summary><p>{details.detail}</p></details>}
@@ -71,7 +80,10 @@ const copy = {
         </article>;
       })}
     </div>
-    <a class="treatments-page__creator" href={massageCreatorPath(locale)}>{copy.creator} <span aria-hidden="true">→</span></a>
+    <section class="treatments-page__creator" aria-label={copy.creatorPrompt}>
+      <div><h2>{copy.creatorPrompt}</h2><p>{copy.creatorBody}</p></div>
+      <a class="btn btn--ghost" href={massageCreatorPath(locale)}>{copy.creatorCta}<span aria-hidden="true">→</span></a>
+    </section>
   </section>
 </Base>
 
@@ -96,7 +108,9 @@ const copy = {
   .treatments-page__options button:hover, .treatments-page__options button:focus-visible { transform: translateY(-2px); }
   .treatments-page__options button strong { font-size: 1.1rem; white-space: nowrap; }
   .treatments-page__book { justify-self: stretch; min-height: 2.9rem; }
-  .treatments-page__creator { display: inline-flex; gap: .7rem; margin-top: 2rem; color: var(--pine-dark); font-weight: 700; }
+  .treatments-page__creator { display: flex; flex-wrap: wrap; gap: 1rem 2rem; align-items: center; justify-content: space-between; margin-top: 2rem; padding: 1.5rem; border: 1px solid var(--border); border-radius: 1.3rem; background: var(--pine-soft); }
+  .treatments-page__creator h2 { margin: 0 0 .35rem; font-size: 1.6rem; }
+  .treatments-page__creator p { max-width: 35rem; margin: 0; color: var(--ink-soft); }
   @media (max-width: 48rem) { .treatments-page__card { grid-template-columns: 1fr; gap: 1.25rem; } }
   @media (max-width: 38rem) {
     .treatments-page { padding-block: 1.5rem 2rem; }

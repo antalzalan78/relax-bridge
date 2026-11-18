@@ -36,6 +36,11 @@ const weekendTiming = copy.timing.filter((option) => option.key.startsWith('week
       <span class="eyebrow">{copy.eyebrow}</span>
       <h1>{copy.title}</h1>
       <p class="lead">{copy.intro}</p>
+      <div class="questionnaire-tags">
+        <span>{copy.timeTag}</span>
+        <span>{copy.anonymousTag}</span>
+        <span>{copy.questionCount}</span>
+      </div>
       <p class="questionnaire-anonymous">
         <span aria-hidden="true">✓</span>
         {copy.anonymous}
@@ -267,6 +272,8 @@ const weekendTiming = copy.timing.filter((option) => option.key.startsWith('week
   .questionnaire-hero .eyebrow { display: block; margin-top: 1.5rem; color: var(--clay-dark); }
   .questionnaire-hero h1 { max-width: 17ch; margin: 0.65rem 0 1.2rem; font-size: clamp(3rem, 4.5vw, 4.5rem); }
   .questionnaire-hero .lead { max-width: 45rem; color: var(--ink-soft); }
+  .questionnaire-tags { display: flex; flex-wrap: wrap; gap: .55rem; margin-top: 1.25rem; }
+  .questionnaire-tags span { padding: .45rem .75rem; border: 1px solid var(--border); border-radius: 999px; color: var(--pine-dark); font-size: .8rem; font-weight: 700; }
   .questionnaire-anonymous {
     display: flex;
     gap: 0.75rem;

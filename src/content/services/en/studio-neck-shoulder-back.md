@@ -13,6 +13,6 @@ prices:
     eur: 70
 ---
 
-The Neck, Shoulder & Back Massage is especially recommended for desk work, stress or prolonged physical strain, when the shoulders and back are continuously overloaded.
+The neck, shoulder and back massage can be a good choice if you spend a lot of time sitting or feel tension in your shoulders and back.
 
-During the treatment I use targeted, deeper techniques that help release tight muscles, reduce pain and improve freedom of movement.
+During the treatment, I use targeted, deeper techniques to give tense areas attention and help you relax.

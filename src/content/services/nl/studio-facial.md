@@ -4,7 +4,7 @@ key: facial
 category: studio
 slug: gezichtsmassage
 title: Gezichtsmassage
-summary: Ontspant de gezichtsspieren, verfrist de huid en herstelt de natuurlijke uitstraling.
+summary: Helpt de gezichtsspieren te ontspannen, verfrist de huid en geeft je een frisser, uitgeruster gevoel.
 order: 3
 prices:
   - minutes: 30

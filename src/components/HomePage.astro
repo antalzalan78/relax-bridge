@@ -13,6 +13,7 @@ import {
 } from '../data/site';
 import { anchors } from '../data/routes';
 import { t } from '../i18n';
+import { blogText } from '../i18n/blog';
 import { studioBookingText } from '../i18n/studio-booking';
 import { getServices, homeAlternates } from '../lib/services';
 import { localBusinessSchema, faqSchema } from '../lib/schema';
@@ -28,6 +29,7 @@ interface Props {
 
 const { locale } = Astro.props;
 const d = t(locale);
+const blogCopy = blogText(locale);
 const studioCopy = studioBookingText(locale);
 
 const studio = await getServices(locale, 'studio');
@@ -207,11 +209,11 @@ const designCopy = {
 
   <section class="wrap home-blog-promo" aria-labelledby="home-blog-title">
     <div>
-      <span class="eyebrow">{d.nav.blog}</span>
-      <h2 id="home-blog-title">{locale === 'hu' ? 'Egy kis idő a felfedezésre.' : locale === 'nl' ? 'Even tijd om te ontdekken.' : 'Take a moment to explore.'}</h2>
-      <p>{locale === 'hu' ? 'Történetek, gyakorlati tudnivalók és inspiráció a masszázs világából.' : locale === 'nl' ? 'Verhalen, praktische tips en inspiratie uit de wereld van massage.' : 'Stories, practical tips and inspiration from the world of massage.'}</p>
+      <span class="eyebrow">{blogCopy.homeEyebrow}</span>
+      <h2 id="home-blog-title">{blogCopy.homeTitle}</h2>
+      <p>{blogCopy.homeIntro}</p>
     </div>
-    <a class="btn btn--ghost" href={blogPath(locale)}>{locale === 'hu' ? 'Témák megtekintése' : locale === 'nl' ? 'Bekijk de onderwerpen' : 'Explore the topics'} <span aria-hidden="true">→</span></a>
+    <a class="btn btn--ghost" href={blogPath(locale)}>{blogCopy.homeLink} <span aria-hidden="true">→</span></a>
   </section>
 
   <section class="wrap section knowledge-grid" id="practical-info">

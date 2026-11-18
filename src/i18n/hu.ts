@@ -37,12 +37,12 @@ export default {
   },
 
   hero: {
-    eyebrow: 'A te masszázsod. A te pillanatod.',
+    eyebrow: 'A Relax Bridge filozófiája',
     title: 'Figyelem, választás, egy kis idő magadra.',
     intro:
       'A Relax Bridge-nél a személyes figyelem és a pihenés élménye ugyanolyan fontos, mint maga a kezelés. A masszázs egy lehetőség a sok közül arra, hogy tegyünk magunkért.',
     mobileIntro:
-      'Személyes figyelem és pihenés Tilburg–Reeshofban. Egy kis idő magadra, a saját igényeid szerint.',
+      'A Relax Bridge-nél a személyes figyelem és a pihenés élménye ugyanolyan fontos, mint maga a kezelés. A masszázs egy lehetőség a sok közül arra, hogy tegyünk magunkért.',
     primaryCta: 'Időpontfoglalás',
     secondaryCta: 'Árak megtekintése',
   },
@@ -54,6 +54,7 @@ export default {
 
   introduction: {
     title: 'Rólam',
+    kicker: 'A Relax Bridge mögött',
     homeTitle: 'Brigitta vagyok.',
     homeBody: 'Figyelmes, nyugodt környezetben várlak Tilburg–Reeshofban. Fontos nekem, hogy a kezelésedet és a pihenés apró részleteit is a saját igényeidhez tudd alakítani.',
     paragraphs: [
@@ -89,7 +90,7 @@ export default {
 
   options: {
     studio: {
-      label: 'A stúdió',
+      label: 'Itt fogadlak',
       title: 'Szívesen látlak a stúdiómban.',
       body: 'Az otthonomban kialakított stúdió egy csendes hely Tilburgban, ahol semmit nem kell csinálnod.',
       location: {
@@ -181,6 +182,7 @@ export default {
   },
 
   footer: {
+    tagline: 'Híd a feszültség és a pihenés között.',
     rights: 'Minden jog fenntartva.',
     cookies: 'Süti-szabályzat',
     privacy: 'Adatvédelmi tájékoztató',

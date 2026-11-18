@@ -4,7 +4,7 @@ key: facial
 category: studio
 slug: arcmasszazs
 title: Arcmasszázs
-summary: Ellazítja az arc izmait, felfrissíti a bőrt, és visszaadja a természetes ragyogást.
+summary: Segít ellazítani az arc izmait, felfrissíti az arcbőrt, és üdébb, kipihentebb érzetet ad.
 order: 3
 prices:
   - minutes: 30

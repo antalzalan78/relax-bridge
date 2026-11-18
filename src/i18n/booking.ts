@@ -10,7 +10,7 @@ const booking = {
     eyebrow: 'Tijd voor jouw rustmoment',
     title: 'Kies een rustig moment.',
     intro:
-      'Kies je behandeling en zoek daarna een dag en tijdstip dat bij je past. Na verzenden is je afspraak direct bevestigd.',
+      'Nadat je een behandeling hebt gekozen, hoef je alleen nog een passende dag en tijd te vinden.',
     steps: ['Behandeling', 'Tijdstip', 'Gegevens'],
     service: 'Behandeling',
     chooseService: 'Kies een behandeling',
@@ -81,7 +81,7 @@ const booking = {
     eyebrow: 'Time for your moment of rest',
     title: 'Choose a quiet moment.',
     intro:
-      'Choose your treatment, then find a day and time that suits you. Your appointment is confirmed immediately after submitting.',
+      'Once you have chosen a treatment, all that remains is to find a day and time that suits you.',
     steps: ['Treatment', 'Time', 'Details'],
     service: 'Treatment',
     chooseService: 'Choose a treatment',
@@ -152,7 +152,7 @@ const booking = {
     eyebrow: 'A te időd a pihenésre',
     title: 'Válassz egy nyugodt időpontot.',
     intro:
-      'Válaszd ki a kezelést, majd keresd meg a megfelelő napot és időpontot. A foglalás elküldés után azonnal véglegessé válik.',
+      'A választott kezelés után már csak a megfelelő napot és időpontot kell megtalálnod.',
     steps: ['Kezelés', 'Időpont', 'Adatok'],
     service: 'Kezelés',
     chooseService: 'Válassz kezelést',

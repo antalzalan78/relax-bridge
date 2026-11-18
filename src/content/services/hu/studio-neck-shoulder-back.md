@@ -13,6 +13,6 @@ prices:
     eur: 70
 ---
 
-A Nyak-váll-hátmasszázs különösen ajánlott ülőmunka, stressz vagy hosszan tartó megterhelés esetén, amikor a vállak és a hát folyamatosan túlterheltek.
+A nyak-váll-hátmasszázs jó választás lehet, ha sokat ülsz, vagy feszültséget érzel a válladban és a hátadban.
 
-A kezelés során célzott, mélyebb technikákkal dolgozom, amelyek segítenek ellazítani a feszes izmokat, csökkentik a fájdalmat és növelik a mozgástartományt.
+A kezelés során célzott, mélyebb fogásokkal figyelek a feszes területekre, hogy könnyebben ellazulhass.

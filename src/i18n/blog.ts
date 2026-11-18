@@ -9,6 +9,8 @@ const copy = {
     readTime: 'min leestijd', related: 'Verder lezen', sources: 'Bronnen', music: 'Muziektip',
     video: 'Bijbehorende video', series: 'Serie', previous: 'Vorig deel', next: 'Volgend deel',
     homeEyebrow: 'Uit de blog van Brigitta', homeTitle: 'Even tijd om te ontdekken.', homeLink: 'Bekijk de onderwerpen', homeIntro: 'Verhalen, praktische tips en inspiratie uit de wereld van massage.',
+    indexBottomEyebrow: 'Er valt altijd iets te ontdekken', indexBottomTitle: 'De blog groeit verder.',
+    indexBottomBody: 'Kom gerust terug voor nieuwe verhalen, gedachten en artikelen over ontspanning.', indexBottomCta: 'Bekijk de behandelingen',
     topicLabel: 'Onderwerp', articleNotFound: 'Dit artikel is niet beschikbaar.',
   },
   en: {
@@ -19,6 +21,8 @@ const copy = {
     readTime: 'min read', related: 'Keep reading', sources: 'Sources', music: 'Music suggestion',
     video: 'Related video', series: 'Series', previous: 'Previous part', next: 'Next part',
     homeEyebrow: 'From Brigitta’s blog', homeTitle: 'Take a moment to explore.', homeLink: 'Explore the topics', homeIntro: 'Stories, practical tips, and inspiration from the world of massage.',
+    indexBottomEyebrow: 'Always more to discover', indexBottomTitle: 'The blog is growing.',
+    indexBottomBody: 'Come back for new stories, reflections and articles about relaxation.', indexBottomCta: 'Explore the treatments',
     topicLabel: 'Topic', articleNotFound: 'This article is not available.',
   },
   hu: {
@@ -29,6 +33,8 @@ const copy = {
     readTime: 'perc olvasás', related: 'Kapcsolódó írások', sources: 'Források', music: 'Zeneajánló',
     video: 'Kapcsolódó videó', series: 'Sorozat', previous: 'Előző rész', next: 'Következő rész',
     homeEyebrow: 'Brigitta blogjából', homeTitle: 'Egy kis idő a felfedezésre.', homeLink: 'Témák megtekintése', homeIntro: 'Történetek, gyakorlati tippek és inspiráció a masszázs világából.',
+    indexBottomEyebrow: 'Mindig van mit felfedezni', indexBottomTitle: 'A blog folyamatosan bővül.',
+    indexBottomBody: 'Új történetekkel, gondolatokkal és a pihenéshez kapcsolódó írásokkal várlak vissza.', indexBottomCta: 'Megnézem a kezelési lehetőségeket',
     topicLabel: 'Téma', articleNotFound: 'Ez a cikk nem érhető el.',
   },
 } as const;
