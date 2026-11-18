@@ -11,4 +11,7 @@ test('Agustina’s complete English review and faithful translations appear in g
   assert.match(reviews, /<span>\{quote\.note\}<\/span>/);
   assert.equal((reviews.match(/name: 'Marilisa'/g) ?? []).length, 3);
   assert.doesNotMatch(reviews, /Marilisa Pimentel/);
+  assert.equal((reviews.match(/name: 'Renáta'/g) ?? []).length, 3);
+  assert.doesNotMatch(reviews, /Renáta Horváth/);
+  assert.match(reviews, /I had a nice, relaxing massage with Brigitta\. She is attentive and kind, making sure the atmosphere and pressure were just right the whole time\. I left feeling calm and rested\. Thank you!/);
 });
