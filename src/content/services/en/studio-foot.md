@@ -4,7 +4,7 @@ key: foot
 category: studio
 slug: foot-massage
 title: Foot Massage
-summary: Relaxing care for tired feet and lower legs. Ideal after long periods of standing, lots of walking, or whenever your feet simply deserve some extra rest.
+summary: Relaxing care for tired feet and lower legs.
 order: 4
 prices:
   - minutes: 30

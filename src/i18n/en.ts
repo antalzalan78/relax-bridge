@@ -37,12 +37,12 @@ export default {
   },
 
   hero: {
-    eyebrow: 'Your massage. Your moment.',
+    eyebrow: 'The Relax Bridge philosophy',
     title: 'Attention, choice, a moment for yourself.',
     intro:
       'At Relax Bridge, personal attention and the experience of rest matter just as much as the treatment itself. Massage is one of many ways to take care of yourself.',
     mobileIntro:
-      'Personal attention and rest in Tilburg–Reeshof. A moment for yourself, shaped around your needs.',
+      'At Relax Bridge, personal attention and the experience of rest matter just as much as the treatment itself. Massage is one of many ways to take care of yourself.',
     primaryCta: 'Book an appointment',
     secondaryCta: 'See the prices',
   },
@@ -54,6 +54,7 @@ export default {
 
   introduction: {
     title: 'About me',
+    kicker: 'Behind Relax Bridge',
     homeTitle: 'I’m Brigitta.',
     homeBody: 'I welcome you to a calm, attentive space in Tilburg–Reeshof. It matters to me that you can shape both your treatment and the small details of your rest time around your own needs.',
     paragraphs: [
@@ -89,7 +90,7 @@ export default {
 
   options: {
     studio: {
-      label: 'The studio',
+      label: 'Where I welcome you',
       title: 'You are welcome in my studio.',
       body: 'My home studio is a quiet place in Tilburg where you do not have to do anything.',
       location: {
@@ -103,7 +104,7 @@ export default {
       personalization: {
         title: 'Massage Creator',
         spotlightEyebrow: 'Your massage, your choice',
-        spotlightIntro: 'Want something more personal than a fixed treatment? Create your own massage: choose a base, add what suits you and see the duration and price straight away.',
+        spotlightIntro: 'Prefer not to choose a ready-made treatment? Create your own massage: choose a base treatment, add suitable elements and see the duration and price straight away.',
         spotlightCta: 'Create your massage',
         spotlightSteps: [
           { title: 'Choose a base', body: 'Start with a relaxing massage or focused back massage.' },
@@ -181,6 +182,7 @@ export default {
   },
 
   footer: {
+    tagline: 'A bridge between tension and rest.',
     rights: 'All rights reserved.',
     cookies: 'Cookie policy',
     privacy: 'Privacy notice',

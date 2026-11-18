@@ -14,7 +14,7 @@ const studioBooking = {
       'Stel je eigen behandeling samen uit de beschikbare behandelingselementen met de Massage Creator.',
     creatorHowTitle: 'Hoe werkt het?',
     creatorHowBody:
-      'Kies een relaxmassage of een gerichte nek-schouder-rugmassage als basis. Voeg daarna passende elementen toe en bekijk de volledige duur en prijs.',
+      'Kies een relaxmassage of een gerichte nek-, schouder- en rugmassage als basis. Voeg daarna passende elementen toe en bekijk de volledige duur en prijs.',
     creatorRules:
       'Je ziet alleen combinaties die ik als massagetherapeut professioneel verantwoord en goed combineerbaar vind. Zo kun je je behandeling vrij samenstellen.',
     creatorReview:
@@ -35,7 +35,7 @@ const studioBooking = {
         headline:
           'Helpt de gezichtsspieren te ontspannen, verfrist de huid en geeft een frisser, meer uitgerust gevoel.',
         detail:
-          'Vooral aanbevolen tijdens stressvolle periodes, bij vermoeidheid of wanneer je behoefte hebt aan wat extra verzorging en vernieuwing. Goed te combineren met een relaxmassage of nek-schouder-rugmassage.',
+          'Fijn tijdens drukke periodes, bij vermoeidheid of wanneer je behoefte hebt aan extra verzorging. Goed te combineren met een relaxmassage of nek-, schouder- en rugmassage.',
       },
       foot: {
         headline: 'Ontspannende verzorging voor vermoeide voeten en onderbenen.',

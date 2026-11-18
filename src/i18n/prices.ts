@@ -2,10 +2,10 @@ import type { Locale } from '../data/site';
 
 const pricePage = {
   nl: {
-    eyebrow: 'Relax Bridge · Tarieven',
+    eyebrow: 'Relax Bridge · Prijslijst',
     title: 'Alle prijzen op één plek.',
     metaDescription: 'Bekijk de prijzen van behandelingen in de studio en de Massage Creator in Tilburg.',
-    intro: 'Een overzicht van de behandelingen in de studio en jouw eigen samenstelling met de Massage Creator.',
+    intro: 'Een overzicht van de prijzen van vaste studiobehandelingen en de Massage Creator.',
     categoriesLabel: 'Spring naar een categorie',
     readyHeading: 'Vaste behandelingen',
     readyIntro: 'Kies een bestaande behandeling in de studio. De prijzen gelden per persoon en per behandeling.',
@@ -21,7 +21,7 @@ const pricePage = {
     eyebrow: 'Relax Bridge · Price list',
     title: 'All prices in one place.',
     metaDescription: 'See prices for studio treatments and the Massage Creator in Tilburg.',
-    intro: 'An overview of studio treatments and a custom treatment with the Massage Creator.',
+    intro: 'An overview of prices for ready-made studio treatments and the Massage Creator.',
     categoriesLabel: 'Jump to a category',
     readyHeading: 'Ready-made treatments',
     readyIntro: 'Choose an existing studio treatment. Prices are per person and per treatment.',

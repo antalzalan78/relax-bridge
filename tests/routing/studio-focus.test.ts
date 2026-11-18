@@ -12,13 +12,13 @@ test('the homepage introduces Relax Bridge before the featured Massage Creator a
   assert.match(homepage, /id=\{anchors\.services\}/);
   assert.match(homepage, /href=\{creatorHref\}/);
 
-  const titles = [
-    ['nl', 'Jouw massage. Jouw moment.'],
-    ['hu', 'A te masszázsod. A te pillanatod.'],
-    ['en', 'Your massage. Your moment.'],
+  const introductoryLabels = [
+    ['nl', 'De filosofie van Relax Bridge'],
+    ['hu', 'A Relax Bridge filozófiája'],
+    ['en', 'The Relax Bridge philosophy'],
   ];
-  for (const [locale, title] of titles) {
-    assert.ok((await source(`src/i18n/${locale}.ts`)).includes(title));
+  for (const [locale, label] of introductoryLabels) {
+    assert.ok((await source(`src/i18n/${locale}.ts`)).includes(label));
   }
 });
 

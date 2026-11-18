@@ -3,7 +3,7 @@ lang: nl
 key: neck-shoulder-back
 category: studio
 slug: nek-schouder-rugmassage
-title: Nek-Schouder-Rugmassage
+title: Nek-, schouder- en rugmassage
 summary: Gerichte, diepere technieken bij zittend werk, stress of langdurige belasting.
 order: 2
 prices:
@@ -13,6 +13,6 @@ prices:
     eur: 70
 ---
 
-De Nek-Schouder-Rugmassage wordt vooral aanbevolen bij zittend werk, stress of langdurige belasting, wanneer de schouders en rug voortdurend overbelast zijn.
+Deze nek-, schouder- en rugmassage is een fijne keuze als je veel zit of spanning in je schouders en rug voelt.
 
-Tijdens de behandeling werk ik met gerichte, diepere technieken die helpen vastzittende spieren los te maken, pijn te verminderen en de bewegingsvrijheid te verbeteren.
+Tijdens de behandeling gebruik ik gerichte, diepere technieken om de gespannen gebieden aandacht te geven en je te helpen ontspannen.

@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import BlogVisual from './BlogVisual.astro';
-import { blogPath, blogTopicPath, locales, type Locale } from '../data/site';
+import { blogPath, blogTopicPath, bookingChoicePath, locales, type Locale } from '../data/site';
 import { blogText } from '../i18n/blog';
 import { listPublished, listTopics } from '../lib/server/blog';
 import { publicTopics } from '../lib/blog-public';
@@ -29,5 +29,9 @@ const alternates = Object.fromEntries(locales.map((lang) => [lang, blogPath(lang
         </a>)}
       </div>
     </nav>}
+    <section class="blog-bottom blog-wrap">
+      <div><span class="blog-eyebrow">{c.indexBottomEyebrow}</span><h2>{c.indexBottomTitle}</h2><p>{c.indexBottomBody}</p></div>
+      <a class="btn btn--ghost" href={bookingChoicePath(locale)}>{c.indexBottomCta}<span aria-hidden="true">→</span></a>
+    </section>
   </div>
 </Base>

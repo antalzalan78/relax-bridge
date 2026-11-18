@@ -2,9 +2,7 @@
 import Base from '../layouts/Base.astro';
 import { bookingPath, massageCreatorPath, treatmentsPath, type Locale } from '../data/site';
 import { bookingText } from '../i18n/booking';
-import { t } from '../i18n';
 import { massageCreatorText } from '../i18n/massage-creator';
-import { studioBookingText } from '../i18n/studio-booking';
 import { creatorAddons, creatorBases, creatorMaximumMinutes } from '../lib/booking/massage-creator';
 
 interface Props {
@@ -14,8 +12,6 @@ interface Props {
 const { locale } = Astro.props;
 const copy = massageCreatorText(locale);
 const preferencesCopy = bookingText(locale);
-const guide = studioBookingText(locale);
-const guideSteps = t(locale).options.studio.personalization.spotlightSteps;
 const guideAside = {
   nl: { title: 'Elementen die bij jou passen. Een heldere keuze.', body: 'Tijdens het samenstellen zie je meteen waaruit je behandeling bestaat, hoe lang die duurt en wat die kost.', tag: 'Jij kiest, binnen professionele grenzen.' },
   en: { title: 'Elements that suit you. A clear choice.', body: 'As you build your massage, you can see what it includes, how long it takes and what it costs.', tag: 'Your choice, guided by professional care.' },
@@ -53,15 +49,25 @@ const creatorBaseOptions = [
         <h1>{copy.title}</h1>
         <p class="creator-hero__subtitle">{copy.subtitle}</p>
         <p class="lead">{copy.intro}</p>
-        <a class="btn btn--primary" href="#creator-builder">{guide.creatorCta}<span aria-hidden="true">→</span></a>
+        <a class="btn btn--primary" href="#creator-builder">{copy.heroCta}<span aria-hidden="true">→</span></a>
       </div>
       <aside class="creator-hero__guide"><svg aria-hidden="true" class="creator-hero__symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/><path d="M9 4v4M16 10v4M7 16v4"/></svg><h2>{guideAside.title}</h2><p>{guideAside.body}</p><small>{guideAside.tag}</small></aside>
     </div>
   </section>
 
   <section class="wrap creator-how" aria-labelledby="creator-how-title">
-    <span class="eyebrow">Relax Bridge</span><h2 id="creator-how-title">{guide.creatorHowTitle}</h2>
-    <ol>{guideSteps.map((step, index) => <li><span>{String(index + 1).padStart(2, '0')}</span><h3>{step.title}</h3><p>{step.body}</p></li>)}</ol>
+    <span class="eyebrow">{copy.howEyebrow}</span><h2 id="creator-how-title">{copy.howTitle}</h2>
+    <ol>{copy.howSteps.map((step, index) => <li><span>{String(index + 1).padStart(2, '0')}</span><h3>{step.title}</h3><p>{step.body}</p></li>)}</ol>
+  </section>
+
+  <section class="wrap creator-professional">
+    <span class="creator-professional__mark" aria-hidden="true">✓</span>
+    <div><h2>{copy.professionalTitle}</h2><p>{copy.professionalBody}</p></div>
+  </section>
+
+  <section class="wrap creator-next">
+    <div><h2>{copy.startTitle}</h2><p>{copy.startBody}</p></div>
+    <a class="btn btn--primary" href="#creator-builder">{copy.startCta}<span aria-hidden="true">→</span></a>
   </section>
 
   <section class="wrap creator-shell" id="creator-builder">
@@ -192,6 +198,7 @@ const creatorBaseOptions = [
       </section>
     </form>
   </section>
+  <p class="wrap creator-cross-link">{copy.readyPrompt} <a href={treatmentsPath(locale)}>{copy.readyCta} <span aria-hidden="true">→</span></a></p>
 </Base>
 
 <style>
@@ -213,6 +220,14 @@ const creatorBaseOptions = [
   .creator-how li > span { color: var(--clay-dark); font-size: .8rem; font-weight: 700; letter-spacing: .1em; }
   .creator-how h3 { margin: .6rem 0; font-size: clamp(1.25rem, 2vw, 1.6rem); }
   .creator-how p { margin: 0; color: var(--ink-soft); font-size: .9rem; }
+  .creator-professional { display: flex; gap: 1.25rem; align-items: flex-start; max-width: 84rem; margin-block: 0 2rem; padding: 1.5rem; border: 1px solid #d9e2c9; border-radius: var(--radius-lg); background: var(--pine-soft); }
+  .creator-professional__mark { display: grid; width: 2.3rem; height: 2.3rem; flex: none; place-items: center; border-radius: 50%; background: var(--pine-dark); color: #fff; }
+  .creator-professional h2 { margin: 0 0 .55rem; font-size: 1.4rem; }
+  .creator-professional p, .creator-next p { margin: 0; color: var(--ink-soft); line-height: 1.65; }
+  .creator-next { display: flex; flex-wrap: wrap; gap: 1rem 2rem; align-items: center; justify-content: space-between; max-width: 84rem; margin-bottom: 2.5rem; padding: 1.5rem; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); }
+  .creator-next h2 { margin: 0 0 .45rem; font-size: 1.7rem; }
+  .creator-cross-link { max-width: 84rem; margin-block: 2rem 3rem; color: var(--ink-soft); }
+  .creator-cross-link a { color: var(--pine-dark); font-weight: 700; }
   .creator-shell { padding-top: 0; }
   @media (min-width: 62rem) { .creator-hero > .wrap { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 1.5rem 4rem; } .creator-hero__copy { grid-column: 1; } .creator-hero__guide { grid-column: 2; grid-row: 2; } }
   @media (max-width: 47.99rem) {
@@ -231,6 +246,9 @@ const creatorBaseOptions = [
     .creator-how li > span { position: absolute; top: .1rem; left: 0; display: grid; width: 2rem; height: 2rem; place-items: center; border-radius: 50%; background: var(--pine-soft); color: var(--pine-dark); }
     .creator-how h3 { margin: .1rem 0 .45rem; font-size: 1.4rem; }
     .creator-how p { font-size: .9rem; line-height: 1.6; }
+    .creator-professional, .creator-next { padding: 1.25rem; }
+    .creator-professional h2 { font-size: 1.2rem; }
+    .creator-next .btn { width: 100%; justify-content: center; }
   }
 </style>
 
