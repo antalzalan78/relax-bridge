@@ -6,26 +6,26 @@ const { locale, compact = false } = Astro.props;
 const copy = {
   nl: {
     eyebrow: 'Persoonlijke ervaringen', title: 'Van mensen die hier al waren.',
-    read: 'Lees meer beoordelingen op Google', note: 'Google-beoordeling · vertaald fragment',
+    read: 'Lees meer beoordelingen op Google',
     quotes: [
-      { name: 'Marilisa Pimentel', text: 'Ik hield van de muziek en van de manier waarop al mijn zintuigen werden aangesproken.' },
-      { name: 'Agustina', text: 'Brigitta was heel professioneel en attent; ik voelde me de hele tijd op mijn gemak en ontspannen.' },
+      { name: 'Marilisa Pimentel', text: 'Ik hield van de muziek en van de manier waarop al mijn zintuigen werden aangesproken.', note: 'Google-beoordeling · vertaald fragment' },
+      { name: 'Agustina', text: 'Ik heb een heerlijke massage gehad! Brigitta was heel professioneel en attent. Ze zorgde ervoor dat ik me tijdens de hele behandeling op mijn gemak en ontspannen voelde. Ik heb er echt van genoten en zou haar zeker aanbevelen!', note: 'Google-beoordeling · vertaald uit het Engels' },
     ],
   },
   en: {
     eyebrow: 'Personal experiences', title: 'From people who have been here.',
-    read: 'Read more reviews on Google', note: 'Google review · translated excerpt',
+    read: 'Read more reviews on Google',
     quotes: [
-      { name: 'Marilisa Pimentel', text: 'I loved the music and the way it engaged all my senses.' },
-      { name: 'Agustina', text: 'Brigitta was very professional and attentive; I felt comfortable and relaxed throughout.' },
+      { name: 'Marilisa Pimentel', text: 'I loved the music and the way it engaged all my senses.', note: 'Google review · translated excerpt' },
+      { name: 'Agustina', text: 'I had a wonderful massage experience! Brigitta was very professional, attentive, and made me feel comfortable and relaxed throughout the session. I really enjoyed it and would definitely recommend her!', note: 'Google review · original English' },
     ],
   },
   hu: {
     eyebrow: 'Személyes tapasztalatok', title: 'Akik már jártak nálam.',
-    read: 'További vélemények a Google-on', note: 'Google-vélemény · magyar fordítás, részlet',
+    read: 'További vélemények a Google-on',
     quotes: [
-      { name: 'Marilisa Pimentel', text: 'Imádtam a zenét és azt, ahogyan minden érzékemre hatott.' },
-      { name: 'Agustina', text: 'Brigitta nagyon profi és figyelmes volt; végig kényelmesen és ellazulva éreztem magam.' },
+      { name: 'Marilisa Pimentel', text: 'Imádtam a zenét és azt, ahogyan minden érzékemre hatott.', note: 'Google-vélemény · magyar fordítás, részlet' },
+      { name: 'Agustina', text: 'Csodálatos masszázsélményben volt részem! Brigitta nagyon profi és figyelmes volt, és a kezelés alatt végig kényelmesen, ellazultan éreztem magam. Nagyon élveztem, és bátran ajánlom őt!', note: 'Google-vélemény · angolból fordítva' },
     ],
   },
 }[locale];
@@ -38,7 +38,7 @@ const copy = {
     {copy.quotes.map((quote) => <figure class="guest-reviews__card">
       <span class="guest-reviews__stars" aria-label="5 / 5">★★★★★</span>
       <blockquote>“{quote.text}”</blockquote>
-      <figcaption><strong>{quote.name}</strong><span>{copy.note}</span></figcaption>
+      <figcaption><strong>{quote.name}</strong><span>{quote.note}</span></figcaption>
     </figure>)}
   </div>
   <a class="guest-reviews__link" href={site.googleReviews} target="_blank" rel="noopener noreferrer">{copy.read} <span aria-hidden="true">↗</span></a>
