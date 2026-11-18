@@ -39,6 +39,12 @@ test('the design handoff copy stays localized without turning card headlines int
   assert.match(await source('src/components/Footer.astro'), /\{d\.choice\.readyLabel\}/);
 });
 
+test('Dutch guest-facing copy consistently names fixed treatments', async () => {
+  assert.match(await source('src/i18n/nl.ts'), /readyLabel: 'Vaste behandelingen'/);
+  assert.match(await source('src/components/TreatmentsPage.astro'), /title: 'Vaste behandelingen'/);
+  assert.match(await source('src/i18n/massage-creator.ts'), /readyPrompt: 'Liever een vaste behandeling kiezen\?'/);
+});
+
 test('Massage Creator and ready-made treatments are both bookable, with Creator shown first', async () => {
   const choice = await source('src/components/StudioVisitBookingPage.astro');
   assert.ok(choice.indexOf('id="massage-creator"') < choice.indexOf('id="ready-treatments"'));
