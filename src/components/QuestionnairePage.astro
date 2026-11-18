@@ -389,8 +389,18 @@ const weekendTiming = copy.timing.filter((option) => option.key.startsWith('week
     .timing-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
   @media (max-width: 35rem) {
+    .questionnaire-hero { padding-block: 1.5rem 2rem; }
+    .questionnaire-hero .eyebrow { margin-top: 1rem; }
+    .questionnaire-hero h1 { font-size: 2.3rem; line-height: 1.1; }
+    .questionnaire-hero .lead { font-size: .95rem; line-height: 1.7; }
+    .questionnaire-anonymous { gap: .65rem; margin-top: 1.3rem; padding: .85rem; font-size: .8rem; }
+    .questionnaire-layout { margin-top: 1.3rem; padding-bottom: 3rem; }
+    .questionnaire-form { gap: 1.2rem; }
+    .question-card { padding: 1.25rem 1.1rem; border-radius: 1.4rem; }
+    .question-card legend { font-size: 1.55rem; }
     .question-card > .option-list { grid-template-columns: 1fr; }
     .option-list--compact { grid-template-columns: 1fr; }
     .question-card__number { display: flex; width: 1.95rem; height: 1.95rem; margin: 0 0 0.65rem; font-size: 0.7rem; }
+    .option-card { min-height: 3rem; padding: .8rem; font-size: .9rem; }
   }
 </style>

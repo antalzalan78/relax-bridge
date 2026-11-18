@@ -215,7 +215,23 @@ const creatorBaseOptions = [
   .creator-how p { margin: 0; color: var(--ink-soft); font-size: .9rem; }
   .creator-shell { padding-top: 0; }
   @media (min-width: 62rem) { .creator-hero > .wrap { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 1.5rem 4rem; } .creator-hero__copy { grid-column: 1; } .creator-hero__guide { grid-column: 2; grid-row: 2; } }
-  @media (max-width: 47.99rem) { .creator-how ol { grid-template-columns: 1fr; } .creator-hero__guide { margin-top: 1.5rem; border-radius: 2rem; } }
+  @media (max-width: 47.99rem) {
+    .creator-hero { padding-block: 1.5rem 1.75rem; }
+    .creator-hero__copy { gap: .85rem; }
+    .creator-hero__copy h1 { font-size: clamp(2.35rem, 10vw, 3rem); line-height: 1.08; }
+    .creator-hero__copy .lead { font-size: 1rem; line-height: 1.7; }
+    .creator-hero__guide { display: grid; grid-template-columns: 1.5rem minmax(0, 1fr); align-items: start; gap: .75rem; max-width: none; margin-top: 1.5rem; padding: 1.125rem; border-radius: 1.125rem; }
+    .creator-hero__symbol { width: 1.5rem; height: 1.5rem; }
+    .creator-hero__guide h2, .creator-hero__guide small { display: none; }
+    .creator-hero__guide p { font-size: .875rem; line-height: 1.55; }
+    .creator-how { padding-block: 1.75rem 2rem; }
+    .creator-how h2 { font-size: 1.85rem; }
+    .creator-how ol { grid-template-columns: 1fr; gap: 1.4rem; margin-top: 1.5rem; }
+    .creator-how li { position: relative; min-height: 2.5rem; padding: 0 0 0 3rem; border: 0; border-radius: 0; background: transparent; }
+    .creator-how li > span { position: absolute; top: .1rem; left: 0; display: grid; width: 2rem; height: 2rem; place-items: center; border-radius: 50%; background: var(--pine-soft); color: var(--pine-dark); }
+    .creator-how h3 { margin: .1rem 0 .45rem; font-size: 1.4rem; }
+    .creator-how p { font-size: .9rem; line-height: 1.6; }
+  }
 </style>
 
 <script>
