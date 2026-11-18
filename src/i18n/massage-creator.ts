@@ -20,7 +20,7 @@ const massageCreator = {
     startTitle: 'Klaar om je massage samen te stellen?',
     startBody: 'De Massage Creator leidt je stap voor stap door de mogelijkheden.',
     startCta: 'Open de Massage Creator',
-    readyPrompt: 'Liever een losse massage kiezen?',
+    readyPrompt: 'Liever een vaste behandeling kiezen?',
     readyCta: 'Bekijk de behandelingen',
     steps: ['Basisbehandeling', 'Aanvullingen', 'Overzicht', 'Tijdstip'],
     baseHeading: 'Kies je basisbehandeling',

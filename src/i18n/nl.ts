@@ -74,7 +74,7 @@ export default {
     creatorTitle: 'Stel je eigen massage samen.',
     creatorBody: 'Kies een basismassage en passende aanvullingen. De totale duur en prijs zie je vooraf.',
     creatorCta: 'Stel mijn massage samen',
-    readyLabel: 'Losse massages',
+    readyLabel: 'Vaste behandelingen',
     readyTitle: 'Kies uit onze vaste behandelingen.',
     readyBody: 'Kies uit een relaxmassage, nek-, schouder- en rugmassage, gezichts- of voetmassage. Kies de duur; de details stemmen we op jou af.',
     readyCta: 'Bekijk de behandelingen',
