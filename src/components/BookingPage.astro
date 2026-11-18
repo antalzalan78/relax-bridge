@@ -929,4 +929,24 @@ const creatorConfig = { bases: creatorBases, addons: creatorAddons, maximumMinut
   .confirmation-reference { display: grid; gap: 0.25rem; margin: 2rem 0; padding: 1.25rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--paper); }
   .confirmation-reference span { color: var(--ink-soft); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; }
   .confirmation-reference strong { color: var(--pine-dark); font-family: ui-monospace, monospace; font-size: 1.25rem; letter-spacing: 0.05em; }
+  @media (max-width: 38rem) {
+    .booking-hero { padding-block: 1.5rem 1.3rem; }
+    .booking-hero .back-link { margin-bottom: 1.2rem; }
+    .booking-hero h1 { font-size: 2.05rem; line-height: 1.15; }
+    .booking-hero .lead { font-size: .94rem; line-height: 1.7; }
+    .booking-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .3rem; margin-top: 1.3rem; padding-top: .9rem; }
+    .booking-steps li { min-height: 3.8rem; flex-direction: column; align-items: flex-start; gap: .2rem; padding: .55rem .6rem; border: 1px solid var(--border); border-radius: .75rem; font-size: .68rem; line-height: 1.3; }
+    .booking-steps span { font-size: .63rem; }
+    .booking-shell { padding-block: 1.25rem 2rem; }
+    .booking-form { gap: 1rem; }
+    .booking-card, .booking-confirmation { padding: 1.3rem; border-radius: 1.4rem; }
+    .booking-card--choice { gap: 1.25rem; }
+    .booking-card__number { top: .6rem; right: 1.1rem; font-size: 2.8rem; }
+    .booking-calendar { max-width: none; }
+    .booking-calendar__weekdays, .booking-calendar__grid { gap: .18rem; }
+    .slot-fieldset { padding-top: 1.1rem; }
+    .slot-grid { grid-template-columns: repeat(auto-fill, minmax(4.7rem, 1fr)); gap: .45rem; }
+    .creator-fieldset { padding: 1rem; }
+    .creator-fieldset__actions .btn { width: 100%; justify-content: center; }
+  }
 </style>

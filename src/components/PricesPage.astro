@@ -160,7 +160,18 @@ const addonRows = [
   .price-overview-rule { max-width: 47rem; margin: 1.2rem 0 0; color: var(--ink-soft); font-size: 0.88rem; line-height: 1.65; }
   @media (min-width: 50rem) { .price-overview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   @media (max-width: 36rem) {
+    .price-overview-hero { padding-block: 1.5rem; }
+    .price-overview-hero h1 { font-size: 2.2rem; }
+    .price-overview-hero .lead { font-size: .95rem; line-height: 1.7; }
+    .price-overview-nav { gap: .5rem; margin-top: 1.3rem; }
+    .price-overview-nav a { display: inline-flex; min-height: 2.75rem; align-items: center; font-size: .75rem; }
+    .price-overview-section { padding-top: 1.8rem; }
     .price-overview-heading { gap: 0.7rem; }
+    .price-overview-heading h2 { font-size: 1.8rem; }
+    .price-overview-heading p { font-size: .9rem; }
+    .price-overview-panel { padding: 1.3rem; border-radius: 1.35rem; }
+    .price-overview-panel h3 { font-size: 1.5rem; }
+    .price-overview-list li { gap: .6rem; font-size: .9rem; }
     .price-overview-panel__footer .btn, .price-overview-section__footer .btn { width: 100%; justify-content: center; }
   }
 </style>
